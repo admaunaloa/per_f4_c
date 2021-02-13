@@ -1,15 +1,47 @@
 ## ALOHA!
-This project is a hardware abstraction (HAL) library for STM32 micro-controller peripherals written in C.  
+This project is a hardware abstraction (HAL) library for STM32 F4 micro-controller peripherals written in C.  
 The advantages of this libary are:
 * Fast execution!
 * Small size of executable
 * Interrupt and thread safe register manipulation
 * Type safe consistent API interface
 
-Bitband technology is used extensively to maximise performance and minimise footprint.  
+Tests on GPIO peripheral functions showed 50-60% shorter execution time and 50% smaller footprint.  
+Bitband technology is used extensively to maximise performance and minimise footprint.
 Bitband is excellently explained by: [Martin Hubacek](http://www.martinhubacek.cz/arm/advanced-arm-cortex-tips/bit-banding---fast-and-safe-bit-manipulation)
 
 ## USAGE
+Two examples. The first one is a GPIO set output, the second is an interrupt handler.
+### GPIO
+```c++
+
+    volatile bool value = true;
+	
+	 // Enable the green LED
+    HAL_GPIO_WritePin(LD1_GPIO_Port, LD1_Pin, value);
+
+    //***********************************************
+
+    // Single definition of green LED
+    static per_inline const per_gpio_out_t* const bsp_gpio_led_green(void)
+    {
+        static const per_gpio_out_t gpio =
+        {
+            .Per = PER_GPIOB,
+            .Pin = PER_GPIO_PIN_0,
+        };
+        return &gpio;
+    }
+
+    volatile bool value = true;
+
+    // Enable the green LED
+	per_gpio_set_out(bsp_gpio_led_green(), value);
+```
+
+
+
+### IRQ
 Below are two examples. The first one is an interrupt handler with the standard implementation. The second one is the same interrupt handler with this interface.
 It compiles to a smaller and faster executable and it has a safer syntax.
 
@@ -27,9 +59,8 @@ It compiles to a smaller and faster executable and it has a safer syntax.
             // ...
         }
     }
-```
 
-```c++
+	//*********************************************
     #include "per_tim_gp.h"
 
     void TIM3_IRQHandler(void)
