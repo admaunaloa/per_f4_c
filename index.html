@@ -1,0 +1,159 @@
+<html>
+  <head>
+   <meta name="google-site-verification" content="LRh-NOnBtxH0oF4fEHKJDm8nBBLzDV1U09QCOvJf4uA" />
+   <meta name="keywords" content="STM32, HAL, peripheral, bitband, bit-band, C, alternative, safe, fast small" />
+   <style> body {font-family: verdana;} code {font-size: large;}</style>
+  </head>
+  <body>
+  
+<h2><a id="user-content-aloha" class="anchor" aria-hidden="true" href="#aloha"></a>ALOHA!</h2>
+<p>This project is a hardware abstraction (HAL) library for STM32 micro-controller peripherals written in C.<br>
+The advantages of this libary are:</p>
+<ul>
+<li>Fast execution!</li>
+<li>Small size of executable</li>
+<li>Interrupt and thread safe register manipulation</li>
+<li>Type safe consistent API interface</li>
+</ul>
+<p>Bitband technology is used extensively to maximise performance and minimise footprint.<br>
+Bitband is excellently explained by: <a href="http://www.martinhubacek.cz/arm/advanced-arm-cortex-tips/bit-banding---fast-and-safe-bit-manipulation" rel="nofollow">Martin Hubacek</a></p>
+<h2><a id="user-content-usage" class="anchor" aria-hidden="true" href="#usage"></a>USAGE</h2>
+<p>Below are two examples. The first one is an interrupt handler with the standard implementation. The second one is the same interrupt handler with this interface.
+It compiles to a smaller and faster executable and it has a safer syntax.</p>
+<div class="highlight highlight-source-c++"><pre>    #<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>stm32f4xx_it.h<span class="pl-pds">"</span></span>
+
+    <span class="pl-k">void</span> <span class="pl-en">TIM3_IRQHandler</span>(<span class="pl-k">void</span>)
+    {
+        TIM_HandleTypeDef *htim = &amp;htim3; <span class="pl-c"><span class="pl-c">//</span> Create handle to correct timer</span>
+	
+        <span class="pl-k">if</span> (<span class="pl-c1">__HAL_TIM_GET_FLAG</span>(htim, TIM_FLAG_UPDATE) != RESET) <span class="pl-c"><span class="pl-c">//</span> Check the Update event</span>
+        {
+            <span class="pl-c1">__HAL_TIM_CLEAR_IT</span>(htim, TIM_IT_UPDATE); <span class="pl-c"><span class="pl-c">//</span> Clear the Update event</span>
+            <span class="pl-c"><span class="pl-c">//</span> user code to handle interrupt reason</span>
+            <span class="pl-c"><span class="pl-c">//</span> ...</span>
+        }
+    }</pre></div>
+<div class="highlight highlight-source-c++"><pre>    #<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>per_tim_gp.h<span class="pl-pds">"</span></span>
+
+    <span class="pl-k">void</span> <span class="pl-en">TIM3_IRQHandler</span>(<span class="pl-k">void</span>)
+    {
+        <span class="pl-k">if</span> (<span class="pl-c1">per_tim_gp_rdclr_uif</span>(<span class="pl-c1">per_tim_gp_3</span>()))
+        {
+            <span class="pl-c"><span class="pl-c">//</span> user code to handle interrupt reason</span>
+            <span class="pl-c"><span class="pl-c">//</span> ...</span>
+        }
+    }</pre></div>
+<h2><a id="user-content-syntax" class="anchor" aria-hidden="true" href="#syntax"></a>SYNTAX</h2>
+<p>For each peripheral bit the possible get and set functions are provided.
+The syntax is</p>
+<ol>
+<li><strong>per_</strong>      Peripheral library prefix</li>
+<li><strong><em>usart</em></strong>   Peripheral type USART</li>
+<li><strong>_ue</strong>       Peripheral field name as in the STM32 manual. UE is Usart Enable.</li>
+<li><strong>(...)</strong>     Function</li>
+</ol>
+<p>Example:</p>
+<div class="highlight highlight-source-c++"><pre>    <span class="pl-k">bool</span> <span class="pl-en">per_usart_ue</span>(<span class="pl-c1">per_usart_t</span>* )           <span class="pl-c"><span class="pl-c">//</span> returns the value of the Usart Enable bit.</span>
+    void per_usart_set_ue(<span class="pl-c1">per_usart_t</span>* , <span class="pl-k">bool</span>) <span class="pl-c"><span class="pl-c">//</span> modifies the value of Usart Enable bit.</span></pre></div>
+<p>The per_usart_t pointers are provided in a function format</p>
+<div class="highlight highlight-source-c++"><pre>    <span class="pl-c1">per_usart_t</span>* <span class="pl-en">per_usart_1</span>(<span class="pl-k">void</span>)
+    per_usart_t* per_usart_2(<span class="pl-k">void</span>)
+	...</pre></div>
+<p>Enabling USART3 comes down to:</p>
+<div class="highlight highlight-source-c++"><pre>    <span class="pl-en">per_usart_set_ue</span>(per_usart_3(), true);</pre></div>
+<p>This set UE example results in a minimal number of assembly instructions because
+both functions are inlined and bitband is used. Both functions also make it
+type-safe and they enable features such as zero-cost error checking.</p>
+<h2><a id="user-content-development-status-jan-2021" class="anchor" aria-hidden="true" href="#development-status-jan-2021"></a>DEVELOPMENT STATUS (jan 2021)</h2>
+<p>Status of peripheral code</p>
+<ul>
+<li>100% ADC, DMA, SPI, USART, GPIO, TIM_AD, TIM_GP, DES</li>
+<li>50%  PWR, RCC, SYS_CFG, RCC</li>
+<li>10%  ETH</li>
+</ul>
+<p>Status generics</p>
+<ul>
+<li>100% BITBAND, LOGGING</li>
+</ul>
+<h2><a id="user-content-structure" class="anchor" aria-hidden="true" href="#structure"></a>STRUCTURE</h2>
+<p>The library consists the following layers:</p>
+<h3><a id="user-content-generic-type-definitions" class="anchor" aria-hidden="true" href="#generic-type-definitions"></a>generic type definitions</h3>
+<p>In per_bit_f4.h generic field types are provided. The types are available per access rule and per bit size.
+For example per_bit_rw1_t is a 1 bit size read and write peripheral field.</p>
+<h3><a id="user-content-generic-functions-for-each-generic-type" class="anchor" aria-hidden="true" href="#generic-functions-for-each-generic-type"></a>generic functions for each generic type</h3>
+<p>In per_bit_f4.h generic functions are provided. Each function accesses one specific field type.
+For example per_bit_rw1_set(..., ...) sets one specific bit.</p>
+<h3><a id="user-content-peripheral-specific-structure" class="anchor" aria-hidden="true" href="#peripheral-specific-structure"></a>peripheral specific structure</h3>
+<p>Each peripheral has a specific structure defining all the internal fields with size, type and position. It is assembled from the generic types.
+per_usart_f4.h shows an example of this.</p>
+<div class="highlight highlight-source-c++"><pre>    <span class="pl-k">typedef</span> <span class="pl-k">struct</span>
+    {
+        <span class="pl-c1">per_bit_rw1_t</span> Ue; <span class="pl-c"><span class="pl-c">//</span>/&lt; USART enable</span>
+        <span class="pl-c1">per_bit_rw2_t</span> Stop; <span class="pl-c"><span class="pl-c">//</span>/&lt; STOP bits</span>
+        <span class="pl-c1">per_bit_rw8_t</span> Psc; <span class="pl-c"><span class="pl-c">//</span>/&lt; Pre-scaler value</span>
+    } <span class="pl-c1">per_usart_per_t</span>;	</pre></div>
+<p>Each single line defines six properties of the specific peripheral field for the compiler.</p>
+<ul>
+<li>The type <strong>per_bit_rw1_t</strong> provides both the bit size and the access rules.</li>
+<li>The position in the containing struct provides the register address, the bit offset in the register and also the bitband address.</li>
+<li>The name of the containing struct provides a small scope.</li>
+</ul>
+<p>Compare this with alternatives that require calculations with magic numbers and global scoped names.
+These first three layers are very powerfull and they allow to define a complete new peripheral with minimal errors and in minimal time.</p>
+<h3><a id="user-content-peripheral-field-specific-functions" class="anchor" aria-hidden="true" href="#peripheral-field-specific-functions"></a>peripheral field specific functions</h3>
+<p>Each peripheral field has specific functions to access this field.<br>
+If relevant an enum is provided to interpret the value of the field correctly.
+per_usart_f4.h shows examples of this.</p>
+<div class="highlight highlight-source-c++"><pre>    <span class="pl-c"><span class="pl-c">//</span>/ USART enable get</span>
+    <span class="pl-k">static</span> per_inline <span class="pl-k">bool</span> <span class="pl-en">per_usart_ue</span>(<span class="pl-k">const</span> <span class="pl-c1">per_usart_t</span>* <span class="pl-k">const</span> usart)
+    {
+        <span class="pl-k">return</span> <span class="pl-c1">per_bit_rw1</span>(&amp;usart-&gt;<span class="pl-smi">Per</span>-&gt;<span class="pl-smi">Ue</span>);
+    }
+
+    <span class="pl-c"><span class="pl-c">//</span>/ USART enable set</span>
+    <span class="pl-k">static</span> per_inline <span class="pl-k">void</span> <span class="pl-en">per_usart_set_ue</span>(<span class="pl-k">const</span> <span class="pl-c1">per_usart_t</span>* <span class="pl-k">const</span> usart, <span class="pl-k">bool</span> val)
+    {
+        <span class="pl-c1">per_bit_rw1_set</span>(&amp;usart-&gt;<span class="pl-smi">Per</span>-&gt;<span class="pl-smi">Ue</span>, val);
+    }</pre></div>
+<h3><a id="user-content-peripheral-variants" class="anchor" aria-hidden="true" href="#peripheral-variants"></a>peripheral variants</h3>
+<p>Peripherals have variations that are handled by include files in the STM32Fxxx/inc directory.
+Variants are for example the UART and USART. also the STM32F407 has six UART/USARTS while the STM32F439 has eight of these.
+These variants are handled with a descriptor structure for each specific peripheral.<br>
+This descriptor structure contains</p>
+<ul>
+<li>a pointer to the real peripheral structure</li>
+<li>enums that define the variant</li>
+<li>function pointers to get the base frequency</li>
+<li>error logging enums</li>
+</ul>
+<p>The prevention of functions accessing non-suporting peripheral variants is done with a zero-cost check.
+If the variant is correct the compiler will optimise it out, if(0), if the variant is wrong, if(1) the linker will report this non existing function.</p>
+<div class="highlight highlight-source-c++"><pre>    <span class="pl-k">if</span> (usart-&gt;Uart)
+    {
+        <span class="pl-c1">per_log_err_function_not_supported</span>();
+    }</pre></div>
+<p>An example is STM32F439/inc/per_usart.h.</p>
+<h3><a id="user-content-peripheral-descriptor-functions" class="anchor" aria-hidden="true" href="#peripheral-descriptor-functions"></a>peripheral descriptor functions</h3>
+<p>Access to the peripheral descriptors is done via functions that return this descriptor. This function interface is future proof and it is consistent for all peripherals.
+For example <strong>per_usart_1(void)</strong>. The functions limit the scope the desciptor structure</p>
+<h2><a id="user-content-inline" class="anchor" aria-hidden="true" href="#inline"></a>inline</h2>
+<p>All the layers are provided in header files and inline functions. This allows the compiler to resolve all constants and optimise this all to a minimum size executable with fast execution times.
+The use of inline functions makes the API consistent and type safe.</p>
+<h2><a id="user-content-debug-logging" class="anchor" aria-hidden="true" href="#debug-logging"></a>debug logging</h2>
+<p>Runtime debug logging is provided in bsp_dep.c. This file contains a call-back function that is called from the per_... files in case of a runtime fault.
+A default log implementation captures this errors. It is up to the user to adapt and extend this file.</p>
+<h2><a id="user-content-exceptions" class="anchor" aria-hidden="true" href="#exceptions"></a>exceptions</h2>
+<p>There are a few hardware peripheral registers that are better or faster accessed by register instead of bitband.
+The specific functions for this register handle this implicitly. An example of this is TIMx_SR.</p>
+<h2><a id="user-content-compilation" class="anchor" aria-hidden="true" href="#compilation"></a>COMPILATION</h2>
+<p>The library can coexist with the standard library. Just add the directories to the project.
+Note: the STMF439 is also good for other STM32F4 types, it provides all possible peripherals.
+Add the include libraries: STM32/inc, STM32F439/inc, Nucleo_439
+If required, compile the files: per_bit.c, per_gpio.c, per_dep.c and bsp_dep.c</p>
+<h2><a id="user-content-the-end" class="anchor" aria-hidden="true" href="#the-end"></a>THE END</h2>
+<p>If you have any tips, remarks, questions and suggestions please send an email.<br>
+Developing more efficient software can decrease energy consumption, decrease CO2 exhaust and help our planet :-)</p>
+
+
+  </body>
+</html>
