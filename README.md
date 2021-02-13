@@ -35,11 +35,14 @@ Two examples. The first one is a GPIO set output, the second is an interrupt han
         };
         return &gpio;
     }
+	
+	
+	
 
     volatile bool value = true;
 
     // Enable the green LED
-	per_gpio_set_out(bsp_gpio_led_green(), value);
+    per_gpio_set_out(bsp_gpio_led_green(), value);
 ```
 
 
