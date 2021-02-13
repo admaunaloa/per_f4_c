@@ -14,14 +14,17 @@ Bitband is excellently explained by: [Martin Hubacek](http://www.martinhubacek.c
 Two examples. The first one is a GPIO set output, the second is an interrupt handler.
 ### GPIO
 ```c++
-
     volatile bool value = true;
 	
 	 // Enable the green LED
     HAL_GPIO_WritePin(LD1_GPIO_Port, LD1_Pin, value);
 
-    //***********************************************
 
+
+    // per_f4_c *******************************************
+	
+    #include "per_gpio.h"
+   
     // Single definition of green LED
     static per_inline const per_gpio_out_t* const bsp_gpio_led_green(void)
     {
@@ -60,7 +63,10 @@ It compiles to a smaller and faster executable and it has a safer syntax.
         }
     }
 
-	//*********************************************
+
+
+    // per_f4_c *******************************************
+	
     #include "per_tim_gp.h"
 
     void TIM3_IRQHandler(void)
