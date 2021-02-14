@@ -178,7 +178,7 @@ The specific functions for this register handle this implicitly. An example of t
 
 ## COMPILATION
 The library can coexist with the standard library. Just add the directories to the project.
-Note: the STMF439 is also good for other F4 types, it provides all possible peripherals.
+Note: the F439 is also good for other F4 types, it provides all possible peripherals.
 Add the include libraries: F4/inc, F439/inc, Nucleo
 If required, compile the files: per_bit.c, per_gpio.c, per_dep.c and bsp_dep.c
 
