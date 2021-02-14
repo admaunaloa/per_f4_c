@@ -1,5 +1,5 @@
 ## ALOHA!
-This project is a hardware abstraction (HAL) library for STM32 F4 micro-controller peripherals written in C.  
+This project is a hardware abstraction (HAL) library for F4 series micro-controller peripherals written in C.  
 The advantages of this libary are:
 * Fast execution!
 * Small size of executable
@@ -14,15 +14,6 @@ Bitband is excellently explained by: [Martin Hubacek](http://www.martinhubacek.c
 Two examples. The first one is a GPIO set output, the second is an interrupt handler.
 ### GPIO
 ```c++
-    volatile bool value = true;
-	
-	 // Enable the green LED
-    HAL_GPIO_WritePin(LD1_GPIO_Port, LD1_Pin, value);
-
-
-
-    // per_f4_c *******************************************
-	
     #include "per_gpio.h"
    
     // Single definition of green LED
@@ -48,28 +39,7 @@ Two examples. The first one is a GPIO set output, the second is an interrupt han
 
 
 ### IRQ
-Below are two examples. The first one is an interrupt handler with the standard implementation. The second one is the same interrupt handler with this interface.
-It compiles to a smaller and faster executable and it has a safer syntax.
-
 ```c++
-    #include "stm32f4xx_it.h"
-
-    void TIM3_IRQHandler(void)
-    {
-        TIM_HandleTypeDef *htim = &htim3; // Create handle to correct timer
-	
-        if (__HAL_TIM_GET_FLAG(htim, TIM_FLAG_UPDATE) != RESET) // Check the Update event
-        {
-            __HAL_TIM_CLEAR_IT(htim, TIM_IT_UPDATE); // Clear the Update event
-            // user code to handle interrupt reason
-            // ...
-        }
-    }
-
-
-
-    // per_f4_c *******************************************
-	
     #include "per_tim_gp.h"
 
     void TIM3_IRQHandler(void)
@@ -87,7 +57,7 @@ For each peripheral bit the possible get and set functions are provided.
 The syntax is
 1. **per_**      Peripheral library prefix
 1. **_usart_**   Peripheral type USART
-1. **_ue**       Peripheral field name as in the STM32 manual. UE is Usart Enable.
+1. **_ue**       Peripheral field name as in the manual. UE is Usart Enable.
 1. **(...)**     Function
 
 Example:
@@ -112,7 +82,7 @@ This set UE example results in a minimal number of assembly instructions because
 both functions are inlined and bitband is used. Both functions also make it
 type-safe and they enable features such as zero-cost error checking.
 
-## DEVELOPMENT STATUS (jan 2021)
+## DEVELOPMENT STATUS (feb 2021)
 Status of peripheral code
 * 100% ADC, DMA, SPI, USART, GPIO, TIM_AD, TIM_GP, DES 
 * 50%  PWR, RCC, SYS_CFG, RCC
@@ -171,8 +141,8 @@ per_usart_f4.h shows examples of this.
 ```
 
 ### peripheral variants
-Peripherals have variations that are handled by include files in the STM32Fxxx/inc directory.
-Variants are for example the UART and USART. also the STM32F407 has six UART/USARTS while the STM32F439 has eight of these.
+Peripherals have variations that are handled by include files in the F4xxx/inc directory.
+Variants are for example the UART and USART. also the F407 has six UART/USARTS while the F439 has eight of these.
 These variants are handled with a descriptor structure for each specific peripheral.  
 This descriptor structure contains
 * a pointer to the real peripheral structure
@@ -188,7 +158,7 @@ If the variant is correct the compiler will optimise it out, if(0), if the varia
         per_log_err_function_not_supported();
     }
 ```
-An example is STM32F439/inc/per_usart.h.
+An example is F439/inc/per_usart.h.
 
 ### peripheral descriptor functions
 Access to the peripheral descriptors is done via functions that return this descriptor. This function interface is future proof and it is consistent for all peripherals.
@@ -208,8 +178,8 @@ The specific functions for this register handle this implicitly. An example of t
 
 ## COMPILATION
 The library can coexist with the standard library. Just add the directories to the project.
-Note: the STMF439 is also good for other STM32F4 types, it provides all possible peripherals.
-Add the include libraries: STM32/inc, STM32F439/inc, Nucleo_439
+Note: the STMF439 is also good for other F4 types, it provides all possible peripherals.
+Add the include libraries: F4/inc, F439/inc, Nucleo
 If required, compile the files: per_bit.c, per_gpio.c, per_dep.c and bsp_dep.c
 
 ## THE END
