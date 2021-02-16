@@ -1,14 +1,19 @@
 ## ALOHA!
 This project is a hardware abstraction (HAL) library for F4 series micro-controller peripherals written in C.  
 The advantages of this libary are:
-* Fast execution!
-* Small size of executable
+* Faster execution (2x)
+* Smaller size (1/2)
 * Interrupt and thread safe register manipulation
 * Type safe consistent API interface
+* It can co-exist with another HAL library
 
-Tests on GPIO peripheral functions showed 50-60% shorter execution time and 50% smaller footprint.  
-Bitband technology is used extensively to maximise performance and minimise footprint.
-Bitband is excellently explained by: [Martin Hubacek](http://www.martinhubacek.cz/arm/advanced-arm-cortex-tips/bit-banding---fast-and-safe-bit-manipulation)
+Tests on typical GPIO peripheral functions showed 50% shorter execution time and 50% smaller footprint.  
+Bitband technology is used extensively to maximise performance and to minimise footprint.
+These figures can easily be verified by executing instructions under the chapter TEST below.
+This library is ideally to give existing bare-metal projects a performance boost.
+
+### Bitband
+This technique is excellently explained by: [Martin Hubacek](http://www.martinhubacek.cz/arm/advanced-arm-cortex-tips/bit-banding---fast-and-safe-bit-manipulation)
 
 ## USAGE
 Two examples. The first one is a GPIO set output, the second is an interrupt handler.
@@ -16,7 +21,7 @@ Two examples. The first one is a GPIO set output, the second is an interrupt han
 ```c++
     #include "per_gpio.h"
    
-    // Single definition of green LED
+    // Definition of green LED
     static per_inline const per_gpio_out_t* const bsp_gpio_led_green(void)
     {
         static const per_gpio_out_t gpio =
@@ -27,15 +32,10 @@ Two examples. The first one is a GPIO set output, the second is an interrupt han
         return &gpio;
     }
 	
-	
-	
-
-    volatile bool value = true;
 
     // Enable the green LED
-    per_gpio_set_out(bsp_gpio_led_green(), value);
+    per_gpio_set_out(bsp_gpio_led_green(), true);
 ```
-
 
 
 ### IRQ
@@ -44,12 +44,41 @@ Two examples. The first one is a GPIO set output, the second is an interrupt han
 
     void TIM3_IRQHandler(void)
     {
+        // Read and clear the Timer _ GeneralPurpose _ Update Interrupt Flag	
         if (per_tim_gp_rdclr_uif(per_tim_gp_3()))
         {
             // user code to handle interrupt reason
             // ...
         }
     }
+```
+
+## TEST
+Add the include libraries F4/inc and F439ZI/inc to an existing project. Add the code below to a source file. Compile it with -O3.  
+Note the size of the executable. Replace per_gpio_set_out() with another function that sets an GPIO output, compile and compare the size.  
+```c++
+    #include "per_gpio.h"
+	
+   
+    // Single definition of green LED
+    static per_inline const per_gpio_out_t* const bsp_gpio_led_green(void)
+    {
+        // Replace PER_GPIOB and PER_GPIO_PIN_0 with valid port and pin values or an output
+        static const per_gpio_out_t gpio =
+        {
+            .Per = PER_GPIOB,
+            .Pin = PER_GPIO_PIN_0,
+        };
+        return &gpio;
+    }
+	
+	
+	
+    // Make a variable value here. Replace dots by some non const value.
+    bool value = ...;
+
+    // Enable the green LED
+    per_gpio_set_out(bsp_gpio_led_green(), value);
 ```
 
 ## SYNTAX
@@ -85,7 +114,7 @@ type-safe and they enable features such as zero-cost error checking.
 ## DEVELOPMENT STATUS (feb 2021)
 Status of peripheral code
 * 100% ADC, DMA, SPI, USART, GPIO, TIM_AD, TIM_GP, DES 
-* 50%  PWR, RCC, SYS_CFG, RCC
+* 50%  PWR, RCC, SYS_CFG
 * 10%  ETH
 
 Status generics
@@ -161,12 +190,13 @@ If the variant is correct the compiler will optimise it out, if(0), if the varia
 An example is F439/inc/per_usart.h.
 
 ### peripheral descriptor functions
-Access to the peripheral descriptors is done via functions that return this descriptor. This function interface is future proof and it is consistent for all peripherals.
-For example **per_usart_1(void)**. The functions limit the scope the desciptor structure
+Access to the peripheral descriptors is done via functions that return this descriptor.  
+This function interface is future proof and it is consistent for all peripherals.
+For example **per_usart_1(void)**. The functions limit the scope the desciptor structure.  
 
 ## inline
 All the layers are provided in header files and inline functions. This allows the compiler to resolve all constants and optimise this all to a minimum size executable with fast execution times.
-The use of inline functions makes the API consistent and type safe.
+The use of inline functions makes the API consistent and type safe.  
 
 ## debug logging
 Runtime debug logging is provided in bsp_dep.c. This file contains a call-back function that is called from the per_... files in case of a runtime fault.
@@ -177,11 +207,11 @@ There are a few hardware peripheral registers that are better or faster accessed
 The specific functions for this register handle this implicitly. An example of this is TIMx_SR.  
 
 ## COMPILATION
-The library can coexist with the standard library. Just add the directories to the project.
-Note: the F439 is also good for other F4 types, it provides all possible peripherals.
-Add the include libraries: F4/inc, F439/inc, Nucleo
-If required, compile the files: per_bit.c, per_gpio.c, per_dep.c and bsp_dep.c
+The library can coexist with other HAL libraries. Just add the directories to the project.
+Note: the F439ZI is also good for other F4 types, it provides all possible peripherals.
+Add the include libraries: F4/inc, F439ZI/inc, Nucleo/inc
+If required, compile the files: per_bit.c, per_gpio.c, per_dep.c and bsp_dep.c  
 
 ## THE END
 If you have any tips, remarks, questions and suggestions please send an email.  
-Developing more efficient software can decrease energy consumption, decrease CO2 exhaust and help our planet :-) 
+Developing more efficient software can decrease energy consumption, decrease CO2 exhaust and help our planet :-)  
