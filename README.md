@@ -54,8 +54,14 @@ Two examples. The first one is a GPIO set output, the second is an interrupt han
 ```
 
 ## TEST
-Add the include libraries F4/inc and F439ZI/inc to an existing project. Add the code below to a source file. Compile it with -O3.  
-Note the size of the executable. Replace per_gpio_set_out() with another function that sets an GPIO output, compile and compare the size.  
+1. Add the include libraries F4/inc and F439ZI/inc to an existing project.
+1. Add the code below to a source file.
+1. Compile it with -O3.
+1. Note the size of the executable.
+1. Replace per_gpio_set_out() with a comparable function from another HAL library.
+1. Compile
+1. Compare the size of the executable.  
+
 ```c++
     #include "per_gpio.h"
 	
