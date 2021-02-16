@@ -6,50 +6,93 @@
   </head>
   <body>
   
-<h2><a id="user-content-aloha" class="anchor" aria-hidden="true" href="#aloha"></a>ALOHA!</h2>
-<p>This project is a hardware abstraction (HAL) library for STM32 micro-controller peripherals written in C.<br>
+        <h2><a id="user-content-aloha" class="anchor" aria-hidden="true" href="#aloha"></a>ALOHA!</h2>
+<p>This project is a hardware abstraction (HAL) library for F4 series micro-controller peripherals written in C.<br>
+<p><a href="https://github.com/admaunaloa/per_f4_c" rel="nofollow">REPOSITORY</a></p>
 The advantages of this libary are:</p>
 <ul>
-<li>Fast execution!</li>
-<li>Small size of executable</li>
+<li>Faster execution (2x)</li>
+<li>Smaller size (1/2)</li>
 <li>Interrupt and thread safe register manipulation</li>
 <li>Type safe consistent API interface</li>
+<li>It can co-exist with another HAL library</li>
 </ul>
-<p>Bitband technology is used extensively to maximise performance and minimise footprint.<br>
-Bitband is excellently explained by: <a href="http://www.martinhubacek.cz/arm/advanced-arm-cortex-tips/bit-banding---fast-and-safe-bit-manipulation" rel="nofollow">Martin Hubacek</a></p>
+<p>Tests on typical GPIO peripheral functions showed 50% shorter execution time and 50% smaller footprint.<br>
+Bitband technology is used extensively to maximise performance and to minimise footprint.
+These figures can easily be verified by executing instructions under the chapter TEST below.
+This library is ideally to give existing bare-metal projects a performance boost.</p>
+<h3><a id="user-content-bitband" class="anchor" aria-hidden="true" href="#bitband"></a>Bitband</h3>
+<p>This technique is excellently explained by: <a href="http://www.martinhubacek.cz/arm/advanced-arm-cortex-tips/bit-banding---fast-and-safe-bit-manipulation" rel="nofollow">Martin Hubacek</a></p>
 <h2><a id="user-content-usage" class="anchor" aria-hidden="true" href="#usage"></a>USAGE</h2>
-<p>Below are two examples. The first one is an interrupt handler with the standard implementation. The second one is the same interrupt handler with this interface.
-It compiles to a smaller and faster executable and it has a safer syntax.</p>
-<div class="highlight highlight-source-c++"><pre>    #<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>stm32f4xx_it.h<span class="pl-pds">"</span></span>
-
-    <span class="pl-k">void</span> <span class="pl-en">TIM3_IRQHandler</span>(<span class="pl-k">void</span>)
+<p>Two examples. The first one is a GPIO set output, the second is an interrupt handler.</p>
+<h3><a id="user-content-gpio" class="anchor" aria-hidden="true" href="#gpio"></a>GPIO</h3>
+<div class="highlight highlight-source-c++"><pre>    #<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>per_gpio.h<span class="pl-pds">"</span></span>
+   
+    <span class="pl-c"><span class="pl-c">//</span> Definition of green LED</span>
+    <span class="pl-k">static</span> per_inline <span class="pl-k">const</span> <span class="pl-c1">per_gpio_out_t</span>* <span class="pl-k">const</span> <span class="pl-en">bsp_gpio_led_green</span>(<span class="pl-k">void</span>)
     {
-        TIM_HandleTypeDef *htim = &amp;htim3; <span class="pl-c"><span class="pl-c">//</span> Create handle to correct timer</span>
-	
-        <span class="pl-k">if</span> (<span class="pl-c1">__HAL_TIM_GET_FLAG</span>(htim, TIM_FLAG_UPDATE) != RESET) <span class="pl-c"><span class="pl-c">//</span> Check the Update event</span>
+        <span class="pl-k">static</span> <span class="pl-k">const</span> <span class="pl-c1">per_gpio_out_t</span> gpio =
         {
-            <span class="pl-c1">__HAL_TIM_CLEAR_IT</span>(htim, TIM_IT_UPDATE); <span class="pl-c"><span class="pl-c">//</span> Clear the Update event</span>
-            <span class="pl-c"><span class="pl-c">//</span> user code to handle interrupt reason</span>
-            <span class="pl-c"><span class="pl-c">//</span> ...</span>
-        }
-    }</pre></div>
+            .<span class="pl-smi">Per</span> = PER_GPIOB,
+            .<span class="pl-smi">Pin</span> = PER_GPIO_PIN_0,
+        };
+        <span class="pl-k">return</span> &amp;gpio;
+    }
+	
+
+    <span class="pl-c"><span class="pl-c">//</span> Enable the green LED</span>
+    <span class="pl-en">per_gpio_set_out</span>(bsp_gpio_led_green(), true);</pre></div>
+<h3><a id="user-content-irq" class="anchor" aria-hidden="true" href="#irq"></a>IRQ</h3>
 <div class="highlight highlight-source-c++"><pre>    #<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>per_tim_gp.h<span class="pl-pds">"</span></span>
 
     <span class="pl-k">void</span> <span class="pl-en">TIM3_IRQHandler</span>(<span class="pl-k">void</span>)
     {
+        <span class="pl-c"><span class="pl-c">//</span> Read and clear the Timer _ GeneralPurpose _ Update Interrupt Flag	</span>
         <span class="pl-k">if</span> (<span class="pl-c1">per_tim_gp_rdclr_uif</span>(<span class="pl-c1">per_tim_gp_3</span>()))
         {
             <span class="pl-c"><span class="pl-c">//</span> user code to handle interrupt reason</span>
             <span class="pl-c"><span class="pl-c">//</span> ...</span>
         }
     }</pre></div>
+<h2><a id="user-content-test" class="anchor" aria-hidden="true" href="#test"></a>TEST</h2>
+<ol>
+<li>Add the include libraries F4/inc and F439ZI/inc to an existing project.</li>
+<li>Add the code below to a source file.</li>
+<li>Compile it with -O3.</li>
+<li>Note the size of the executable.</li>
+<li>Replace per_gpio_set_out() with a comparable function from another HAL library.</li>
+<li>Compile</li>
+<li>Compare the size of the executable.</li>
+</ol>
+<div class="highlight highlight-source-c++"><pre>    #<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>per_gpio.h<span class="pl-pds">"</span></span>
+	
+   
+    <span class="pl-c"><span class="pl-c">//</span> Single definition of green LED</span>
+    <span class="pl-k">static</span> per_inline <span class="pl-k">const</span> <span class="pl-c1">per_gpio_out_t</span>* <span class="pl-k">const</span> <span class="pl-en">bsp_gpio_led_green</span>(<span class="pl-k">void</span>)
+    {
+        <span class="pl-c"><span class="pl-c">//</span> Replace PER_GPIOB and PER_GPIO_PIN_0 with valid port and pin values or an output</span>
+        <span class="pl-k">static</span> <span class="pl-k">const</span> <span class="pl-c1">per_gpio_out_t</span> gpio =
+        {
+            .<span class="pl-smi">Per</span> = PER_GPIOB,
+            .<span class="pl-smi">Pin</span> = PER_GPIO_PIN_0,
+        };
+        <span class="pl-k">return</span> &amp;gpio;
+    }
+	
+	
+	
+    <span class="pl-c"><span class="pl-c">//</span> Make a variable value here. Replace dots by some non const value.</span>
+    <span class="pl-k">bool</span> value = ...;
+
+    <span class="pl-c"><span class="pl-c">//</span> Enable the green LED</span>
+    <span class="pl-en">per_gpio_set_out</span>(bsp_gpio_led_green(), value);</pre></div>
 <h2><a id="user-content-syntax" class="anchor" aria-hidden="true" href="#syntax"></a>SYNTAX</h2>
 <p>For each peripheral bit the possible get and set functions are provided.
 The syntax is</p>
 <ol>
 <li><strong>per_</strong>      Peripheral library prefix</li>
 <li><strong><em>usart</em></strong>   Peripheral type USART</li>
-<li><strong>_ue</strong>       Peripheral field name as in the STM32 manual. UE is Usart Enable.</li>
+<li><strong>_ue</strong>       Peripheral field name as in the manual. UE is Usart Enable.</li>
 <li><strong>(...)</strong>     Function</li>
 </ol>
 <p>Example:</p>
@@ -64,11 +107,11 @@ The syntax is</p>
 <p>This set UE example results in a minimal number of assembly instructions because
 both functions are inlined and bitband is used. Both functions also make it
 type-safe and they enable features such as zero-cost error checking.</p>
-<h2><a id="user-content-development-status-jan-2021" class="anchor" aria-hidden="true" href="#development-status-jan-2021"></a>DEVELOPMENT STATUS (jan 2021)</h2>
+<h2><a id="user-content-development-status-feb-2021" class="anchor" aria-hidden="true" href="#development-status-feb-2021"></a>DEVELOPMENT STATUS (feb 2021)</h2>
 <p>Status of peripheral code</p>
 <ul>
 <li>100% ADC, DMA, SPI, USART, GPIO, TIM_AD, TIM_GP, DES</li>
-<li>50%  PWR, RCC, SYS_CFG, RCC</li>
+<li>50%  PWR, RCC, SYS_CFG</li>
 <li>10%  ETH</li>
 </ul>
 <p>Status generics</p>
@@ -116,8 +159,8 @@ per_usart_f4.h shows examples of this.</p>
         <span class="pl-c1">per_bit_rw1_set</span>(&amp;usart-&gt;<span class="pl-smi">Per</span>-&gt;<span class="pl-smi">Ue</span>, val);
     }</pre></div>
 <h3><a id="user-content-peripheral-variants" class="anchor" aria-hidden="true" href="#peripheral-variants"></a>peripheral variants</h3>
-<p>Peripherals have variations that are handled by include files in the STM32Fxxx/inc directory.
-Variants are for example the UART and USART. also the STM32F407 has six UART/USARTS while the STM32F439 has eight of these.
+<p>Peripherals have variations that are handled by include files in the F4xxx/inc directory.
+Variants are for example the UART and USART. also the F407 has six UART/USARTS while the F439 has eight of these.
 These variants are handled with a descriptor structure for each specific peripheral.<br>
 This descriptor structure contains</p>
 <ul>
@@ -132,10 +175,11 @@ If the variant is correct the compiler will optimise it out, if(0), if the varia
     {
         <span class="pl-c1">per_log_err_function_not_supported</span>();
     }</pre></div>
-<p>An example is STM32F439/inc/per_usart.h.</p>
+<p>An example is F439/inc/per_usart.h.</p>
 <h3><a id="user-content-peripheral-descriptor-functions" class="anchor" aria-hidden="true" href="#peripheral-descriptor-functions"></a>peripheral descriptor functions</h3>
-<p>Access to the peripheral descriptors is done via functions that return this descriptor. This function interface is future proof and it is consistent for all peripherals.
-For example <strong>per_usart_1(void)</strong>. The functions limit the scope the desciptor structure</p>
+<p>Access to the peripheral descriptors is done via functions that return this descriptor.<br>
+This function interface is future proof and it is consistent for all peripherals.
+For example <strong>per_usart_1(void)</strong>. The functions limit the scope the desciptor structure.</p>
 <h2><a id="user-content-inline" class="anchor" aria-hidden="true" href="#inline"></a>inline</h2>
 <p>All the layers are provided in header files and inline functions. This allows the compiler to resolve all constants and optimise this all to a minimum size executable with fast execution times.
 The use of inline functions makes the API consistent and type safe.</p>
@@ -146,9 +190,9 @@ A default log implementation captures this errors. It is up to the user to adapt
 <p>There are a few hardware peripheral registers that are better or faster accessed by register instead of bitband.
 The specific functions for this register handle this implicitly. An example of this is TIMx_SR.</p>
 <h2><a id="user-content-compilation" class="anchor" aria-hidden="true" href="#compilation"></a>COMPILATION</h2>
-<p>The library can coexist with the standard library. Just add the directories to the project.
-Note: the STMF439 is also good for other STM32F4 types, it provides all possible peripherals.
-Add the include libraries: STM32/inc, STM32F439/inc, Nucleo_439
+<p>The library can coexist with other HAL libraries. Just add the directories to the project.
+Note: the F439ZI is also good for other F4 types, it provides all possible peripherals.
+Add the include libraries: F4/inc, F439ZI/inc, Nucleo/inc
 If required, compile the files: per_bit.c, per_gpio.c, per_dep.c and bsp_dep.c</p>
 <h2><a id="user-content-the-end" class="anchor" aria-hidden="true" href="#the-end"></a>THE END</h2>
 <p>If you have any tips, remarks, questions and suggestions please send an email.<br>
