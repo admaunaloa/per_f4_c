@@ -72,7 +72,31 @@ typedef enum
     PER_RCC_APB_DIV_16 = 0b111, ///< Divide by 16
 } per_rcc_apb_div_e;
 
-typedef per_bit_rw1_t per_rcc_en1_t; ///< Peripheral clock enable on AHB and APB see ES0182. Needs delay after set
+/// RCC Number of GPIO ports enumeration
+typedef enum
+{
+    PER_RCC_GPIO_NR_9  = 9, ///< 9 GPIO ports
+    PER_RCC_GPIO_NR_11  = 11, ///< 11 GPIO ports
+} per_rcc_gpio_nr_e;
+
+/// RCC Peripheral Read-write enable bit
+typedef struct
+{
+    per_bit_bitband_t Rw; ///< One read write bit
+} per_rcc_en1_t;
+
+/// RCC One read and write enable bit get
+static per_inline bool per_rcc_en1(const per_rcc_en1_t* self)
+{
+    return self->Rw.Bit8 != PER_BIT_0;
+}
+
+/// RCC One read and write enable bit set
+static per_inline void per_rcc_en1_set(per_rcc_en1_t* self, bool val)
+{
+    self->Rw.Bit8 = (uint_fast8_t)val; // Cast is fast
+    val = self->Rw.Bit8 != PER_BIT_0;  // Wait read back
+}
 
 typedef struct
 {
@@ -368,7 +392,7 @@ typedef struct
     per_rcc_en1_t Crclpen; ///< CRC clock enable during Sleep mode
     per_bit_n2_t Ahb1lpenrBit13; ///< Reserved.
     per_rcc_en1_t Flitflpen; ///< Flash interface clock enable during Sleep mode
-    per_rcc_en1_t Sram1lpen; ///< SRAM 1interface clock enable during Sleep mode
+    per_rcc_en1_t Sram1lpen; ///< SRAM 1 interface clock enable during Sleep mode
     per_rcc_en1_t Sram2lpen; ///< SRAM 2 interface clock enable during Sleep mode
     per_rcc_en1_t Bkpsramlpen; ///< Backup SRAM interface clock enable during Sleep mode
     per_rcc_en1_t Sram3lpen; ///< SRAM 3 interface clock enable during Sleep mode
@@ -507,21 +531,16 @@ typedef struct
 /// RCC descriptor
 typedef struct
 {
-    per_rcc_per_t* const Per; ///< Peripheral
-    const per_log_e Err; ///< Peripheral error number
+    per_rcc_per_t* const Per;       ///< Peripheral
+    const per_log_e Err;            ///< Peripheral error number
+    const per_rcc_gpio_nr_e GpioNr; ///< Number of GPIO ports
+    const bool Eth;                 ///< Ethernet present
 } per_rcc_t;
 
 /// Get peripheral clock frequency
 static per_inline uint32_t per_rcc_freq(void)
 {
     return PER_RCC_FREQ;
-}
-
-/// Enable a RCC item
-static per_inline void per_rcc_enable(per_rcc_en1_t* reg, bool en)
-{
-    per_bit_rw1_set(reg, en);
-    en = per_bit_rw1(reg); // Wait
 }
 
 /// Get MCO divider value
@@ -553,6 +572,2703 @@ static per_inline void per_rcc_set_apb_div(per_bit_rw3_t* reg, per_rcc_apb_div_e
 {
     per_bit_rw3_set(reg, (uint32_t)div);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+/// RCC IO port A clock reset
+static per_inline bool per_rcc_gpioarst(const per_rcc_t* const rcc)
+{
+    return per_bit_rw1(&rcc->Per->Gpioarst);
+}
+
+/// RCC IO port A clock reset
+static per_inline void per_rcc_set_gpioarst(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_rw1_set(&rcc->Per->Gpioarst, val);
+}
+
+/// RCC IO port B clock reset
+static per_inline bool per_rcc_gpiobrst(const per_rcc_t* const rcc)
+{
+    return per_bit_rw1(&rcc->Per->Gpiobrst);
+}
+
+/// RCC IO port B clock reset
+static per_inline void per_rcc_set_gpiobrst(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_rw1_set(&rcc->Per->Gpiobrst, val);
+}
+
+/// RCC IO port C clock reset
+static per_inline bool per_rcc_gpiocrst(const per_rcc_t* const rcc)
+{
+    return per_bit_rw1(&rcc->Per->Gpiocrst);
+}
+
+/// RCC IO port C clock reset
+static per_inline void per_rcc_set_gpiocrst(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_rw1_set(&rcc->Per->Gpiocrst, val);
+}
+
+/// RCC IO port D clock reset
+static per_inline bool per_rcc_gpiodrst(const per_rcc_t* const rcc)
+{
+    return per_bit_rw1(&rcc->Per->Gpiodrst);
+}
+
+/// RCC IO port D clock reset
+static per_inline void per_rcc_set_gpiodrst(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_rw1_set(&rcc->Per->Gpiodrst, val);
+}
+
+/// RCC IO port E clock reset
+static per_inline bool per_rcc_gpioerst(const per_rcc_t* const rcc)
+{
+    return per_bit_rw1(&rcc->Per->Gpioerst);
+}
+
+/// RCC IO port E clock reset
+static per_inline void per_rcc_set_gpioerst(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_rw1_set(&rcc->Per->Gpioerst, val);
+}
+
+/// RCC IO port F clock reset
+static per_inline bool per_rcc_gpiofrst(const per_rcc_t* const rcc)
+{
+    return per_bit_rw1(&rcc->Per->Gpiofrst);
+}
+
+/// RCC IO port F clock reset
+static per_inline void per_rcc_set_gpiofrst(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_rw1_set(&rcc->Per->Gpiofrst, val);
+}
+
+/// RCC IO port G clock reset
+static per_inline bool per_rcc_gpiogrst(const per_rcc_t* const rcc)
+{
+    return per_bit_rw1(&rcc->Per->Gpiogrst);
+}
+
+/// RCC IO port G clock reset
+static per_inline void per_rcc_set_gpiogrst(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_rw1_set(&rcc->Per->Gpiogrst, val);
+}
+
+/// RCC IO port H clock reset
+static per_inline bool per_rcc_gpiohrst(const per_rcc_t* const rcc)
+{
+    return per_bit_rw1(&rcc->Per->Gpiohrst);
+}
+
+/// RCC IO port H clock reset
+static per_inline void per_rcc_set_gpiohrst(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_rw1_set(&rcc->Per->Gpiohrst, val);
+}
+
+/// RCC IO port I clock reset
+static per_inline bool per_rcc_gpioirst(const per_rcc_t* const rcc)
+{
+    return per_bit_rw1(&rcc->Per->Gpioirst);
+}
+
+/// RCC IO port I clock reset
+static per_inline void per_rcc_set_gpioirst(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_rw1_set(&rcc->Per->Gpioirst, val);
+}
+
+/// RCC IO port J clock reset
+static per_inline bool per_rcc_gpiojrst(const per_rcc_t* const rcc)
+{
+    if (rcc->GpioNr < PER_RCC_GPIO_NR_11)
+    {
+        per_log_err_function_not_supported();
+    }
+
+    return per_bit_rw1(&rcc->Per->Gpiojrst);
+}
+
+/// RCC IO port J clock reset
+static per_inline void per_rcc_set_gpiojrst(const per_rcc_t* const rcc, bool val)
+{
+    if (rcc->GpioNr < PER_RCC_GPIO_NR_11)
+    {
+        per_log_err_function_not_supported();
+    }
+
+    per_bit_rw1_set(&rcc->Per->Gpiojrst, val);
+}
+
+/// RCC IO port K clock reset
+static per_inline bool per_rcc_gpiokrst(const per_rcc_t* const rcc)
+{
+    if (rcc->GpioNr < PER_RCC_GPIO_NR_11)
+    {
+        per_log_err_function_not_supported();
+    }
+
+    return per_bit_rw1(&rcc->Per->Gpiokrst);
+}
+
+/// RCC IO port K clock reset
+static per_inline void per_rcc_set_gpiokrst(const per_rcc_t* const rcc, bool val)
+{
+    if (rcc->GpioNr < PER_RCC_GPIO_NR_11)
+    {
+        per_log_err_function_not_supported();
+    }
+
+    per_bit_rw1_set(&rcc->Per->Gpiokrst, val);
+}
+
+/// RCC CRC clock reset
+static per_inline bool per_rcc_crcrst(const per_rcc_t* const rcc)
+{
+    return per_bit_rw1(&rcc->Per->Crcrst);
+}
+
+/// RCC CRC clock reset
+static per_inline void per_rcc_set_crcrst(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_rw1_set(&rcc->Per->Crcrst, val);
+}
+
+/// RCC DMA1 clock reset
+static per_inline bool per_rcc_dma1rst(const per_rcc_t* const rcc)
+{
+    return per_bit_rw1(&rcc->Per->Dma1rst);
+}
+
+/// RCC DMA1 clock reset
+static per_inline void per_rcc_set_dma1rst(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_rw1_set(&rcc->Per->Dma1rst, val);
+}
+
+/// RCC DMA2 clock reset
+static per_inline bool per_rcc_dma2rst(const per_rcc_t* const rcc)
+{
+    return per_bit_rw1(&rcc->Per->Dma2rst);
+}
+
+/// RCC DMA2 clock reset
+static per_inline void per_rcc_set_dma2rst(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_rw1_set(&rcc->Per->Dma2rst, val);
+}
+
+/// RCC DMA2D clock reset
+static per_inline bool per_rcc_dma2drst(const per_rcc_t* const rcc)
+{
+    return per_bit_rw1(&rcc->Per->Dma2drst);
+}
+
+/// RCC DMA2D clock reset
+static per_inline void per_rcc_set_dma2drst(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_rw1_set(&rcc->Per->Dma2drst, val);
+}
+
+/// RCC Ethernet MAC clock reset
+static per_inline bool per_rcc_ethmacrst(const per_rcc_t* const rcc)
+{
+    if (!rcc->Eth)
+    {
+        per_log_err_function_not_supported();
+    }
+
+    return per_bit_rw1(&rcc->Per->Ethmacrst);
+}
+
+/// RCC Ethernet MAC clock reset
+static per_inline void per_rcc_set_ethmacrst(const per_rcc_t* const rcc, bool val)
+{
+    if (!rcc->Eth)
+    {
+        per_log_err_function_not_supported();
+    }
+
+    per_bit_rw1_set(&rcc->Per->Ethmacrst, val);
+}
+
+/// RCC USB OTG HS clock reset
+static per_inline bool per_rcc_otghsrst(const per_rcc_t* const rcc)
+{
+    return per_bit_rw1(&rcc->Per->Otghsrst);
+}
+
+/// RCC USB OTG HS clock reset
+static per_inline void per_rcc_set_otghsrst(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_rw1_set(&rcc->Per->Otghsrst, val);
+}
+
+/// RCC Camera interface reset
+static per_inline bool per_rcc_dcmirst(const per_rcc_t* const rcc)
+{
+    return per_bit_rw1(&rcc->Per->Dcmirst);
+}
+
+/// RCC Camera interface reset
+static per_inline void per_rcc_set_dcmirst(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_rw1_set(&rcc->Per->Dcmirst, val);
+}
+
+/// RCC Cryptographic modules clock reset
+static per_inline bool per_rcc_cryprst(const per_rcc_t* const rcc)
+{
+    return per_bit_rw1(&rcc->Per->Cryprst);
+}
+
+/// RCC Cryptographic modules clock reset
+static per_inline void per_rcc_set_cryprst(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_rw1_set(&rcc->Per->Cryprst, val);
+}
+
+/// RCC Hash modules clock reset
+static per_inline bool per_rcc_hashrst(const per_rcc_t* const rcc)
+{
+    return per_bit_rw1(&rcc->Per->Hashrst);
+}
+
+/// RCC Hash modules clock reset
+static per_inline void per_rcc_set_hashrst(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_rw1_set(&rcc->Per->Hashrst, val);
+}
+
+/// RCC Random number generator clock reset
+static per_inline bool per_rcc_rngrst(const per_rcc_t* const rcc)
+{
+    return per_bit_rw1(&rcc->Per->Rngrst);
+}
+
+/// RCC Random number generator clock reset
+static per_inline void per_rcc_set_rngrst(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_rw1_set(&rcc->Per->Rngrst, val);
+}
+
+/// RCC USB OTG FS clock reset
+static per_inline bool per_rcc_otgfsrst(const per_rcc_t* const rcc)
+{
+    return per_bit_rw1(&rcc->Per->Otgfsrst);
+}
+
+/// RCC USB OTG FS clock reset
+static per_inline void per_rcc_set_otgfsrst(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_rw1_set(&rcc->Per->Otgfsrst, val);
+}
+
+/// RCC Flexible memory controller module clock reset
+static per_inline bool per_rcc_fmcrst(const per_rcc_t* const rcc)
+{
+    return per_bit_rw1(&rcc->Per->Fmcrst);
+}
+
+/// RCC Flexible memory controller module clock reset
+static per_inline void per_rcc_set_fmcrst(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_rw1_set(&rcc->Per->Fmcrst, val);
+}
+
+/// RCC TIM2 clock reset
+static per_inline bool per_rcc_tim2rst(const per_rcc_t* const rcc)
+{
+    return per_bit_rw1(&rcc->Per->Tim2rst);
+}
+
+/// RCC TIM2 clock reset
+static per_inline void per_rcc_set_tim2rst(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_rw1_set(&rcc->Per->Tim2rst, val);
+}
+
+/// RCC TIM3 clock reset
+static per_inline bool per_rcc_tim3rst(const per_rcc_t* const rcc)
+{
+    return per_bit_rw1(&rcc->Per->Tim3rst);
+}
+
+/// RCC TIM3 clock reset
+static per_inline void per_rcc_set_tim3rst(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_rw1_set(&rcc->Per->Tim3rst, val);
+}
+per_bit_rw1_t Tim4en; ///< TIM4 clock reset
+/// RCC TIM4 clock reset
+static per_inline bool per_rcc_tim4rst(const per_rcc_t* const rcc)
+{
+    return per_bit_rw1(&rcc->Per->Tim4rst);
+}
+
+/// RCC TIM4 clock reset
+static per_inline void per_rcc_set_tim4rst(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_rw1_set(&rcc->Per->Tim4rst, val);
+}
+
+/// RCC TIM5 clock reset
+static per_inline bool per_rcc_tim5rst(const per_rcc_t* const rcc)
+{
+    return per_bit_rw1(&rcc->Per->Tim5rst);
+}
+
+/// RCC TIM5 clock reset
+static per_inline void per_rcc_set_tim5rst(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_rw1_set(&rcc->Per->Tim5rst, val);
+}
+
+/// RCC TIM6 clock reset
+static per_inline bool per_rcc_tim6rst(const per_rcc_t* const rcc)
+{
+    return per_bit_rw1(&rcc->Per->Tim6rst);
+}
+
+/// RCC TIM6 clock reset
+static per_inline void per_rcc_set_tim6rst(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_rw1_set(&rcc->Per->Tim6rst, val);
+}
+
+/// RCC TIM7 clock reset
+static per_inline bool per_rcc_tim7rst(const per_rcc_t* const rcc)
+{
+    return per_bit_rw1(&rcc->Per->Tim7rst);
+}
+
+/// RCC TIM7 clock reset
+static per_inline void per_rcc_set_tim7rst(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_rw1_set(&rcc->Per->Tim7rst, val);
+}
+
+/// RCC TIM12 clock reset
+static per_inline bool per_rcc_tim12rst(const per_rcc_t* const rcc)
+{
+    return per_bit_rw1(&rcc->Per->Tim12rst);
+}
+
+/// RCC TIM12 clock reset
+static per_inline void per_rcc_set_tim12rst(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_rw1_set(&rcc->Per->Tim12rst, val);
+}
+
+/// RCC TIM13 clock reset
+static per_inline bool per_rcc_tim13rst(const per_rcc_t* const rcc)
+{
+    return per_bit_rw1(&rcc->Per->Tim13rst);
+}
+
+/// RCC TIM13 clock reset
+static per_inline void per_rcc_set_tim13rst(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_rw1_set(&rcc->Per->Tim13rst, val);
+}
+
+/// RCC TIM14 clock reset
+static per_inline bool per_rcc_tim14rst(const per_rcc_t* const rcc)
+{
+    return per_bit_rw1(&rcc->Per->Tim14rst);
+}
+
+/// RCC TIM14 clock reset
+static per_inline void per_rcc_set_tim14rst(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_rw1_set(&rcc->Per->Tim14rst, val);
+}
+
+/// RCC Window watchdog clock reset
+static per_inline bool per_rcc_wwdgrst(const per_rcc_t* const rcc)
+{
+    return per_bit_rw1(&rcc->Per->Wwdgrst);
+}
+
+/// RCC Window watchdog clock reset
+static per_inline void per_rcc_set_wwdgrst(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_rw1_set(&rcc->Per->Wwdgrst, val);
+}
+
+/// RCC SPI2 clock reset
+static per_inline bool per_rcc_spi2rst(const per_rcc_t* const rcc)
+{
+    return per_bit_rw1(&rcc->Per->Spi2rst);
+}
+
+/// RCC SPI2 clock reset
+static per_inline void per_rcc_set_spi2rst(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_rw1_set(&rcc->Per->Spi2rst, val);
+}
+
+/// RCC SPI3 clock reset
+static per_inline bool per_rcc_spi3rst(const per_rcc_t* const rcc)
+{
+    return per_bit_rw1(&rcc->Per->Spi3rst);
+}
+
+/// RCC SPI3 clock reset
+static per_inline void per_rcc_set_spi3rst(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_rw1_set(&rcc->Per->Spi3rst, val);
+}
+
+/// RCC USART2 clock reset
+static per_inline bool per_rcc_usart2rst(const per_rcc_t* const rcc)
+{
+    return per_bit_rw1(&rcc->Per->Usart2rst);
+}
+
+/// RCC USART2 clock reset
+static per_inline void per_rcc_set_usart2rst(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_rw1_set(&rcc->Per->Usart2rst, val);
+}
+
+/// RCC USART3 clock reset
+static per_inline bool per_rcc_usart3rst(const per_rcc_t* const rcc)
+{
+    return per_bit_rw1(&rcc->Per->Usart3rst);
+}
+
+/// RCC USART3 clock reset
+static per_inline void per_rcc_set_usart3rst(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_rw1_set(&rcc->Per->Usart3rst, val);
+}
+
+/// RCC UART4 clock reset
+static per_inline bool per_rcc_uart4rst(const per_rcc_t* const rcc)
+{
+    return per_bit_rw1(&rcc->Per->Uart4rst);
+}
+
+/// RCC UART4 clock reset
+static per_inline void per_rcc_set_uart4rst(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_rw1_set(&rcc->Per->Uart4rst, val);
+}
+
+/// RCC UART5 clock reset
+static per_inline bool per_rcc_uart5rst(const per_rcc_t* const rcc)
+{
+    return per_bit_rw1(&rcc->Per->Uart5rst);
+}
+
+/// RCC UART5 clock reset
+static per_inline void per_rcc_set_uart5rst(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_rw1_set(&rcc->Per->Uart5rst, val);
+}
+
+/// RCC I2C1 clock reset
+static per_inline bool per_rcc_i2c1rst(const per_rcc_t* const rcc)
+{
+    return per_bit_rw1(&rcc->Per->I2c1rst);
+}
+
+/// RCC I2C1 clock reset
+static per_inline void per_rcc_set_i2c1rst(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_rw1_set(&rcc->Per->I2c1rst, val);
+}
+
+/// RCC I2C2 clock reset
+static per_inline bool per_rcc_i2c2rst(const per_rcc_t* const rcc)
+{
+    return per_bit_rw1(&rcc->Per->I2c2rst);
+}
+
+/// RCC I2C2 clock reset
+static per_inline void per_rcc_set_i2c2rst(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_rw1_set(&rcc->Per->I2c2rst, val);
+}
+
+/// RCC I2C3 clock reset
+static per_inline bool per_rcc_i2c3rst(const per_rcc_t* const rcc)
+{
+    return per_bit_rw1(&rcc->Per->I2c3rst);
+}
+
+/// RCC I2C3 clock reset
+static per_inline void per_rcc_set_i2c3rst(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_rw1_set(&rcc->Per->I2c3rst, val);
+}
+
+/// RCC CAN1 clock reset
+static per_inline bool per_rcc_can1rst(const per_rcc_t* const rcc)
+{
+    return per_bit_rw1(&rcc->Per->Can1rst);
+}
+
+/// RCC CAN1 clock reset
+static per_inline void per_rcc_set_can1rst(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_rw1_set(&rcc->Per->Can1rst, val);
+}
+
+/// RCC CAN2 clock reset
+static per_inline bool per_rcc_can2rst(const per_rcc_t* const rcc)
+{
+    return per_bit_rw1(&rcc->Per->Can2rst);
+}
+
+/// RCC CAN2 clock reset
+static per_inline void per_rcc_set_can2rst(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_rw1_set(&rcc->Per->Can2rst, val);
+}
+
+/// RCC Power interface clock reset
+static per_inline bool per_rcc_pwrrst(const per_rcc_t* const rcc)
+{
+    return per_bit_rw1(&rcc->Per->Pwrrst);
+}
+
+/// RCC Power interface clock reset
+static per_inline void per_rcc_set_pwrrst(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_rw1_set(&rcc->Per->Pwrrst, val);
+}
+
+/// RCC DAC interface clock reset
+static per_inline bool per_rcc_dacrst(const per_rcc_t* const rcc)
+{
+    return per_bit_rw1(&rcc->Per->Dacrst);
+}
+
+/// RCC DAC interface clock reset
+static per_inline void per_rcc_set_dacrst(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_rw1_set(&rcc->Per->Dacrst, val);
+}
+
+/// RCC UART7 clock reset
+static per_inline bool per_rcc_uart7rst(const per_rcc_t* const rcc)
+{
+    return per_bit_rw1(&rcc->Per->Uart7rst);
+}
+
+/// RCC UART7 clock reset
+static per_inline void per_rcc_set_uart7rst(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_rw1_set(&rcc->Per->Uart7rst, val);
+}
+
+/// RCC UART8 clock reset
+static per_inline bool per_rcc_uart8rst(const per_rcc_t* const rcc)
+{
+    return per_bit_rw1(&rcc->Per->Uart8rst);
+}
+
+/// RCC UART8 clock reset
+static per_inline void per_rcc_set_uart8rst(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_rw1_set(&rcc->Per->Uart8rst, val);
+}
+
+/// RCC TIM1 clock reset
+static per_inline bool per_rcc_tim1rst(const per_rcc_t* const rcc)
+{
+    return per_bit_rw1(&rcc->Per->Tim1rst);
+}
+
+/// RCC TIM1 clock reset
+static per_inline void per_rcc_set_tim1rst(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_rw1_set(&rcc->Per->Tim1rst, val);
+}
+
+/// RCC TIM8 clock reset
+static per_inline bool per_rcc_tim8rst(const per_rcc_t* const rcc)
+{
+    return per_bit_rw1(&rcc->Per->Tim8rst);
+}
+
+/// RCC TIM8 clock reset
+static per_inline void per_rcc_set_tim8rst(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_rw1_set(&rcc->Per->Tim8rst, val);
+}
+
+/// RCC USART1 clock reset
+static per_inline bool per_rcc_usart1rst(const per_rcc_t* const rcc)
+{
+    return per_bit_rw1(&rcc->Per->Usart1rst);
+}
+
+/// RCC USART1 clock reset
+static per_inline void per_rcc_set_usart1rst(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_rw1_set(&rcc->Per->Usart1rst, val);
+}
+
+/// RCC USART6 clock reset
+static per_inline bool per_rcc_usart6rst(const per_rcc_t* const rcc)
+{
+    return per_bit_rw1(&rcc->Per->Usart6rst);
+}
+
+/// RCC USART6 clock reset
+static per_inline void per_rcc_set_usart6rst(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_rw1_set(&rcc->Per->Usart6rst, val);
+}
+
+/// RCC ADC1 clock reset
+static per_inline bool per_rcc_adcrst(const per_rcc_t* const rcc)
+{
+    return per_bit_rw1(&rcc->Per->Adcrst);
+}
+
+/// RCC ADC1 clock reset
+static per_inline void per_rcc_set_adcrst(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_rw1_set(&rcc->Per->Adcrst, val);
+}
+
+/// RCC SDIO clock reset
+static per_inline bool per_rcc_sdiorst(const per_rcc_t* const rcc)
+{
+    return per_bit_rw1(&rcc->Per->Sdiorst);
+}
+
+/// RCC SDIO clock reset
+static per_inline void per_rcc_set_sdiorst(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_rw1_set(&rcc->Per->Sdiorst, val);
+}
+
+/// RCC SPI1 clock reset
+static per_inline bool per_rcc_spi1rst(const per_rcc_t* const rcc)
+{
+    return per_bit_rw1(&rcc->Per->Spi1rst);
+}
+
+/// RCC SPI1 clock reset
+static per_inline void per_rcc_set_spi1rst(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_rw1_set(&rcc->Per->Spi1rst, val);
+}
+
+/// RCC SPI4 clock reset
+static per_inline bool per_rcc_spi4rst(const per_rcc_t* const rcc)
+{
+    return per_bit_rw1(&rcc->Per->Spi4rst);
+}
+
+/// RCC SPI4 clock reset
+static per_inline void per_rcc_set_spi4rst(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_rw1_set(&rcc->Per->Spi4rst, val);
+}
+
+/// RCC SYSCFGEN clock reset
+static per_inline bool per_rcc_syscfgrst(const per_rcc_t* const rcc)
+{
+    return per_bit_rw1(&rcc->Per->Syscfgrst);
+}
+
+/// RCC SYSCFGEN clock reset
+static per_inline void per_rcc_set_syscfgrst(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_rw1_set(&rcc->Per->Syscfgrst, val);
+}
+
+/// RCC TIM9 clock reset
+static per_inline bool per_rcc_tim9rst(const per_rcc_t* const rcc)
+{
+    return per_bit_rw1(&rcc->Per->Tim9rst);
+}
+
+/// RCC TIM9 clock reset
+static per_inline void per_rcc_set_tim9rst(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_rw1_set(&rcc->Per->Tim9rst, val);
+}
+
+/// RCC TIM10 clock reset
+static per_inline bool per_rcc_tim10rst(const per_rcc_t* const rcc)
+{
+    return per_bit_rw1(&rcc->Per->Tim10rst);
+}
+
+/// RCC TIM10 clock reset
+static per_inline void per_rcc_set_tim10rst(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_rw1_set(&rcc->Per->Tim10rst, val);
+}
+
+/// RCC TIM11 clock reset
+static per_inline bool per_rcc_tim11rst(const per_rcc_t* const rcc)
+{
+    return per_bit_rw1(&rcc->Per->Tim11rst);
+}
+
+/// RCC TIM11 clock reset
+static per_inline void per_rcc_set_tim11rst(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_rw1_set(&rcc->Per->Tim11rst, val);
+}
+
+/// RCC SPI5 clock reset
+static per_inline bool per_rcc_spi5rst(const per_rcc_t* const rcc)
+{
+    return per_bit_rw1(&rcc->Per->Spi5rst);
+}
+
+/// RCC SPI5 clock reset
+static per_inline void per_rcc_set_spi5rst(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_rw1_set(&rcc->Per->Spi5rst, val);
+}
+
+/// RCC SPI6 clock reset
+static per_inline bool per_rcc_spi6rst(const per_rcc_t* const rcc)
+{
+    return per_bit_rw1(&rcc->Per->Spi6rst);
+}
+
+/// RCC SPI6 clock reset
+static per_inline void per_rcc_set_spi6rst(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_rw1_set(&rcc->Per->Spi6rst, val);
+}
+
+/// RCC SAI1 clock reset
+static per_inline bool per_rcc_sai1rst(const per_rcc_t* const rcc)
+{
+    return per_bit_rw1(&rcc->Per->Sai1rst);
+}
+
+/// RCC SAI1 clock reset
+static per_inline void per_rcc_set_sai1rst(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_rw1_set(&rcc->Per->Sai1rst, val);
+}
+
+/// RCC LTDC clock reset
+static per_inline bool per_rcc_ltdcrst(const per_rcc_t* const rcc)
+{
+    return per_bit_rw1(&rcc->Per->Ltdcrst);
+}
+
+/// RCC LTDC clock reset
+static per_inline void per_rcc_set_ltdcrst(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_rw1_set(&rcc->Per->Ltdcrst, val);
+}
+
+/// RCC IO port A clock enable
+static per_inline bool per_rcc_gpioaen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Gpioaen);
+}
+
+/// RCC IO port A clock enable
+static per_inline void per_rcc_set_gpioaen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Gpioaen, val);
+}
+
+/// RCC IO port B clock enable
+static per_inline bool per_rcc_gpioben(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Gpioben);
+}
+
+/// RCC IO port B clock enable
+static per_inline void per_rcc_set_gpioben(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Gpioben, val);
+}
+
+/// RCC IO port C clock enable
+static per_inline bool per_rcc_gpiocen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Gpiocen);
+}
+
+/// RCC IO port C clock enable
+static per_inline void per_rcc_set_gpiocen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Gpiocen, val);
+}
+
+/// RCC IO port D clock enable
+static per_inline bool per_rcc_gpioden(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Gpioden);
+}
+
+/// RCC IO port D clock enable
+static per_inline void per_rcc_set_gpioden(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Gpioden, val);
+}
+
+/// RCC IO port E clock enable
+static per_inline bool per_rcc_gpioeen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Gpioeen);
+}
+
+/// RCC IO port E clock enable
+static per_inline void per_rcc_set_gpioeen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Gpioeen, val);
+}
+
+/// RCC IO port F clock enable
+static per_inline bool per_rcc_gpiofen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Gpiofen);
+}
+
+/// RCC IO port F clock enable
+static per_inline void per_rcc_set_gpiofen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Gpiofen, val);
+}
+
+/// RCC IO port G clock enable
+static per_inline bool per_rcc_gpiogen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Gpiogen);
+}
+
+/// RCC IO port G clock enable
+static per_inline void per_rcc_set_gpiogen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Gpiogen, val);
+}
+
+/// RCC IO port H clock enable
+static per_inline bool per_rcc_gpiohen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Gpiohen);
+}
+
+/// RCC IO port H clock enable
+static per_inline void per_rcc_set_gpiohen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Gpiohen, val);
+}
+
+/// RCC IO port I clock enable
+static per_inline bool per_rcc_gpioien(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Gpioien);
+}
+
+/// RCC IO port I clock enable
+static per_inline void per_rcc_set_gpioien(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Gpioien, val);
+}
+
+/// RCC IO port J clock enable
+static per_inline bool per_rcc_gpiojen(const per_rcc_t* const rcc)
+{
+    if (rcc->GpioNr < PER_RCC_GPIO_NR_11)
+    {
+        per_log_err_function_not_supported();
+    }
+
+    return per_rcc_en1(&rcc->Per->Gpiojen);
+}
+
+/// RCC IO port J clock enable
+static per_inline void per_rcc_set_gpiojen(const per_rcc_t* const rcc, bool val)
+{
+    if (rcc->GpioNr < PER_RCC_GPIO_NR_11)
+    {
+        per_log_err_function_not_supported();
+    }
+
+    per_rcc_en1_set(&rcc->Per->Gpiojen, val);
+}
+
+/// RCC IO port K clock enable
+static per_inline bool per_rcc_gpioken(const per_rcc_t* const rcc)
+{
+    if (rcc->GpioNr < PER_RCC_GPIO_NR_11)
+    {
+        per_log_err_function_not_supported();
+    }
+
+    return per_rcc_en1(&rcc->Per->Gpioken);
+}
+
+/// RCC IO port K clock enable
+static per_inline void per_rcc_set_gpioken(const per_rcc_t* const rcc, bool val)
+{
+    if (rcc->GpioNr < PER_RCC_GPIO_NR_11)
+    {
+        per_log_err_function_not_supported();
+    }
+
+    per_rcc_en1_set(&rcc->Per->Gpioken, val);
+}
+
+/// RCC CRC clock enable
+static per_inline bool per_rcc_crcen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Crcen);
+}
+
+/// RCC CRC clock enable
+static per_inline void per_rcc_set_crcen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Crcen, val);
+}
+
+/// RCC Backup SRAM interface clock enable
+static per_inline bool per_rcc_bkpsramen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Bkpsramen);
+}
+
+/// RCC Backup SRAM interface clock enable
+static per_inline void per_rcc_set_bkpsramen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Bkpsramen, val);
+}
+
+/// RCC CCM data RAM clock enable
+static per_inline bool per_rcc_ccmdataramen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Ccmdataramen);
+}
+
+/// RCC CCM data RAM clock enable
+static per_inline void per_rcc_set_ccmdataramen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Ccmdataramen, val);
+}
+
+/// RCC DMA1 clock enable
+static per_inline bool per_rcc_dma1en(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Dma1en);
+}
+
+/// RCC DMA1 clock enable
+static per_inline void per_rcc_set_dma1en(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Dma1en, val);
+}
+
+/// RCC DMA2 clock enable
+static per_inline bool per_rcc_dma2en(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Dma2en);
+}
+
+/// RCC DMA2 clock enable
+static per_inline void per_rcc_set_dma2en(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Dma2en, val);
+}
+
+/// RCC DMA2D clock enable
+static per_inline bool per_rcc_dma2den(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Dma2den);
+}
+
+/// RCC DMA2D clock enable
+static per_inline void per_rcc_set_dma2den(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Dma2den, val);
+}
+
+/// RCC Ethernet MAC clock enable
+static per_inline bool per_rcc_ethmacen(const per_rcc_t* const rcc)
+{
+    if (!rcc->Eth)
+    {
+        per_log_err_function_not_supported();
+    }
+
+    return per_rcc_en1(&rcc->Per->Ethmacen);
+}
+
+/// RCC Ethernet MAC clock enable
+static per_inline void per_rcc_set_ethmacen(const per_rcc_t* const rcc, bool val)
+{
+    if (!rcc->Eth)
+    {
+        per_log_err_function_not_supported();
+    }
+
+    per_rcc_en1_set(&rcc->Per->Ethmacen, val);
+}
+
+/// RCC Ethernet Transmission clock enable
+static per_inline bool per_rcc_ethmactxen(const per_rcc_t* const rcc)
+{
+    if (!rcc->Eth)
+    {
+        per_log_err_function_not_supported();
+    }
+
+    return per_rcc_en1(&rcc->Per->Ethmactxen);
+}
+
+/// RCC Ethernet Transmission clock enable
+static per_inline void per_rcc_set_ethmactxen(const per_rcc_t* const rcc, bool val)
+{
+    if (!rcc->Eth)
+    {
+        per_log_err_function_not_supported();
+    }
+
+    per_rcc_en1_set(&rcc->Per->Ethmactxen, val);
+}
+
+/// RCC Ethernet Reception clock enable
+static per_inline bool per_rcc_ethmacrxen(const per_rcc_t* const rcc)
+{
+    if (!rcc->Eth)
+    {
+        per_log_err_function_not_supported();
+    }
+
+    return per_rcc_en1(&rcc->Per->Ethmacrxen);
+}
+
+/// RCC Ethernet Reception clock enable
+static per_inline void per_rcc_set_ethmacrxen(const per_rcc_t* const rcc, bool val)
+{
+    if (!rcc->Eth)
+    {
+        per_log_err_function_not_supported();
+    }
+
+    per_rcc_en1_set(&rcc->Per->Ethmacrxen, val);
+}
+
+/// RCC Ethernet PTP clock enable
+static per_inline bool per_rcc_ethmacptpen(const per_rcc_t* const rcc)
+{
+    if (!rcc->Eth)
+    {
+        per_log_err_function_not_supported();
+    }
+
+    return per_rcc_en1(&rcc->Per->Ethmacptpen);
+}
+
+/// RCC Ethernet PTP clock enable
+static per_inline void per_rcc_set_ethmacptpen(const per_rcc_t* const rcc, bool val)
+{
+    if (!rcc->Eth)
+    {
+        per_log_err_function_not_supported();
+    }
+
+    per_rcc_en1_set(&rcc->Per->Ethmacptpen, val);
+}
+
+/// RCC USB OTG HS clock enable
+static per_inline bool per_rcc_otghsen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Otghsen);
+}
+
+/// RCC USB OTG HS clock enable
+static per_inline void per_rcc_set_otghsen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Otghsen, val);
+}
+
+/// RCC USB OTG HSULPI clock enable
+static per_inline bool per_rcc_otghsulpien(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Otghsulpien);
+}
+
+/// RCC USB OTG HSULPI clock enable
+static per_inline void per_rcc_set_otghsulpien(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Otghsulpien, val);
+}
+
+/// RCC Camera interface enable
+static per_inline bool per_rcc_dcmien(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Dcmien);
+}
+
+/// RCC Camera interface enable
+static per_inline void per_rcc_set_dcmien(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Dcmien, val);
+}
+
+/// RCC Cryptographic modules clock enable
+static per_inline bool per_rcc_crypen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Crypen);
+}
+
+/// RCC Cryptographic modules clock enable
+static per_inline void per_rcc_set_crypen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Crypen, val);
+}
+
+/// RCC Hash modules clock enable
+static per_inline bool per_rcc_hashen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Hashen);
+}
+
+/// RCC Hash modules clock enable
+static per_inline void per_rcc_set_hashen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Hashen, val);
+}
+
+/// RCC Random number generator clock enable
+static per_inline bool per_rcc_rngen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Rngen);
+}
+
+/// RCC Random number generator clock enable
+static per_inline void per_rcc_set_rngen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Rngen, val);
+}
+
+/// RCC USB OTG FS clock enable
+static per_inline bool per_rcc_otgfsen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Otgfsen);
+}
+
+/// RCC USB OTG FS clock enable
+static per_inline void per_rcc_set_otgfsen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Otgfsen, val);
+}
+
+/// RCC Flexible memory controller module clock enable
+static per_inline bool per_rcc_fmcen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Fmcen);
+}
+
+/// RCC Flexible memory controller module clock enable
+static per_inline void per_rcc_set_fmcen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Fmcen, val);
+}
+
+/// RCC TIM2 clock enable
+static per_inline bool per_rcc_tim2en(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Tim2en);
+}
+
+/// RCC TIM2 clock enable
+static per_inline void per_rcc_set_tim2en(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Tim2en, val);
+}
+
+/// RCC TIM3 clock enable
+static per_inline bool per_rcc_tim3en(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Tim3en);
+}
+
+/// RCC TIM3 clock enable
+static per_inline void per_rcc_set_tim3en(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Tim3en, val);
+}
+
+/// RCC TIM4 clock enable
+static per_inline bool per_rcc_tim4en(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Tim4en);
+}
+
+/// RCC TIM4 clock enable
+static per_inline void per_rcc_set_tim4en(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Tim4en, val);
+}
+
+/// RCC TIM5 clock enable
+static per_inline bool per_rcc_tim5en(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Tim5en);
+}
+
+/// RCC TIM5 clock enable
+static per_inline void per_rcc_set_tim5en(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Tim5en, val);
+}
+
+/// RCC TIM6 clock enable
+static per_inline bool per_rcc_tim6en(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Tim6en);
+}
+
+/// RCC TIM6 clock enable
+static per_inline void per_rcc_set_tim6en(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Tim6en, val);
+}
+
+/// RCC TIM7 clock enable
+static per_inline bool per_rcc_tim7en(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Tim7en);
+}
+
+/// RCC TIM7 clock enable
+static per_inline void per_rcc_set_tim7en(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Tim7en, val);
+}
+
+/// RCC TIM12 clock enable
+static per_inline bool per_rcc_tim12en(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Tim12en);
+}
+
+/// RCC TIM12 clock enable
+static per_inline void per_rcc_set_tim12en(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Tim12en, val);
+}
+
+/// RCC TIM13 clock enable
+static per_inline bool per_rcc_tim13en(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Tim13en);
+}
+
+/// RCC TIM13 clock enable
+static per_inline void per_rcc_set_tim13en(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Tim13en, val);
+}
+
+/// RCC TIM14 clock enable
+static per_inline bool per_rcc_tim14en(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Tim14en);
+}
+
+/// RCC TIM14 clock enable
+static per_inline void per_rcc_set_tim14en(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Tim14en, val);
+}
+
+/// RCC Window watchdog clock enable
+static per_inline bool per_rcc_wwdgen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Wwdgen);
+}
+
+/// RCC Window watchdog clock enable
+static per_inline void per_rcc_set_wwdgen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Wwdgen, val);
+}
+
+/// RCC SPI2 clock enable
+static per_inline bool per_rcc_spi2en(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Spi2en);
+}
+
+/// RCC SPI2 clock enable
+static per_inline void per_rcc_set_spi2en(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Spi2en, val);
+}
+
+/// RCC SPI3 clock enable
+static per_inline bool per_rcc_spi3en(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Spi3en);
+}
+
+/// RCC SPI3 clock enable
+static per_inline void per_rcc_set_spi3en(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Spi3en, val);
+}
+
+/// RCC USART2 clock enable
+static per_inline bool per_rcc_usart2en(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Usart2en);
+}
+
+/// RCC USART2 clock enable
+static per_inline void per_rcc_set_usart2en(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Usart2en, val);
+}
+
+/// RCC USART3 clock enable
+static per_inline bool per_rcc_usart3en(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Usart3en);
+}
+
+/// RCC USART3 clock enable
+static per_inline void per_rcc_set_usart3en(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Usart3en, val);
+}
+
+/// RCC UART4 clock enable
+static per_inline bool per_rcc_uart4en(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Uart4en);
+}
+
+/// RCC UART4 clock enable
+static per_inline void per_rcc_set_uart4en(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Uart4en, val);
+}
+
+/// RCC UART5 clock enable
+static per_inline bool per_rcc_uart5en(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Uart5en);
+}
+
+/// RCC UART5 clock enable
+static per_inline void per_rcc_set_uart5en(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Uart5en, val);
+}
+
+/// RCC I2C1 clock enable
+static per_inline bool per_rcc_i2c1en(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->I2c1en);
+}
+
+/// RCC I2C1 clock enable
+static per_inline void per_rcc_set_i2c1en(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->I2c1en, val);
+}
+
+/// RCC I2C2 clock enable
+static per_inline bool per_rcc_i2c2en(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->I2c2en);
+}
+
+/// RCC I2C2 clock enable
+static per_inline void per_rcc_set_i2c2en(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->I2c2en, val);
+}
+
+/// RCC I2C3 clock enable
+static per_inline bool per_rcc_i2c3en(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->I2c3en);
+}
+
+/// RCC I2C3 clock enable
+static per_inline void per_rcc_set_i2c3en(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->I2c3en, val);
+}
+
+/// RCC CAN1 clock enable
+static per_inline bool per_rcc_can1en(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Can1en);
+}
+
+/// RCC CAN1 clock enable
+static per_inline void per_rcc_set_can1en(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Can1en, val);
+}
+
+/// RCC CAN2 clock enable
+static per_inline bool per_rcc_can2en(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Can2en);
+}
+
+/// RCC CAN2 clock enable
+static per_inline void per_rcc_set_can2en(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Can2en, val);
+}
+
+/// RCC Power interface clock enable
+static per_inline bool per_rcc_pwren(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Pwren);
+}
+
+/// RCC Power interface clock enable
+static per_inline void per_rcc_set_pwren(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Pwren, val);
+}
+
+/// RCC DAC interface clock enable
+static per_inline bool per_rcc_dacen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Dacen);
+}
+
+/// RCC DAC interface clock enable
+static per_inline void per_rcc_set_dacen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Dacen, val);
+}
+
+/// RCC UART7 clock enable
+static per_inline bool per_rcc_uart7en(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Uart7en);
+}
+
+/// RCC UART7 clock enable
+static per_inline void per_rcc_set_uart7en(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Uart7en, val);
+}
+
+/// RCC UART8 clock enable
+static per_inline bool per_rcc_uart8en(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Uart8en);
+}
+
+/// RCC UART8 clock enable
+static per_inline void per_rcc_set_uart8en(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Uart8en, val);
+}
+
+/// RCC TIM1 clock enable
+static per_inline bool per_rcc_tim1en(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Tim1en);
+}
+
+/// RCC TIM1 clock enable
+static per_inline void per_rcc_set_tim1en(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Tim1en, val);
+}
+
+/// RCC TIM8 clock enable
+static per_inline bool per_rcc_tim8en(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Tim8en);
+}
+
+/// RCC TIM8 clock enable
+static per_inline void per_rcc_set_tim8en(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Tim8en, val);
+}
+
+/// RCC USART1 clock enable
+static per_inline bool per_rcc_usart1en(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Usart1en);
+}
+
+/// RCC USART1 clock enable
+static per_inline void per_rcc_set_usart1en(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Usart1en, val);
+}
+
+/// RCC USART6 clock enable
+static per_inline bool per_rcc_usart6en(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Usart6en);
+}
+
+/// RCC USART6 clock enable
+static per_inline void per_rcc_set_usart6en(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Usart6en, val);
+}
+
+/// RCC ADC1 clock enable
+static per_inline bool per_rcc_adc1en(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Adc1en);
+}
+
+/// RCC ADC1 clock enable
+static per_inline void per_rcc_set_adc1en(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Adc1en, val);
+}
+
+/// RCC ADC2 clock enable
+static per_inline bool per_rcc_adc2en(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Adc2en);
+}
+
+/// RCC ADC2 clock enable
+static per_inline void per_rcc_set_adc2en(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Adc2en, val);
+}
+
+/// RCC ADC3 clock enable
+static per_inline bool per_rcc_adc3en(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Adc3en);
+}
+
+/// RCC ADC3 clock enable
+static per_inline void per_rcc_set_adc3en(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Adc3en, val);
+}
+
+/// RCC SDIO clock enable
+static per_inline bool per_rcc_sdioen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Sdioen);
+}
+
+/// RCC SDIO clock enable
+static per_inline void per_rcc_set_sdioen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Sdioen, val);
+}
+
+/// RCC SPI1 clock enable
+static per_inline bool per_rcc_spi1en(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Spi1en);
+}
+
+/// RCC SPI1 clock enable
+static per_inline void per_rcc_set_spi1en(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Spi1en, val);
+}
+
+/// RCC SPI4 clock enable
+static per_inline bool per_rcc_spi4en(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Spi4en);
+}
+
+/// RCC SPI4 clock enable
+static per_inline void per_rcc_set_spi4en(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Spi4en, val);
+}
+
+/// RCC SYSCFGEN clock enable
+static per_inline bool per_rcc_syscfgen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Syscfgen);
+}
+
+/// RCC SYSCFGEN clock enable
+static per_inline void per_rcc_set_syscfgen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Syscfgen, val);
+}
+
+/// RCC TIM9 clock enable
+static per_inline bool per_rcc_tim9en(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Tim9en);
+}
+
+/// RCC TIM9 clock enable
+static per_inline void per_rcc_set_tim9en(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Tim9en, val);
+}
+
+/// RCC TIM10 clock enable
+static per_inline bool per_rcc_tim10en(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Tim10en);
+}
+
+/// RCC TIM10 clock enable
+static per_inline void per_rcc_set_tim10en(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Tim10en, val);
+}
+
+/// RCC TIM11 clock enable
+static per_inline bool per_rcc_tim11en(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Tim11en);
+}
+
+/// RCC TIM11 clock enable
+static per_inline void per_rcc_set_tim11en(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Tim11en, val);
+}
+
+/// RCC SPI5 clock enable
+static per_inline bool per_rcc_spi5en(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Spi5en);
+}
+
+/// RCC SPI5 clock enable
+static per_inline void per_rcc_set_spi5en(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Spi5en, val);
+}
+
+/// RCC SPI6 clock enable
+static per_inline bool per_rcc_spi6en(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Spi6en);
+}
+
+/// RCC SPI6 clock enable
+static per_inline void per_rcc_set_spi6en(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Spi6en, val);
+}
+
+/// RCC SAI1 clock enable
+static per_inline bool per_rcc_sai1en(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Sai1en);
+}
+
+/// RCC SAI1 clock enable
+static per_inline void per_rcc_set_sai1en(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Sai1en, val);
+}
+
+/// RCC LTDC clock enable
+static per_inline bool per_rcc_ltdcen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Ltdcen);
+}
+
+/// RCC LTDC clock enable
+static per_inline void per_rcc_set_ltdcen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Ltdcen, val);
+}
+
+/// RCC IO port A clock enable during Sleep mode
+static per_inline bool per_rcc_gpioalpen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Gpioalpen);
+}
+
+/// RCC IO port A clock enable during Sleep mode
+static per_inline void per_rcc_set_gpioalpen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Gpioalpen, val);
+}
+
+/// RCC IO port B clock enable during Sleep mode
+static per_inline bool per_rcc_gpioblpen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Gpioblpen);
+}
+
+/// RCC IO port B clock enable during Sleep mode
+static per_inline void per_rcc_set_gpioblpen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Gpioblpen, val);
+}
+
+/// RCC IO port C clock enable during Sleep mode
+static per_inline bool per_rcc_gpioclpen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Gpioclpen);
+}
+
+/// RCC IO port C clock enable during Sleep mode
+static per_inline void per_rcc_set_gpioclpen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Gpioclpen, val);
+}
+
+/// RCC IO port D clock enable during Sleep mode
+static per_inline bool per_rcc_gpiodlpen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Gpiodlpen);
+}
+
+/// RCC IO port D clock enable during Sleep mode
+static per_inline void per_rcc_set_gpiodlpen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Gpiodlpen, val);
+}
+
+/// RCC IO port E clock enable during Sleep mode
+static per_inline bool per_rcc_gpioelpen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Gpioelpen);
+}
+
+/// RCC IO port E clock enable during Sleep mode
+static per_inline void per_rcc_set_gpioelpen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Gpioelpen, val);
+}
+
+/// RCC IO port F clock enable during Sleep mode
+static per_inline bool per_rcc_gpioflpen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Gpioflpen);
+}
+
+/// RCC IO port F clock enable during Sleep mode
+static per_inline void per_rcc_set_gpioflpen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Gpioflpen, val);
+}
+
+/// RCC IO port G clock enable during Sleep mode
+static per_inline bool per_rcc_gpioglpen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Gpioglpen);
+}
+
+/// RCC IO port G clock enable during Sleep mode
+static per_inline void per_rcc_set_gpioglpen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Gpioglpen, val);
+}
+
+/// RCC IO port H clock enable during Sleep mode
+static per_inline bool per_rcc_gpiohlpen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Gpiohlpen);
+}
+
+/// RCC IO port H clock enable during Sleep mode
+static per_inline void per_rcc_set_gpiohlpen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Gpiohlpen, val);
+}
+
+/// RCC IO port I clock enable during Sleep mode
+static per_inline bool per_rcc_gpioilpen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Gpioilpen);
+}
+
+/// RCC IO port I clock enable during Sleep mode
+static per_inline void per_rcc_set_gpioilpen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Gpioilpen, val);
+}
+
+/// RCC IO port J clock enable during Sleep mode
+static per_inline bool per_rcc_gpiojlpen(const per_rcc_t* const rcc)
+{
+    if (rcc->GpioNr < PER_RCC_GPIO_NR_11)
+    {
+        per_log_err_function_not_supported();
+    }
+
+    return per_rcc_en1(&rcc->Per->Gpiojlpen);
+}
+
+/// RCC IO port J clock enable during Sleep mode
+static per_inline void per_rcc_set_gpiojlpen(const per_rcc_t* const rcc, bool val)
+{
+    if (rcc->GpioNr < PER_RCC_GPIO_NR_11)
+    {
+        per_log_err_function_not_supported();
+    }
+
+    per_rcc_en1_set(&rcc->Per->Gpiojlpen, val);
+}
+
+/// RCC IO port K clock enable during Sleep mode
+static per_inline bool per_rcc_gpioklpen(const per_rcc_t* const rcc)
+{
+    if (rcc->GpioNr < PER_RCC_GPIO_NR_11)
+    {
+        per_log_err_function_not_supported();
+    }
+
+    return per_rcc_en1(&rcc->Per->Gpioklpen);
+}
+
+/// RCC IO port K clock enable during Sleep mode
+static per_inline void per_rcc_set_gpioklpen(const per_rcc_t* const rcc, bool val)
+{
+    if (rcc->GpioNr < PER_RCC_GPIO_NR_11)
+    {
+        per_log_err_function_not_supported();
+    }
+
+    per_rcc_en1_set(&rcc->Per->Gpioklpen, val);
+}
+
+/// RCC CRC clock enable during Sleep mode
+static per_inline bool per_rcc_crclpen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Crclpen);
+}
+
+/// RCC CRC clock enable during Sleep mode
+static per_inline void per_rcc_set_crclpen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Crclpen, val);
+}
+
+/// RCC Flash interface clock enable during Sleep mode
+static per_inline bool per_rcc_flitflpen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Flitflpen);
+}
+
+/// RCC Flash interface clock enable during Sleep mode
+static per_inline void per_rcc_set_flitflpen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Flitflpen, val);
+}
+
+/// RCC SRAM 1 interface clock enable during Sleep mode
+static per_inline bool per_rcc_sram1lpen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Sram1lpen);
+}
+
+/// RCC SRAM 1 interface clock enable during Sleep mode
+static per_inline void per_rcc_set_sram1lpen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Sram1lpen, val);
+}
+
+/// RCC SRAM 2 interface clock enable during Sleep mode
+static per_inline bool per_rcc_sram2lpen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Sram2lpen);
+}
+
+/// RCC SRAM 2 interface clock enable during Sleep mode
+static per_inline void per_rcc_set_sram2lpen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Sram2lpen, val);
+}
+
+/// RCC Backup SRAM interface clock enable during Sleep mode
+static per_inline bool per_rcc_bkpsramlpen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Bkpsramlpen);
+}
+
+/// RCC Backup SRAM interface clock enable during Sleep mode
+static per_inline void per_rcc_set_bkpsramlpen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Bkpsramlpen, val);
+}
+
+/// RCC SRAM 3 interface clock enable during Sleep mode
+static per_inline bool per_rcc_sram3lpen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Sram3lpen);
+}
+
+/// RCC SRAM 3 interface clock enable during Sleep mode
+static per_inline void per_rcc_set_sram3lpen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Sram3lpen, val);
+}
+
+/// RCC DMA1 clock enable during Sleep mode
+static per_inline bool per_rcc_dma1lpen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Dma1lpen);
+}
+
+/// RCC DMA1 clock enable during Sleep mode
+static per_inline void per_rcc_set_dma1lpen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Dma1lpen, val);
+}
+
+/// RCC DMA2 clock enable during Sleep mode
+static per_inline bool per_rcc_dma2lpen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Dma2lpen);
+}
+
+/// RCC DMA2 clock enable during Sleep mode
+static per_inline void per_rcc_set_dma2lpen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Dma2lpen, val);
+}
+
+/// RCC DMA2D clock enable during Sleep mode
+static per_inline bool per_rcc_dma2dlpen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Dma2dlpen);
+}
+
+/// RCC DMA2D clock enable during Sleep mode
+static per_inline void per_rcc_set_dma2dlpen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Dma2dlpen, val);
+}
+
+/// RCC Ethernet MAC clock enable during Sleep mode
+static per_inline bool per_rcc_ethmaclpen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Ethmaclpen);
+}
+
+/// RCC Ethernet MAC clock enable during Sleep mode
+static per_inline void per_rcc_set_ethmaclpen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Ethmaclpen, val);
+}
+
+/// RCC Ethernet Transmission clock enable during Sleep mode
+static per_inline bool per_rcc_ethmactxlpen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Ethmactxlpen);
+}
+
+/// RCC Ethernet Transmission clock enable during Sleep mode
+static per_inline void per_rcc_set_ethmactxlpen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Ethmactxlpen, val);
+}
+
+/// RCC Ethernet Reception clock enable during Sleep mode
+static per_inline bool per_rcc_ethmacrxlpen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Ethmacrxlpen);
+}
+
+/// RCC Ethernet Reception clock enable during Sleep mode
+static per_inline void per_rcc_set_ethmacrxlpen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Ethmacrxlpen, val);
+}
+
+/// RCC Ethernet PTP clock enable during Sleep mode
+static per_inline bool per_rcc_ethmacptplpen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Ethmacptplpen);
+}
+
+/// RCC Ethernet PTP clock enable during Sleep mode
+static per_inline void per_rcc_set_ethmacptplpen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Ethmacptplpen, val);
+}
+
+/// RCC USB OTG HS clock enable during Sleep mode
+static per_inline bool per_rcc_otghslpen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Otghslpen);
+}
+
+/// RCC USB OTG HS clock enable during Sleep mode
+static per_inline void per_rcc_set_otghslpen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Otghslpen, val);
+}
+
+/// RCC USB OTG HSULPI clock enable during Sleep mode
+static per_inline bool per_rcc_otghsulpilpen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Otghsulpilpen);
+}
+
+/// RCC USB OTG HSULPI clock enable during Sleep mode
+static per_inline void per_rcc_set_otghsulpilpen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Otghsulpilpen, val);
+}
+
+/// RCC Camera interface enable during Sleep mode
+static per_inline bool per_rcc_dcmilpen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Dcmilpen);
+}
+
+/// RCC Camera interface enable during Sleep mode
+static per_inline void per_rcc_set_dcmilpen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Dcmilpen, val);
+}
+
+/// RCC Cryptographic modules clock enable during Sleep mode
+static per_inline bool per_rcc_cryplpen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Cryplpen);
+}
+
+/// RCC Cryptographic modules clock enable during Sleep mode
+static per_inline void per_rcc_set_cryplpen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Cryplpen, val);
+}
+
+/// RCC Hash modules clock enable during Sleep mode
+static per_inline bool per_rcc_hashlpen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Hashlpen);
+}
+
+/// RCC Hash modules clock enable during Sleep mode
+static per_inline void per_rcc_set_hashlpen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Hashlpen, val);
+}
+
+/// RCC Random number generator clock enable during Sleep mode
+static per_inline bool per_rcc_rnglpen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Rnglpen);
+}
+
+/// RCC Random number generator clock enable during Sleep mode
+static per_inline void per_rcc_set_rnglpen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Rnglpen, val);
+}
+
+/// RCC USB OTG FS clock enable during Sleep mode
+static per_inline bool per_rcc_otgfslpen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Otgfslpen);
+}
+
+/// RCC USB OTG FS clock enable during Sleep mode
+static per_inline void per_rcc_set_otgfslpen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Otgfslpen, val);
+}
+
+/// RCC Flexible memory controller module clock enable during Sleep mode
+static per_inline bool per_rcc_fmclpen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Fmclpen);
+}
+
+/// RCC Flexible memory controller module clock enable during Sleep mode
+static per_inline void per_rcc_set_fmclpen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Fmclpen, val);
+}
+
+/// RCC TIM2 clock enable during Sleep mode
+static per_inline bool per_rcc_tim2lpen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Tim2lpen);
+}
+
+/// RCC TIM2 clock enable during Sleep mode
+static per_inline void per_rcc_set_tim2lpen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Tim2lpen, val);
+}
+
+/// RCC TIM3 clock enable during Sleep mode
+static per_inline bool per_rcc_tim3lpen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Tim3lpen);
+}
+
+/// RCC TIM3 clock enable during Sleep mode
+static per_inline void per_rcc_set_tim3lpen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Tim3lpen, val);
+}
+
+/// RCC TIM4 clock enable during Sleep mode
+static per_inline bool per_rcc_tim4lpen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Tim4lpen);
+}
+
+/// RCC TIM4 clock enable during Sleep mode
+static per_inline void per_rcc_set_tim4lpen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Tim4lpen, val);
+}
+
+/// RCC TIM5 clock enable during Sleep mode
+static per_inline bool per_rcc_tim5lpen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Tim5lpen);
+}
+
+/// RCC TIM5 clock enable during Sleep mode
+static per_inline void per_rcc_set_tim5lpen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Tim5lpen, val);
+}
+
+/// RCC TIM6 clock enable during Sleep mode
+static per_inline bool per_rcc_tim6lpen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Tim6lpen);
+}
+
+/// RCC TIM6 clock enable during Sleep mode
+static per_inline void per_rcc_set_tim6lpen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Tim6lpen, val);
+}
+
+/// RCC TIM7 clock enable during Sleep mode
+static per_inline bool per_rcc_tim7lpen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Tim7lpen);
+}
+
+/// RCC TIM7 clock enable during Sleep mode
+static per_inline void per_rcc_set_tim7lpen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Tim7lpen, val);
+}
+
+/// RCC TIM12 clock enable during Sleep mode
+static per_inline bool per_rcc_tim12lpen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Tim12lpen);
+}
+
+/// RCC TIM12 clock enable during Sleep mode
+static per_inline void per_rcc_set_tim12lpen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Tim12lpen, val);
+}
+
+/// RCC TIM13 clock enable during Sleep mode
+static per_inline bool per_rcc_tim13lpen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Tim13lpen);
+}
+
+/// RCC TIM13 clock enable during Sleep mode
+static per_inline void per_rcc_set_tim13lpen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Tim13lpen, val);
+}
+
+/// RCC TIM14 clock enable during Sleep mode
+static per_inline bool per_rcc_tim14lpen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Tim14lpen);
+}
+
+/// RCC TIM14 clock enable during Sleep mode
+static per_inline void per_rcc_set_tim14lpen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Tim14lpen, val);
+}
+
+/// RCC Window watchdog clock enable during Sleep mode
+static per_inline bool per_rcc_wwdglpen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Wwdglpen);
+}
+
+/// RCC Window watchdog clock enable during Sleep mode
+static per_inline void per_rcc_set_wwdglpen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Wwdglpen, val);
+}
+
+/// RCC SPI2 clock enable during Sleep mode
+static per_inline bool per_rcc_spi2lpen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Spi2lpen);
+}
+
+/// RCC SPI2 clock enable during Sleep mode
+static per_inline void per_rcc_set_spi2lpen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Spi2lpen, val);
+}
+
+/// RCC SPI3 clock enable during Sleep mode
+static per_inline bool per_rcc_spi3lpen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Spi3lpen);
+}
+
+/// RCC SPI3 clock enable during Sleep mode
+static per_inline void per_rcc_set_spi3lpen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Spi3lpen, val);
+}
+
+/// RCC USART2 clock enable during Sleep mode
+static per_inline bool per_rcc_usart2lpen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Usart2lpen);
+}
+
+/// RCC USART2 clock enable during Sleep mode
+static per_inline void per_rcc_set_usart2lpen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Usart2lpen, val);
+}
+
+/// RCC USART3 clock enable during Sleep mode
+static per_inline bool per_rcc_usart3lpen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Usart3lpen);
+}
+
+/// RCC USART3 clock enable during Sleep mode
+static per_inline void per_rcc_set_usart3lpen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Usart3lpen, val);
+}
+
+/// RCC UART4 clock enable during Sleep mode
+static per_inline bool per_rcc_uart4lpen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Uart4lpen);
+}
+
+/// RCC UART4 clock enable during Sleep mode
+static per_inline void per_rcc_set_uart4lpen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Uart4lpen, val);
+}
+
+/// RCC UART5 clock enable during Sleep mode
+static per_inline bool per_rcc_uart5lpen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Uart5lpen);
+}
+
+/// RCC UART5 clock enable during Sleep mode
+static per_inline void per_rcc_set_uart5lpen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Uart5lpen, val);
+}
+
+/// RCC I2C1 clock enable during Sleep mode
+static per_inline bool per_rcc_i2c1lpen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->I2c1lpen);
+}
+
+/// RCC I2C1 clock enable during Sleep mode
+static per_inline void per_rcc_set_i2c1lpen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->I2c1lpen, val);
+}
+
+/// RCC I2C2 clock enable during Sleep mode
+static per_inline bool per_rcc_i2c2lpen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->I2c2lpen);
+}
+
+/// RCC I2C2 clock enable during Sleep mode
+static per_inline void per_rcc_set_i2c2lpen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->I2c2lpen, val);
+}
+
+/// RCC I2C3 clock enable during Sleep mode
+static per_inline bool per_rcc_i2c3lpen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->I2c3lpen);
+}
+
+/// RCC I2C3 clock enable during Sleep mode
+static per_inline void per_rcc_set_i2c3lpen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->I2c3lpen, val);
+}
+
+/// RCC CAN1 clock enable during Sleep mode
+static per_inline bool per_rcc_can1lpen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Can1lpen);
+}
+
+/// RCC CAN1 clock enable during Sleep mode
+static per_inline void per_rcc_set_can1lpen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Can1lpen, val);
+}
+
+/// RCC CAN2 clock enable during Sleep mode
+static per_inline bool per_rcc_can2lpen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Can2lpen);
+}
+
+/// RCC CAN2 clock enable during Sleep mode
+static per_inline void per_rcc_set_can2lpen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Can2lpen, val);
+}
+
+/// RCC Power interface clock enable during Sleep mode
+static per_inline bool per_rcc_pwrlpen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Pwrlpen);
+}
+
+/// RCC Power interface clock enable during Sleep mode
+static per_inline void per_rcc_set_pwrlpen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Pwrlpen, val);
+}
+
+/// RCC DAC interface clock enable during Sleep mode
+static per_inline bool per_rcc_daclpen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Daclpen);
+}
+
+/// RCC DAC interface clock enable during Sleep mode
+static per_inline void per_rcc_set_daclpen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Daclpen, val);
+}
+
+/// RCC UART7 clock enable during Sleep mode
+static per_inline bool per_rcc_uart7lpen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Uart7lpen);
+}
+
+/// RCC UART7 clock enable during Sleep mode
+static per_inline void per_rcc_set_uart7lpen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Uart7lpen, val);
+}
+
+/// RCC UART8 clock enable during Sleep mode
+static per_inline bool per_rcc_uart8lpen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Uart8lpen);
+}
+
+/// RCC UART8 clock enable during Sleep mode
+static per_inline void per_rcc_set_uart8lpen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Uart8lpen, val);
+}
+
+/// RCC TIM1 clock enable during Sleep mode
+static per_inline bool per_rcc_tim1lpen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Tim1lpen);
+}
+
+/// RCC TIM1 clock enable during Sleep mode
+static per_inline void per_rcc_set_tim1lpen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Tim1lpen, val);
+}
+
+/// RCC TIM8 clock enable during Sleep mode
+static per_inline bool per_rcc_tim8lpen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Tim8lpen);
+}
+
+/// RCC TIM8 clock enable during Sleep mode
+static per_inline void per_rcc_set_tim8lpen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Tim8lpen, val);
+}
+
+/// RCC USART1 clock enable during Sleep mode
+static per_inline bool per_rcc_usart1lpen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Usart1lpen);
+}
+
+/// RCC USART1 clock enable during Sleep mode
+static per_inline void per_rcc_set_usart1lpen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Usart1lpen, val);
+}
+
+/// RCC USART6 clock enable during Sleep mode
+static per_inline bool per_rcc_usart6lpen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Usart6lpen);
+}
+
+/// RCC USART6 clock enable during Sleep mode
+static per_inline void per_rcc_set_usart6lpen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Usart6lpen, val);
+}
+
+/// RCC ADC1 clock enable during Sleep mode
+static per_inline bool per_rcc_adc1lpen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Adc1lpen);
+}
+
+/// RCC ADC1 clock enable during Sleep mode
+static per_inline void per_rcc_set_adc1lpen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Adc1lpen, val);
+}
+
+/// RCC ADC2 clock enable during Sleep mode
+static per_inline bool per_rcc_adc2lpen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Adc2lpen);
+}
+
+/// RCC ADC2 clock enable during Sleep mode
+static per_inline void per_rcc_set_adc2lpen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Adc2lpen, val);
+}
+
+/// RCC ADC3 clock enable during Sleep mode
+static per_inline bool per_rcc_adc3lpen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Adc3lpen);
+}
+
+/// RCC ADC3 clock enable during Sleep mode
+static per_inline void per_rcc_set_adc3lpen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Adc3lpen, val);
+}
+
+/// RCC SDIO clock enable during Sleep mode
+static per_inline bool per_rcc_sdiolpen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Sdiolpen);
+}
+
+/// RCC SDIO clock enable during Sleep mode
+static per_inline void per_rcc_set_sdiolpen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Sdiolpen, val);
+}
+
+/// RCC SPI1 clock enable during Sleep mode
+static per_inline bool per_rcc_spi1lpen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Spi1lpen);
+}
+
+/// RCC SPI1 clock enable during Sleep mode
+static per_inline void per_rcc_set_spi1lpen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Spi1lpen, val);
+}
+
+/// RCC SPI4 clock enable during Sleep mode
+static per_inline bool per_rcc_spi4lpen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Spi4lpen);
+}
+
+/// RCC SPI4 clock enable during Sleep mode
+static per_inline void per_rcc_set_spi4lpen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Spi4lpen, val);
+}
+
+/// RCC SYSCFGEN clock enable during Sleep mode
+static per_inline bool per_rcc_syscfglpen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Syscfglpen);
+}
+
+/// RCC SYSCFGEN clock enable during Sleep mode
+static per_inline void per_rcc_set_syscfglpen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Syscfglpen, val);
+}
+
+/// RCC TIM9 clock enable during Sleep mode
+static per_inline bool per_rcc_tim9lpen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Tim9lpen);
+}
+
+/// RCC TIM9 clock enable during Sleep mode
+static per_inline void per_rcc_set_tim9lpen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Tim9lpen, val);
+}
+
+/// RCC TIM10 clock enable during Sleep mode
+static per_inline bool per_rcc_tim10lpen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Tim10lpen);
+}
+
+/// RCC TIM10 clock enable during Sleep mode
+static per_inline void per_rcc_set_tim10lpen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Tim10lpen, val);
+}
+
+/// RCC TIM11 clock enable during Sleep mode
+static per_inline bool per_rcc_tim11lpen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Tim11lpen);
+}
+
+/// RCC TIM11 clock enable during Sleep mode
+static per_inline void per_rcc_set_tim11lpen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Tim11lpen, val);
+}
+
+/// RCC SPI5 clock enable during Sleep mode
+static per_inline bool per_rcc_spi5lpen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Spi5lpen);
+}
+
+/// RCC SPI5 clock enable during Sleep mode
+static per_inline void per_rcc_set_spi5lpen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Spi5lpen, val);
+}
+
+/// RCC SPI6 clock enable during Sleep mode
+static per_inline bool per_rcc_spi6lpen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Spi6lpen);
+}
+
+/// RCC SPI6 clock enable during Sleep mode
+static per_inline void per_rcc_set_spi6lpen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Spi6lpen, val);
+}
+
+/// RCC SAI1 clock enable during Sleep mode
+static per_inline bool per_rcc_sai1lpen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Sai1lpen);
+}
+
+/// RCC SAI1 clock enable during Sleep mode
+static per_inline void per_rcc_set_sai1lpen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Sai1lpen, val);
+}
+
+/// RCC LTDC clock enable during Sleep mode
+static per_inline bool per_rcc_ltdclpen(const per_rcc_t* const rcc)
+{
+    return per_rcc_en1(&rcc->Per->Ltdclpen);
+}
+
+/// RCC LTDC clock enable during Sleep mode
+static per_inline void per_rcc_set_ltdclpen(const per_rcc_t* const rcc, bool val)
+{
+    per_rcc_en1_set(&rcc->Per->Ltdclpen, val);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+///// RCC
+//static per_inline bool per_rcc_(const per_rcc_t* const rcc)
+//{
+//    return per_rcc_en1(&rcc->Per->);
+//}
+//
+///// RCC
+//static per_inline void per_rcc_set_(const per_rcc_t* const rcc, bool val)
+//{
+//    per_rcc_en1_set(&rcc->Per->, val);
+//}
 
 #ifdef __cplusplus
 }

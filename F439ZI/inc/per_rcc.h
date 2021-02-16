@@ -43,6 +43,8 @@ static per_inline const per_rcc_t* const per_rcc(void)
     {
         .Per = (per_rcc_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_RCC),
         .Err = PER_LOG_RCC,
+        .GpioNr = PER_RCC_GPIO_NR_11,
+        .Eth = true,
     };
     return &rcc;
 }
@@ -53,7 +55,7 @@ static per_inline uint_fast32_t per_rcc_apb1_per_freq(void)
     return per_rcc_freq() / per_rcc_apb_div(&(per_rcc()->Per->Ppre1));
 }
 
-/// Frequency of APB1
+/// APB1 timer clock frequency
 static per_inline uint_fast32_t per_rcc_apb1_tim_freq(void)
 {
     return per_rcc_apb1_per_freq() * PER_RCC_APB_PER_TO_TIM_MUL;
@@ -65,7 +67,7 @@ static per_inline uint_fast32_t per_rcc_apb2_per_freq(void)
     return per_rcc_freq() / per_rcc_apb_div(&(per_rcc()->Per->Ppre2));
 }
 
-/// Frequency of APB2
+/// APB2 timer clock frequency
 static per_inline uint_fast32_t per_rcc_apb2_tim_freq(void)
 {
     return per_rcc_apb2_per_freq() * PER_RCC_APB_PER_TO_TIM_MUL;
