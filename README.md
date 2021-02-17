@@ -1,16 +1,15 @@
 ## ALOHA!
 This project is a hardware abstraction (HAL) library for F4 series micro-controller peripherals written in C.  
 The advantages of this libary are:
-* Faster execution (2x)
-* Smaller size (1/2)
+* Faster execution
+* Smaller size
 * Interrupt and thread safe register manipulation
 * Type safe consistent API interface
-* It can co-exist with another HAL library
+* It can co-exist with other HAL libraries
 
-Tests on typical GPIO peripheral functions showed 50% shorter execution time and 50% smaller footprint.  
+Tests on typical GPIO peripheral functions showed 25-30% shorter execution time and 25-30% smaller footprint.  
 Bitband technology is used extensively to maximise performance and to minimise footprint.
-These figures can easily be verified by executing instructions under the chapter TEST below.
-This library is ideally to give existing bare-metal projects a performance boost.
+This library can give existing bare-metal projects a performance boost.
 
 ### Bitband
 This technique is excellently explained by: [Martin Hubacek](http://www.martinhubacek.cz/arm/advanced-arm-cortex-tips/bit-banding---fast-and-safe-bit-manipulation)
@@ -21,17 +20,7 @@ Two examples. The first one is a GPIO set output, the second is an interrupt han
 ```c++
     #include "per_gpio.h"
    
-    // Definition of green LED
-    static per_inline const per_gpio_out_t* const bsp_gpio_led_green(void)
-    {
-        static const per_gpio_out_t gpio =
-        {
-            .Per = PER_GPIOB,
-            .Pin = PER_GPIO_PIN_0,
-        };
-        return &gpio;
-    }
-	
+    #define bsp_gpio_led_green() (&PER_GPIOB->Odr[PER_GPIO_PIN_0])
 
     // Enable the green LED
     per_gpio_set_out(bsp_gpio_led_green(), true);
@@ -51,40 +40,6 @@ Two examples. The first one is a GPIO set output, the second is an interrupt han
             // ...
         }
     }
-```
-
-## TEST
-1. Add the include libraries F4/inc and F439ZI/inc to an existing project.
-1. Add the code below to a source file.
-1. Compile it with -O3.
-1. Note the size of the executable.
-1. Replace per_gpio_set_out() with a comparable function from another HAL library.
-1. Compile
-1. Compare the size of the executable.  
-
-```c++
-    #include "per_gpio.h"
-	
-   
-    // Single definition of green LED
-    static per_inline const per_gpio_out_t* const bsp_gpio_led_green(void)
-    {
-        // Replace PER_GPIOB and PER_GPIO_PIN_0 with valid port and pin values or an output
-        static const per_gpio_out_t gpio =
-        {
-            .Per = PER_GPIOB,
-            .Pin = PER_GPIO_PIN_0,
-        };
-        return &gpio;
-    }
-	
-	
-	
-    // Make a variable value here. Replace dots by some non const value.
-    bool value = ...;
-
-    // Enable the green LED
-    per_gpio_set_out(bsp_gpio_led_green(), value);
 ```
 
 ## SYNTAX
@@ -198,7 +153,7 @@ An example is F439/inc/per_usart.h.
 ### peripheral descriptor functions
 Access to the peripheral descriptors is done via functions that return this descriptor.  
 This function interface is future proof and it is consistent for all peripherals.
-For example **per_usart_1(void)**. The functions limit the scope the desciptor structure.  
+For example **per_usart_1()**. The functions limit the scope the desciptor structure.  
 
 ## inline
 All the layers are provided in header files and inline functions. This allows the compiler to resolve all constants and optimise this all to a minimum size executable with fast execution times.

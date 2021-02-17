@@ -28,15 +28,7 @@
  * per_gpio_set_xxx()       Set
  *
  * First define the GPIO
- * static per_inline const per_gpio_out_t* const bsp_gpio_led_green(void)
- * {
- *    static const per_gpio_out_t gpio =
- *    {
- *        .Per = PER_GPIOB,
- *        .Pin = PER_GPIO_PIN_0,
- *    };
- *    return &gpio;
- * }
+ * #define bsp_gpio_led_green() (&PER_GPIOB->Odr[PER_GPIO_PIN_0])
  *
  * Initialize it as output
  * per_gpio_init_out(bsp_gpio_led_green(), PER_GPIO_OTYPE_PUSH_PULL, PER_GPIO_OSPEED_LOW);
@@ -62,6 +54,36 @@ extern "C" {
 
 /// Number of GPIO per register
 #define PER_GPIO_MAX (16)
+
+/// Input type
+typedef struct
+{
+    per_bit_bitband_t R; ///< One read bit
+} per_gpio_in_t;
+
+/// GPIO get input
+static per_inline bool per_gpio_in(const per_gpio_in_t* const self)
+{
+    return self->R.Bit8 != PER_BIT_0;
+}
+
+/// Output type
+typedef struct
+{
+    per_bit_bitband_t Rw; ///< One read write bit
+} per_gpio_out_t;
+
+/// GPIO get output
+static per_inline bool per_gpio_out(const per_gpio_out_t* const self)
+{
+    return self->Rw.Bit8 != PER_BIT_0;
+}
+
+/// GPIO set output
+static per_inline void per_gpio_set_out(per_gpio_out_t* const self, bool val)
+{
+    self->Rw.Bit8 = (uint_fast8_t)val; // one cycle faster compared to per_gpio_set_bsrr()
+}
 
 /// GPIO pin enumeration
 typedef enum
@@ -182,11 +204,11 @@ typedef struct
     per_bit_rw2_t Pupdr[PER_GPIO_MAX]; ///< Configure the I/O pull-up or pull-down
 
     // IDR port input data register
-    per_bit_r1_t Idr[PER_GPIO_MAX]; ///< The input value of the corresponding I/O port.
+    per_gpio_in_t Idr[PER_GPIO_MAX]; ///< The input value of the corresponding I/O port.
     per_bit_n16_t IdrBit16;         ///< Reserved
 
     // ODR port output data register
-    per_bit_rw1_t Odr[PER_GPIO_MAX]; ///< Port output data
+    per_gpio_out_t Odr[PER_GPIO_MAX]; ///< Port output data
     per_bit_n16_t OdrBit16;          ///< Reserved
 
     // BSRR port bit set/reset register
@@ -201,34 +223,6 @@ typedef struct
     // AFRL AFRH alternate function low/high register
     per_bit_rw4_t Afr[PER_GPIO_MAX]; ///< Alternate function selection
 } __attribute__((packed)) per_gpio_t;
-
-/// GPIO Input type
-typedef struct
-{
-    per_gpio_t* const Per;    ///< Peripheral
-    const per_gpio_pin_e Pin; ///< Pin number
-} per_gpio_in_t;
-
-/// GPIO Output type
-typedef struct
-{
-    per_gpio_t* const Per;    ///< Peripheral
-    const per_gpio_pin_e Pin; ///< Pin number
-} per_gpio_out_t;
-
-/// GPIO Input alternate function type
-typedef struct
-{
-    per_gpio_t* const Per;    ///< Peripheral
-    const per_gpio_pin_e Pin; ///< Pin number
-} per_gpio_in_af_t;
-
-/// GPIO Output alternate function type
-typedef struct
-{
-    per_gpio_t* const Per;    ///< Peripheral
-    const per_gpio_pin_e Pin; ///< Pin number
-} per_gpio_out_af_t;
 
 /// GPIO set mode input, output or alternate
 static per_inline bool per_gpio_set_mode(per_gpio_t* gpio, per_gpio_pin_e pin, per_gpio_mode_e mode)
@@ -257,19 +251,19 @@ static per_inline bool per_gpio_set_pupd(per_gpio_t* gpio, per_gpio_pin_e pin, p
 /// GPIO get input data register
 static per_inline bool per_gpio_idr(const per_gpio_t* const gpio, per_gpio_pin_e pin)
 {
-    return per_bit_r1(&gpio->Idr[pin]);
+    return per_gpio_in(&gpio->Idr[pin]);
 }
 
 /// GPIO get output data register
 static per_inline bool per_gpio_odr(const per_gpio_t* const gpio, per_gpio_pin_e pin)
 {
-    return per_bit_rw1(&gpio->Odr[pin]);
+    return per_gpio_out(&gpio->Odr[pin]);
 }
 
 /// GPIO set output data register
 static per_inline void per_gpio_set_odr(per_gpio_t* gpio, per_gpio_pin_e pin, bool val)
 {
-    per_bit_rw1_set(&gpio->Odr[pin], val);
+    per_gpio_set_out(&gpio->Odr[pin], val);
 }
 
 /// GPIO set output set/reset data register
@@ -301,31 +295,13 @@ static per_inline per_gpio_af_e per_gpio_af(per_gpio_t* gpio, per_gpio_pin_e pin
     return (per_gpio_af_e)per_bit_rw4(&gpio->Afr[pin]);
 }
 
-/// GPIO get input
-static per_inline bool per_gpio_in(const per_gpio_in_t* const in)
-{
-    return per_bit_r1(&in->Per->Idr[in->Pin]);
-}
+bool per_gpio_init_in(per_gpio_in_t* in, per_gpio_pupd_e pupd);
 
-/// GPIO get output
-static per_inline bool per_gpio_out(const per_gpio_out_t* const out)
-{
-    return per_bit_rw1(&out->Per->Odr[out->Pin]);
-}
+bool per_gpio_init_in_af(per_gpio_in_t* in, per_gpio_pupd_e pupd, per_gpio_af_e af);
 
-/// GPIO set output
-static per_inline void per_gpio_set_out(const per_gpio_out_t* const out, bool val)
-{
-    per_bit_rw1_set(&out->Per->Odr[out->Pin], val); // one cycle faster compared to per_gpio_set_bsrr()
-}
+bool per_gpio_init_out(per_gpio_out_t* out, per_gpio_otype_e otype, per_gpio_ospeed_e ospeed);
 
-bool per_gpio_init_in(const per_gpio_in_t* const in, per_gpio_pupd_e pupd);
-
-bool per_gpio_init_in_af(const per_gpio_in_af_t* const in, per_gpio_pupd_e pupd, per_gpio_af_e af);
-
-bool per_gpio_init_out(const per_gpio_out_t* const, per_gpio_otype_e otype, per_gpio_ospeed_e ospeed);
-
-bool per_gpio_init_out_af(const per_gpio_out_af_t* const out, per_gpio_otype_e otype, per_gpio_ospeed_e ospeed, per_gpio_af_e af);
+bool per_gpio_init_out_af(per_gpio_out_t* out, per_gpio_otype_e otype, per_gpio_ospeed_e ospeed, per_gpio_af_e af);
 
 #ifdef __cplusplus
 }

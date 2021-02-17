@@ -38,7 +38,6 @@ extern "C" {
 /// Descriptor Read-write bit
 typedef struct
 {
-    void (*Init)(void); //!< Initialize hardware
     bool (*Setup)(uint8_t*, uint32_t, uint32_t, per_usart_ps_e, per_usart_m_e, per_usart_stop_e); //!< Configure parameters
     void (*Enable)(bool); //!< Enable operation
     uint16_t (*Lock)(void); //!< Mutex aquire
@@ -61,8 +60,6 @@ typedef struct
 } bsp_usart_data_t;
 
 extern bsp_usart_data_t usart_3_inst;
-
-void usart_3_init(void);
 
 /// USART3 lock
 static per_inline uint16_t usart_3_lock(void)
@@ -114,11 +111,6 @@ static per_inline bool usart_3_tx_done(void)
 }
 
 // Dummy functions to prevent null pointers
-
-/// Dummy initialize
-static per_inline void dummy_init(void)
-{
-}
 
 /// Dummy lock
 static per_inline uint16_t dummy_lock(void)
@@ -177,7 +169,6 @@ static per_inline const bsp_usart_desc_t* bsp_usart_3(uint16_t key)
 {
     static const bsp_usart_desc_t usart_desc =
     {
-        .Init = usart_3_init,
         .Lock = usart_3_lock,
         .Unlock = usart_3_unlock,
         .Setup = usart_3_setup,
@@ -191,7 +182,6 @@ static per_inline const bsp_usart_desc_t* bsp_usart_3(uint16_t key)
     /// Dummy descriptor. Prevents that all the caller functions require to check for null pointers.
     static const bsp_usart_desc_t dummy_desc =
     {
-        .Init = dummy_init,
         .Setup = dummy_setup,
         .Enable = dummy_enable,
         .Lock = dummy_lock,

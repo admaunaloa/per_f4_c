@@ -11,16 +11,15 @@
 <p><a href="https://github.com/admaunaloa/per_f4_c" rel="nofollow">REPOSITORY</a></p>
 The advantages of this libary are:</p>
 <ul>
-<li>Faster execution (2x)</li>
-<li>Smaller size (1/2)</li>
+<li>Faster execution</li>
+<li>Smaller size</li>
 <li>Interrupt and thread safe register manipulation</li>
 <li>Type safe consistent API interface</li>
 <li>It can co-exist with another HAL library</li>
 </ul>
-<p>Tests on typical GPIO peripheral functions showed 50% shorter execution time and 50% smaller footprint.<br>
+<p>Tests on typical GPIO peripheral functions showed 25-30% shorter execution time and 25-30% smaller footprint.<br>
 Bitband technology is used extensively to maximise performance and to minimise footprint.
-These figures can easily be verified by executing instructions under the chapter TEST below.
-This library is ideally to give existing bare-metal projects a performance boost.</p>
+This library can give existing bare-metal projects a performance boost.</p>
 <h3><a id="user-content-bitband" class="anchor" aria-hidden="true" href="#bitband"></a>Bitband</h3>
 <p>This technique is excellently explained by: <a href="http://www.martinhubacek.cz/arm/advanced-arm-cortex-tips/bit-banding---fast-and-safe-bit-manipulation" rel="nofollow">Martin Hubacek</a></p>
 <h2><a id="user-content-usage" class="anchor" aria-hidden="true" href="#usage"></a>USAGE</h2>
@@ -28,17 +27,7 @@ This library is ideally to give existing bare-metal projects a performance boost
 <h3><a id="user-content-gpio" class="anchor" aria-hidden="true" href="#gpio"></a>GPIO</h3>
 <div class="highlight highlight-source-c++"><pre>    #<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>per_gpio.h<span class="pl-pds">"</span></span>
    
-    <span class="pl-c"><span class="pl-c">//</span> Definition of green LED</span>
-    <span class="pl-k">static</span> per_inline <span class="pl-k">const</span> <span class="pl-c1">per_gpio_out_t</span>* <span class="pl-k">const</span> <span class="pl-en">bsp_gpio_led_green</span>(<span class="pl-k">void</span>)
-    {
-        <span class="pl-k">static</span> <span class="pl-k">const</span> <span class="pl-c1">per_gpio_out_t</span> gpio =
-        {
-            .<span class="pl-smi">Per</span> = PER_GPIOB,
-            .<span class="pl-smi">Pin</span> = PER_GPIO_PIN_0,
-        };
-        <span class="pl-k">return</span> &amp;gpio;
-    }
-	
+    #define bsp_gpio_led_green() (&PER_GPIOB->Odr[PER_GPIO_PIN_0])
 
     <span class="pl-c"><span class="pl-c">//</span> Enable the green LED</span>
     <span class="pl-en">per_gpio_set_out</span>(bsp_gpio_led_green(), true);</pre></div>
