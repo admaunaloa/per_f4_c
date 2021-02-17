@@ -179,13 +179,6 @@ bool usart_3_dma_1_stream_3_setup(void)
     return result;
 }
 
-/// USART3 initialize
-void usart_3_init(void)
-{
-    bsp_gpio_usart_3_tx()->Init(); // GPIO
-    bsp_gpio_usart_3_rx()->Init(); // GPIO
-}
-
 /// USART3 configure
 bool usart_3_setup(uint8_t* buffer, uint32_t capacity, uint32_t rate, per_usart_ps_e par, per_usart_m_e len, per_usart_stop_e stop)
 {

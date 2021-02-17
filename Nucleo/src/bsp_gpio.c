@@ -1,7 +1,7 @@
 /**
- * @file bsp_gpio.h
+ * @file bsp_gpio.c
  *
- * This file contains the Board Support Package (BSP) General Purpose Input Output (GPIO)
+ * This file contains the Board Support Package (BSP)  GPIO
  *
  * Copyright (c) 2021 admaunaloa admaunaloa@gmail.com
  *
@@ -24,30 +24,17 @@
  * SOFTWARE.
  */
 
-#ifndef bsp_gpio_h_
-#define bsp_gpio_h_
+#include "bsp_gpio.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+/// Initialize GPIO
+void bsp_gpio_init(void)
+{
+    per_gpio_init_out(bsp_gpio_led_green(), PER_GPIO_OTYPE_PUSH_PULL, PER_GPIO_OSPEED_LOW);
+    per_gpio_init_out(bsp_gpio_led_blue(), PER_GPIO_OTYPE_PUSH_PULL, PER_GPIO_OSPEED_LOW);
+    per_gpio_init_out(bsp_gpio_led_red(), PER_GPIO_OTYPE_PUSH_PULL, PER_GPIO_OSPEED_LOW);
 
-#include "per_gpio.h"
+    per_gpio_init_in(bsp_user_button_1(), PER_GPIO_PUPD_PULL_DOWN);
 
-/// Ordered GPIO definitions GPIOA...GPIOK and 0...15
-
-#define bsp_gpio_led_green()        (&PER_GPIOB->Odr[PER_GPIO_PIN_0])
-#define bsp_gpio_led_blue()         (&PER_GPIOB->Odr[PER_GPIO_PIN_7])
-#define bsp_gpio_led_red()          (&PER_GPIOB->Odr[PER_GPIO_PIN_14])
-
-#define bsp_user_button_1()         (&PER_GPIOC->Idr[PER_GPIO_PIN_13])
-
-#define bsp_gpio_usart3_tx()        (&PER_GPIOD->Odr[PER_GPIO_PIN_8])
-#define bsp_gpio_usart3_rx()        (&PER_GPIOD->Idr[PER_GPIO_PIN_9])
-
-void bsp_gpio_init(void);
-
-#ifdef __cplusplus
+    per_gpio_init_out_af(bsp_gpio_usart3_tx(), PER_GPIO_OTYPE_PUSH_PULL, PER_GPIO_OSPEED_MEDIUM, PER_GPIO_AF_USART3);
+    per_gpio_init_in_af(bsp_gpio_usart3_rx(), PER_GPIO_PUPD_PULL_UP, PER_GPIO_AF_USART3);
 }
-#endif
-
-#endif // bsp_gpio_h_

@@ -26,6 +26,15 @@
 
 #include "per_gpio_f4.h"
 
+/// GPIO register block size
+#define PER_GPIO_GPIO_SIZE ((uintptr_t)0x0400)
+
+/// Register address of bit band address
+#define PER_GPIO_BIT_BAND_GPIO(REG) ((per_gpio_t*)((uintptr_t)REG & (~((PER_GPIO_GPIO_SIZE << PER_BIT_BB_REG_SHIFT) - 1))))
+
+/// Pin number of bit band address IDR or ODR
+#define PER_GPIO_BIT_BAND_PIN(REG) ((per_gpio_pin_e)PER_BIT_SHIFT(REG))
+
 /// GPIO Configure GPIO pin
 static bool per_gpio_init(per_gpio_t* gpio,
                           per_gpio_pin_e pin,
@@ -43,33 +52,45 @@ static bool per_gpio_init(per_gpio_t* gpio,
 }
 
 /// GPIO Configure input pin
-bool per_gpio_init_in(const per_gpio_in_t* const in,
+bool per_gpio_init_in(per_gpio_in_t* in,
                       per_gpio_pupd_e pupd)
 {
-    return per_gpio_init(in->Per, in->Pin, PER_GPIO_MODE_INPUT, PER_GPIO_OTYPE_PUSH_PULL, PER_GPIO_OSPEED_LOW, pupd, PER_GPIO_AF_NONE);
+    per_gpio_t* gpio = PER_GPIO_BIT_BAND_GPIO(in);
+    per_gpio_pin_e pin = PER_GPIO_BIT_BAND_PIN(in);
+
+    return per_gpio_init(gpio, pin, PER_GPIO_MODE_INPUT, PER_GPIO_OTYPE_PUSH_PULL, PER_GPIO_OSPEED_LOW, pupd, PER_GPIO_AF_NONE);
 }
 
 /// GPIO Configure alternate function input pin
-bool per_gpio_init_in_af(const per_gpio_in_af_t* const in,
+bool per_gpio_init_in_af(per_gpio_in_t* in,
                          per_gpio_pupd_e pupd,
                          per_gpio_af_e af)
 {
-    return per_gpio_init(in->Per, in->Pin, PER_GPIO_MODE_ALTERNATE, PER_GPIO_OTYPE_PUSH_PULL, PER_GPIO_OSPEED_LOW, pupd, af);
+    per_gpio_t* gpio = PER_GPIO_BIT_BAND_GPIO(in);
+    per_gpio_pin_e pin = PER_GPIO_BIT_BAND_PIN(in);
+
+    return per_gpio_init(gpio, pin, PER_GPIO_MODE_ALTERNATE, PER_GPIO_OTYPE_PUSH_PULL, PER_GPIO_OSPEED_LOW, pupd, af);
 }
 
 /// GPIO Configure output pin
-bool per_gpio_init_out(const per_gpio_out_t* const out,
+bool per_gpio_init_out(per_gpio_out_t* out,
                        per_gpio_otype_e otype,
                        per_gpio_ospeed_e ospeed)
 {
-    return per_gpio_init(out->Per, out->Pin, PER_GPIO_MODE_OUTPUT, otype, ospeed, PER_GPIO_PUPD_NONE, PER_GPIO_AF_NONE);
+    per_gpio_t* gpio = PER_GPIO_BIT_BAND_GPIO(out);
+    per_gpio_pin_e pin = PER_GPIO_BIT_BAND_PIN(out);
+
+    return per_gpio_init(gpio, pin, PER_GPIO_MODE_OUTPUT, otype, ospeed, PER_GPIO_PUPD_NONE, PER_GPIO_AF_NONE);
 }
 
 /// GPIO Configure alternate function output pin
-bool per_gpio_init_out_af(const per_gpio_out_af_t* const out,
+bool per_gpio_init_out_af(per_gpio_out_t* out,
                           per_gpio_otype_e otype,
                           per_gpio_ospeed_e ospeed,
                           per_gpio_af_e af)
 {
-    return per_gpio_init(out->Per, out->Pin, PER_GPIO_MODE_ALTERNATE, otype, ospeed, PER_GPIO_PUPD_NONE, af);
+    per_gpio_t* gpio = PER_GPIO_BIT_BAND_GPIO(out);
+    per_gpio_pin_e pin = PER_GPIO_BIT_BAND_PIN(out);
+
+    return per_gpio_init(gpio, pin, PER_GPIO_MODE_ALTERNATE, otype, ospeed, PER_GPIO_PUPD_NONE, af);
 }
