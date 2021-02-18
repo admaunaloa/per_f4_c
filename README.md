@@ -175,4 +175,4 @@ If required, compile the files: per_bit.c, per_gpio.c, per_dep.c and bsp_dep.c
 
 ## THE END
 If you have any tips, remarks, questions and suggestions please send an email.  
-Developing more efficient software can decrease energy consumption, decrease CO2 exhaust and help our planet :-)  
+Developing more efficient software can decrease energy consumption, decrease carbon footprint and help our planet :-)  
