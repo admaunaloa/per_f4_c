@@ -1,5 +1,6 @@
 ## ALOHA!
-This project is a hardware abstraction (HAL) library for F4 series micro-controller peripherals written in C.  
+This project is a hardware abstraction (HAL) library for F4 micro-controller peripherals written in C.  
+  
 The advantages of this libary are:
 * Faster execution
 * Smaller size
@@ -7,9 +8,9 @@ The advantages of this libary are:
 * Type safe consistent API interface
 * It can co-exist with other HAL libraries
 
-Tests on typical GPIO peripheral functions showed 25-50% shorter execution time and 25-50% smaller footprint.  
-Bitband technology is used extensively to maximise performance and to minimise footprint.
-This library can give existing bare-metal projects a performance boost.
+Tests on typical GPIO peripheral functions showed 25-50% shorter execution time combined with a 25-50% smaller footprint.  
+Bitband technology is used extensively to maximise performance and to minimise footprint.  
+This library can give existing bare-metal projects a performance boost, it unleashes the full power of the peripherals hardware.  
 
 ### Bitband
 This technique is excellently explained by: [Martin Hubacek](http://www.martinhubacek.cz/arm/advanced-arm-cortex-tips/bit-banding---fast-and-safe-bit-manipulation)
@@ -26,7 +27,6 @@ Two examples. The first one is a GPIO set output, the second is an interrupt han
     per_gpio_set_out(bsp_gpio_led_green(), true);
 ```
 
-
 ### IRQ
 ```c++
     #include "per_tim_gp.h"
@@ -41,6 +41,14 @@ Two examples. The first one is a GPIO set output, the second is an interrupt han
         }
     }
 ```
+
+### TRY IT OUT
+1. Copy the libraries F4, F439ZI and Bsp_example in an existing project (F439ZI supports most other types)
+1. Add the directories F4/inc and F439ZI/inc to the include directories of the project/makefile
+1. Copy the lines of the GPIO example above to an existing source file
+1. Modify PER_GPIOB and PER_GPIO_PIN_0 to a valid GPIO output, preferable a LED
+1. Compile
+1. Test  
 
 ## SYNTAX
 For each peripheral bit the possible get and set functions are provided.
@@ -152,8 +160,8 @@ An example is F439/inc/per_usart.h.
 
 ### peripheral descriptor functions
 Access to the peripheral descriptors is done via functions that return this descriptor.  
-This function interface is future proof and it is consistent for all peripherals.
-For example **per_usart_1()**. The functions limit the scope the desciptor structure.  
+This function interface is consistent for all peripherals and it is future proof, for simple GPIO it is implemented as a define, for complex peripherals it is implemented as a function.
+For example **per_usart_1()**.
 
 ## inline
 All the layers are provided in header files and inline functions. This allows the compiler to resolve all constants and optimise this all to a minimum size executable with fast execution times.
