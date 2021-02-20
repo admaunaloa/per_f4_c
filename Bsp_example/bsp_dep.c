@@ -26,7 +26,7 @@
 
 #include "bsp_dep.h"
 
-#include "stm32f429xx.h" // for the LDREX and STREX
+#include "cmsis_gcc.h" // for the LDREX and STREX
 #include "per_des.h"
 
 /// LOG event information structure
