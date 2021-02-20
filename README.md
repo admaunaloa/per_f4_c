@@ -8,16 +8,27 @@ The advantages of this libary are:
 * Type safe consistent API interface
 * It can co-exist with other HAL libraries
 
-Tests on typical GPIO peripheral functions showed 25-50% shorter execution time combined with a 25-50% smaller footprint.  
-Bitband technology is used extensively to maximise performance and to minimise footprint.  
-This library can give existing bare-metal projects a performance boost, it unleashes the full power of the peripherals hardware.  
+Typical GPIO peripheral functions have up to 60% shorter execution time combined with a up to 40% smaller footprint.  
+Bitband technology is used extensively and implicit.  
+This library gives existing bare-metal projects a performance boost, it unleashes the full power of the peripherals hardware.  
 
 ### Bitband
 This technique is excellently explained by: [Martin Hubacek](http://www.martinhubacek.cz/arm/advanced-arm-cortex-tips/bit-banding---fast-and-safe-bit-manipulation)
 
 ## USAGE
-Two examples. The first one is a GPIO set output, the second is an interrupt handler.
-### GPIO
+Three examples. The first two GPIO get and set, the third is an interrupt handler.  
+
+### GPIO GET
+```c++
+    #include "per_gpio.h"
+   
+    #define bsp_user_button_1() (&PER_GPIOC->Idr[PER_GPIO_PIN_13])
+
+    // Get status of the button input
+    bool button_state = per_gpio_in(bsp_user_button_1());
+```
+
+### GPIO SET
 ```c++
     #include "per_gpio.h"
    
@@ -43,10 +54,10 @@ Two examples. The first one is a GPIO set output, the second is an interrupt han
 ```
 
 ### TRY IT OUT
-1. Copy the libraries F4, F439ZI and Bsp_example in an existing project (F439ZI supports most other types)
-1. Add the directories F4/inc and F439ZI/inc to the include directories of the project/makefile
-1. Copy the lines of the GPIO example above to an existing source file
-1. Modify PER_GPIOB and PER_GPIO_PIN_0 to a valid GPIO output, preferable a LED
+1. Copy the libraries F4, F439ZI and Bsp_example in an existing project, F439ZI supports most other types too,
+1. Add the directories F4/inc and F439ZI/inc to the include directories of the project/makefile.
+1. Copy the lines of the GPIO get example above to an existing source file.
+1. Modify PER_GPIOC and PER_GPIO_PIN_13 to a valid GPIO input.
 1. Compile
 1. Test  
 
@@ -56,7 +67,7 @@ The syntax is
 1. **per_**      Peripheral library prefix
 1. **_usart_**   Peripheral type USART
 1. **_ue**       Peripheral field name as in the manual. UE is Usart Enable.
-1. **(...)**     Function
+1. **(...)**     Function  
 
 Example:
 ```c++
@@ -68,12 +79,12 @@ The per_usart_t pointers are provided in a function format
 ```c++
     per_usart_t* per_usart_1(void)
     per_usart_t* per_usart_2(void)
-	...
+	...  
 ```
 
 Enabling USART3 comes down to:
 ```c++
-    per_usart_set_ue(per_usart_3(), true);
+    per_usart_set_ue(per_usart_3(), true);  
 ```
 
 This set UE example results in a minimal number of assembly instructions because
@@ -173,7 +184,7 @@ A default log implementation captures this errors. It is up to the user to adapt
 
 ## exceptions
 There are a few hardware peripheral registers that are better or faster accessed by register instead of bitband.
-The specific functions for this register handle this implicitly. An example of this is TIMx_SR.  
+The specific functions for this register handle this implicitly. An examples of this are TIMx_SR and USARTx_DR
 
 ## COMPILATION
 The library can coexist with other HAL libraries. Just add the directories to the project.
