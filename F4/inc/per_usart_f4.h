@@ -48,7 +48,8 @@
  * constant, this is often implemented in the Board Support Package (bsp_) layer.
  *
  * Convenience functions:
- * per_usart_set_baudrate()
+ * per_usart_set_div(const per_usart_t* const usart, uint_fast32_t fract, uint_fast32_t mant)
+ * per_usart_set_baudrate(const per_usart_t* const usart, uint_fast32_t rate)
  */
 
 #ifndef per_usart_f4_h_
@@ -76,7 +77,9 @@ typedef enum
     PER_USART_PARITY_ERR,           ///< Parity error
     PER_USART_SET_DR_ERR,           ///< DR data invalid value
     PER_USART_SET_DIV_FRACTION_ERR, ///< DIV_Fraction error invalid value
+    PER_USART_SET_DIV_FRACT_ERR,    ///< DIV_Fraction error invalid value
     PER_USART_SET_DIV_MANTISSA_ERR, ///< DIV_Mantissa error invalid value
+    PER_USART_SET_DIV_MANT_ERR,     ///< DIV_Mantissa error invalid value
     PER_USART_SET_ADD_ERR,          ///< ADD address node invalid value
     PER_USART_SET_PSC_IRDA_MAX_ERR, ///< PSC data invalid value IrDA
     PER_USART_SET_PSC_SC_MAX_ERR,   ///< PSC data invalid value SmartCard SC
@@ -133,9 +136,16 @@ typedef struct
     per_bit_rw16_reg_t Dr; ///< Data value
 
     // USART Baud rate register (USART_BRR)
-    per_bit_rw4_t Div_Fraction; ///< fraction of USARTDIV
-    per_bit_rw12_t Div_Mantissa; ///< mantissa of USARTDIV
-    per_bit_n16_t BrrBit16; ///< Reserved
+    union
+    {
+        struct
+        {
+            per_bit_rw4_t Div_Fraction; ///< fraction of USARTDIV
+            per_bit_rw12_t Div_Mantissa; ///< mantissa of USARTDIV
+            per_bit_n16_t BrrBit16; ///< Reserved
+        };
+        per_bit_rw16_reg_t Div; ///< fraction and mantissa
+    };
 
     // USART control register 1 (USART_CR1)
     per_bit_rw1_t Sbk; ///< Send break
@@ -319,13 +329,13 @@ static per_inline volatile uint_fast16_t* per_usart_addr_dr(const per_usart_t* c
     return &PER_BIT_BIT_BAND_TO_REG(&usart->Per->Dr)->Reg16;
 }
 
-/// Fraction of USARTDIV get
+/// USART Fraction of USARTDIV get
 static per_inline uint_fast16_t per_usart_div_fraction(const per_usart_t* const usart)
 {
     return per_bit_rw4(&usart->Per->Div_Fraction);
 }
 
-/// Fraction of USARTDIV set
+/// USART Fraction of USARTDIV set
 static per_inline bool per_usart_set_div_fraction(const per_usart_t* const usart, uint_fast32_t div)
 {
     if (div > per_bit_rw4_max())
@@ -337,13 +347,13 @@ static per_inline bool per_usart_set_div_fraction(const per_usart_t* const usart
     return per_bit_rw4_set(&usart->Per->Div_Fraction, (uint_fast16_t)div);
 }
 
-/// Mantissa of USARTDIV get
+/// USART Mantissa of USARTDIV get
 static per_inline uint_fast16_t per_usart_div_mantissa(const per_usart_t* const usart)
 {
     return per_bit_rw12(&usart->Per->Div_Mantissa);
 }
 
-/// Mantissa of USARTDIV set
+/// USART Mantissa of USARTDIV set
 static per_inline bool per_usart_set_div_mantissa(const per_usart_t* const usart, uint_fast32_t div)
 {
     if (div > per_bit_rw12_max())
@@ -353,6 +363,25 @@ static per_inline bool per_usart_set_div_mantissa(const per_usart_t* const usart
     }
 
     return per_bit_rw12_set(&usart->Per->Div_Mantissa, (uint_fast16_t)div);
+}
+
+/// USART Mantissa and fraction of USARTDIV
+static per_inline bool per_usart_set_div(const per_usart_t* const usart, uint_fast32_t fract, uint_fast32_t mant)
+{
+    if (fract > per_bit_rw4_max())
+    {
+        per_log_err(usart->Err, PER_USART_SET_DIV_FRACT_ERR, fract);
+        return false;
+    }
+
+    if (mant > per_bit_rw12_max())
+    {
+        per_log_err(usart->Err, PER_USART_SET_DIV_MANT_ERR, mant);
+        return false;
+    }
+
+    per_bit_rw16_reg_set(&usart->Per->Div, (uint_fast16_t)(fract | (mant << per_bit_rw12_shift(&usart->Per->Div_Mantissa))));
+    return true;
 }
 
 /// USART Send break get
@@ -1002,8 +1031,7 @@ static per_inline bool per_usart_set_baudrate(const per_usart_t* const usart, ui
         mant += 1;
     }
 
-    return per_usart_set_div_mantissa(usart, mant) &&
-           per_usart_set_div_fraction(usart, fract);
+    return per_usart_set_div(usart, fract, mant);
 }
 
 #ifdef __cplusplus
