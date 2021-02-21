@@ -55,7 +55,7 @@ Three examples. The first two GPIO get and set, the third is an interrupt handle
 
 ### TRY IT OUT
 1. Copy the libraries F4, F439ZI and Bsp_example in an existing project, F439ZI supports most other types too,
-1. Add the directories F4/inc and F439ZI/inc to the include directories of the project/makefile.
+1. Add the directories F4/inc F439ZI/inc and Bsp_example  to the include directories of the project/makefile.
 1. Copy the lines of the GPIO get example above to an existing source file.
 1. Modify PER_GPIOC and PER_GPIO_PIN_13 to a valid GPIO input.
 1. Compile
@@ -182,11 +182,15 @@ The use of inline functions makes the API consistent and type safe.
 Runtime debug logging is provided in bsp_dep.c. This file contains a call-back function that is called from the per_... files in case of a runtime fault.
 A default log implementation captures this errors. It is up to the user to adapt and extend this file. 
 
-## exceptions
-There are a few hardware peripheral registers that are better or faster accessed by register instead of bitband.
-The specific functions for this register handle this implicitly. An examples of this are TIMx_SR and USARTx_DR
+## dependencies
+There are only a few external dependencies. All dependencies are accessed and wrapped via the per_dep.* and bsp_dep.* files.  
+These files allow the user to adapt the library to other development enviroments.
 
-## COMPILATION
+## exceptions
+There are a few hardware peripheral registers that are better accessed by register instead of bitband.
+The specific functions for this register handle this implicitly. Examples of this are TIMx_SR and USARTx_DR
+
+## compilation
 The library can coexist with other HAL libraries. Just add the directories to the project.
 Note: the F439ZI is also good for other F4 types, it provides all possible peripherals.
 Add the include libraries: F4/inc, F439ZI/inc, Nucleo/inc
