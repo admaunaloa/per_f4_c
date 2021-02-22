@@ -32,7 +32,6 @@ extern "C" {
 #endif
 
 // All the external dependencies of the library
-#include <assert.h>
 #include <stdbool.h>
 #include <stdint.h>
 

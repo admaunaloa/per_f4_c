@@ -28,7 +28,7 @@
  * per_gpio_set_xxx()       Set
  *
  * First define the GPIO
- * #define bsp_gpio_led_green() (&PER_GPIOB->Odr[PER_GPIO_PIN_0])
+ * #define bsp_gpio_led_green() (&PER_GPIOB->Od[PER_GPIO_PIN_0])
  *
  * Initialize it as output
  * per_gpio_init_out(bsp_gpio_led_green(), PER_GPIO_OTYPE_PUSH_PULL, PER_GPIO_OSPEED_LOW);
@@ -191,25 +191,25 @@ typedef enum
 typedef struct
 {
     // MODER port mode register
-    per_bit_rw2_t Moder[PER_GPIO_MAX]; ///< Configure the I/O direction mode
+    per_bit_rw2_t Mode[PER_GPIO_MAX]; ///< Configure the I/O direction mode
 
     // OTYPER port output type register
-    per_bit_rw1_t Otyper[PER_GPIO_MAX]; ///< configure the output type of the I/O port
+    per_bit_rw1_t Otype[PER_GPIO_MAX]; ///< configure the output type of the I/O port
     per_bit_n16_t OtyperBit16;          ///< Reserved
 
     // OSPEEDR port output speed register
-    per_bit_rw2_t Ospeedr[PER_GPIO_MAX]; ///< Configure the I/O output speed
+    per_bit_rw2_t Ospeed[PER_GPIO_MAX]; ///< Configure the I/O output speed
 
     // PUPDR port pull-up/pull-down register
-    per_bit_rw2_t Pupdr[PER_GPIO_MAX]; ///< Configure the I/O pull-up or pull-down
+    per_bit_rw2_t Pupd[PER_GPIO_MAX]; ///< Configure the I/O pull-up or pull-down
 
     // IDR port input data register
-    per_gpio_in_t Idr[PER_GPIO_MAX]; ///< The input value of the corresponding I/O port.
-    per_bit_n16_t IdrBit16;         ///< Reserved
+    per_gpio_in_t Id[PER_GPIO_MAX]; ///< The input value of the corresponding I/O port.
+    per_bit_n16_t IdBit16;         ///< Reserved
 
     // ODR port output data register
-    per_gpio_out_t Odr[PER_GPIO_MAX]; ///< Port output data
-    per_bit_n16_t OdrBit16;          ///< Reserved
+    per_gpio_out_t Od[PER_GPIO_MAX]; ///< Port output data
+    per_bit_n16_t OdBit16;          ///< Reserved
 
     // BSRR port bit set/reset register
     per_bit_w1_t Bs[PER_GPIO_MAX]; ///< Port set bit
@@ -227,43 +227,43 @@ typedef struct
 /// GPIO set mode input, output or alternate
 static per_inline bool per_gpio_set_mode(per_gpio_t* gpio, per_gpio_pin_e pin, per_gpio_mode_e mode)
 {
-    return per_bit_rw2_set(&gpio->Moder[pin], (uint_fast16_t)mode);
+    return per_bit_rw2_set(&gpio->Mode[pin], (uint_fast16_t)mode);
 }
 
 /// GPIO set output type
 static per_inline void per_gpio_set_otype(per_gpio_t* gpio, per_gpio_pin_e pin, per_gpio_otype_e otype)
 {
-    per_bit_rw1_set(&gpio->Otyper[pin], (bool)otype);
+    per_bit_rw1_set(&gpio->Otype[pin], (bool)otype);
 }
 
 /// GPIO set output speed
 static per_inline bool per_gpio_set_ospeed(per_gpio_t* gpio, per_gpio_pin_e pin, per_gpio_ospeed_e ospeed)
 {
-    return per_bit_rw2_set(&gpio->Ospeedr[pin], (uint_fast16_t)ospeed);
+    return per_bit_rw2_set(&gpio->Ospeed[pin], (uint_fast16_t)ospeed);
 }
 
 /// GPIO set pull-up pull-down
 static per_inline bool per_gpio_set_pupd(per_gpio_t* gpio, per_gpio_pin_e pin, per_gpio_pupd_e pupd)
 {
-    return per_bit_rw2_set(&gpio->Pupdr[pin], (uint_fast16_t)pupd);
+    return per_bit_rw2_set(&gpio->Pupd[pin], (uint_fast16_t)pupd);
 }
 
 /// GPIO get input data register
 static per_inline bool per_gpio_idr(const per_gpio_t* const gpio, per_gpio_pin_e pin)
 {
-    return per_gpio_in(&gpio->Idr[pin]);
+    return per_gpio_in(&gpio->Id[pin]);
 }
 
 /// GPIO get output data register
 static per_inline bool per_gpio_odr(const per_gpio_t* const gpio, per_gpio_pin_e pin)
 {
-    return per_gpio_out(&gpio->Odr[pin]);
+    return per_gpio_out(&gpio->Od[pin]);
 }
 
 /// GPIO set output data register
 static per_inline void per_gpio_set_odr(per_gpio_t* gpio, per_gpio_pin_e pin, bool val)
 {
-    per_gpio_set_out(&gpio->Odr[pin], val);
+    per_gpio_set_out(&gpio->Od[pin], val);
 }
 
 /// GPIO set output set/reset data register
