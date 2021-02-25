@@ -50,6 +50,7 @@
  * Convenience functions:
  * per_usart_set_div(const per_usart_t* const usart, uint_fast32_t fract, uint_fast32_t mant)
  * per_usart_set_baudrate(const per_usart_t* const usart, uint_fast32_t rate)
+ * per_usart_flag(const per_usart_t* const usart)
  */
 
 #ifndef per_usart_f4_h_
@@ -86,6 +87,25 @@ typedef enum
     PER_USART_SET_GT_MAX_ERR,       ///< GT data invalid value
 } per_usart_error_e;
 
+/// USART Status register flags
+typedef enum
+{
+    PER_USART_SR_PE    = 0b000000000001, ///< Parity error
+    PER_USART_SR_FE    = 0b000000000010, ///< Framing error
+    PER_USART_SR_NF    = 0b000000000100, ///< Noise detected flag
+    PER_USART_SR_ORE   = 0b000000001000, ///< Overrun error
+    PER_USART_SR_IDLE  = 0b000000010000, ///< IDLE line detected
+    PER_USART_SR_RXNE  = 0b000001000000, ///< Read data register not empty
+    PER_USART_SR_TC    = 0b000010000000, ///< Transmission complete
+    PER_USART_SR_TXE   = 0b000100000000, ///< Transmit data register empty
+    PER_USART_SR_LBD   = 0b001000000000, ///< LIN break detection flag
+    PER_USART_SR_CTS   = 0b010000000000, ///< CTS flag
+    PER_USART_SR_CLEAR = PER_USART_SR_RXNE | ///< Clear flags
+                         PER_USART_SR_TC |
+                         PER_USART_SR_LBD |
+                         PER_USART_SR_CTS,
+} per_usart_sr_e;
+
 /// USART data bits enumeration
 typedef enum
 {
@@ -120,17 +140,24 @@ typedef enum
 typedef struct
 {
     // USART status register (USART_SR)
-    per_bit_r1_t Pe; ///< Parity error
-    per_bit_r1_t Fe; ///< Framing error
-    per_bit_r1_t Nf; ///< Noise detected flag
-    per_bit_r1_t Ore; ///< Overrun error
-    per_bit_r1_t Idle; ///< IDLE line detected
-    per_bit_rc1_t Rxne; ///< Read data register not empty
-    per_bit_rc1_t Tc; ///< Transmission complete
-    per_bit_r1_t Txe; ///< Transmit data register empty
-    per_bit_rc1_t Lbd; ///< LIN break detection flag
-    per_bit_rc1_t Cts; ///< CTS flag
-    per_bit_n22_t SrBit10; ///< Reserved
+    union
+    {
+        struct
+        {
+            per_bit_r1_t Pe; ///< Parity error
+            per_bit_r1_t Fe; ///< Framing error
+            per_bit_r1_t Nf; ///< Noise detected flag
+            per_bit_r1_t Ore; ///< Overrun error
+            per_bit_r1_t Idle; ///< IDLE line detected
+            per_bit_rc1_t Rxne; ///< Read data register not empty
+            per_bit_rc1_t Tc; ///< Transmission complete
+            per_bit_r1_t Txe; ///< Transmit data register empty
+            per_bit_rc1_t Lbd; ///< LIN break detection flag
+            per_bit_rc1_t Cts; ///< CTS flag
+            per_bit_n22_t SrBit10; ///< Reserved
+        };
+        per_bit_rw16_reg_t Sr; ///< Status register
+    };
 
     // USART Data register (USART_DR)
     per_bit_rw16_reg_t Dr; ///< Data value
@@ -302,6 +329,18 @@ static per_inline bool per_usart_rdclr_cts(const per_usart_t* const usart)
     }
     
     return per_bit_rc1_rdclr(&usart->Per->Cts);
+}
+
+/// USART Status register
+static per_inline uint_fast16_t per_usart_sr(const per_usart_t* const usart)
+{
+    return per_bit_rw16_reg(&usart->Per->Sr);
+}
+
+/// USART Status register
+static per_inline void per_usart_set_sr(const per_usart_t* const usart, uint16_t val)
+{
+    per_bit_rw16_reg_set(&usart->Per->Sr, val);
 }
 
 /// USART Data value
@@ -994,6 +1033,16 @@ static per_inline bool per_usart_set_gt(const per_usart_t* const usart, uint_fas
     }
 
     return per_bit_rw8_set(&usart->Per->Gt, gt);
+}
+
+/// USART fetch and clear active flags and return the active flags
+static per_inline per_usart_sr_e per_usart_flag(const per_usart_t* const usart)
+{
+    uint_fast16_t flag = per_usart_sr(usart);
+
+    per_usart_set_sr(usart, ~(flag & (uint_fast16_t)PER_USART_SR_CLEAR)); // Clear
+
+    return (per_usart_sr_e)flag;
 }
 
 /// USART Set parity
