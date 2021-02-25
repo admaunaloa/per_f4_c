@@ -8,7 +8,7 @@ The advantages of this libary are:
 * Type safe consistent API interface
 * It can co-exist with other HAL libraries
 
-Typical GPIO peripheral functions have up to 60% shorter execution time combined with a up to 40% smaller footprint.  
+Typical GPIO peripheral functions have up to 50% shorter execution time combined with a up to 40% smaller footprint.  
 Bitband technology is used extensively and implicit.  
 This library gives existing bare-metal projects a performance boost, it unleashes the full power of the peripherals hardware.  
 
