@@ -36,6 +36,9 @@ extern "C" {
 /// RCC base address
 #define PER_RCC (PER_ADDR_AHB1 + (uintptr_t)0x3800)
 
+/// [Hz] Clock frequency
+#define per_rcc_freq() ((uint32_t)168000000)
+
 /// RCC pointer to rcc
 static per_inline const per_rcc_t* const per_rcc(void)
 {
@@ -43,8 +46,15 @@ static per_inline const per_rcc_t* const per_rcc(void)
     {
         .Per = (per_rcc_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_RCC),
         .Err = PER_LOG_RCC,
-        .GpioNr = PER_RCC_GPIO_NR_9,
+        .Adc = PER_RCC_ADC_2,
+        .Can = PER_RCC_CAN_2,
         .Eth = true,
+        .I2c = PER_RCC_I2C_3,
+        .I2s = PER_RCC_I2S_2,
+        .Gpio = PER_RCC_GPIO_I,
+        .Spi = PER_RCC_SPI_3,
+        .Uart = PER_RCC_UART_2,
+        .Usart = PER_RCC_USART_4,
     };
     return &rcc;
 }
@@ -52,7 +62,7 @@ static per_inline const per_rcc_t* const per_rcc(void)
 /// APB1 peripheral clock frequency
 static per_inline uint_fast32_t per_rcc_apb1_per_freq(void)
 {
-    return per_rcc_freq() / per_rcc_apb_div(&(per_rcc()->Per->Ppre1));
+    return per_rcc_freq() / per_rcc_ppre1(per_rcc());
 }
 
 /// APB1 timer clock frequency
@@ -64,7 +74,7 @@ static per_inline uint_fast32_t per_rcc_apb1_tim_freq(void)
 /// APB2 peripheral clock frequency
 static per_inline uint_fast32_t per_rcc_apb2_per_freq(void)
 {
-    return per_rcc_freq() / per_rcc_apb_div(&(per_rcc()->Per->Ppre2));
+    return per_rcc_freq() / per_rcc_ppre2(per_rcc());
 }
 
 /// APB2 timer clock frequency

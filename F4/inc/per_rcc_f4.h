@@ -34,50 +34,170 @@ extern "C" {
 #include "per_bit_f4.h"
 #include "per_log_f4.h"
 
-/// [Hz] Clock frequency
-#define PER_RCC_FREQ ((uint32_t)168000000)
-
-/// APBx to TIMERS fixed multiplier
+/// RCC APBx to TIMERS fixed multiplier
 #define PER_RCC_APB_PER_TO_TIM_MUL ((uint32_t)2)
 
-/// low-speed external clock
+/// RCC low-speed external clock
 #define PER_RCC_LSE ((uint32_t)32768)
 
-/// low-speed internal rc clock
+/// RCC low-speed internal rc clock
 #define PER_RCC_LSI_RC ((uint32_t)32000)
 
-/// high-speed external clock
+/// RCC high-speed external clock
 #define PER_RCC_HSE ((uint32_t)8000000)
 
-/// high-speed internal rc clock
+/// RCC high-speed internal rc clock
 #define PER_RCC_HSI_RC ((uint32_t)16000000)
 
-/// RCC MCO divider enumeration
-typedef enum
-{
-    PER_RCC_MCO_DIV_1 = 0b000, ///< Divide by 1
-    PER_RCC_MCO_DIV_2 = 0b100, ///< Divide by 2
-    PER_RCC_MCO_DIV_3 = 0b101, ///< Divide by 3
-    PER_RCC_MCO_DIV_4 = 0b110, ///< Divide by 4
-    PER_RCC_MCO_DIV_5 = 0b111, ///< Divide by 5
-} per_rcc_mco_div_e;
+/// RCC AHB prescaler maximum
+#define PER_RCC_HPRE_MAX (512)
 
-/// RCC APB divider enumeration
-typedef enum
-{
-    PER_RCC_APB_DIV_1  = 0b000, ///< Divide by 1
-    PER_RCC_APB_DIV_2  = 0b100, ///< Divide by 2
-    PER_RCC_APB_DIV_4  = 0b101, ///< Divide by 4
-    PER_RCC_APB_DIV_8  = 0b110, ///< Divide by 8
-    PER_RCC_APB_DIV_16 = 0b111, ///< Divide by 16
-} per_rcc_apb_div_e;
+/// RCC AHB prescaler invalid
+#define PER_RCC_HPRE_INV ((uint_fast16_t)32)
 
-/// RCC Number of GPIO ports enumeration
+/// RCC AHB prescaler highest bit
+#define PER_RCC_HPRE_MSB ((uint_fast16_t)0b1000)
+
+/// RCC APB prescaler maximum
+#define PER_RCC_PPRE_MAX (16)
+
+/// RCC APB prescaler highest bit
+#define PER_RCC_PPRE_MSB ((uint_fast16_t)0b0100)
+
+/// RCC HSE division factor for RTC clock
+#define PER_RCC_RTCPRE_MAX (31)
+
+/// RCC HSE division factor for RTC clock
+#define PER_RCC_RTCPRE_MIN (2)
+
+/// RCC MCO prescaler maximum
+#define PER_RCC_MCO_MAX (5)
+
+/// RCC error enumeration
 typedef enum
 {
-    PER_RCC_GPIO_NR_9  = 9, ///< 9 GPIO ports
-    PER_RCC_GPIO_NR_11  = 11, ///< 11 GPIO ports
-} per_rcc_gpio_nr_e;
+    PER_RCC_OK_ERR = PER_LOG_RCC * PER_LOG_MULT, ///< No error
+    PER_RCC_HPRE_ERR,     ///< AHB prescaler invalid
+    PER_RCC_PPRE_ERR,     ///< APB prescaler invalid
+    PER_RCC_RTCPRE_ERR,   ///< HSE division factor for RTC clock invalid
+    PER_RCC_MCO1PRE_ERR,   ///< MCO1 prescaler invalid
+    PER_RCC_MCO2PRE_ERR,   ///< MCO2 prescaler invalid
+} per_rcc_error_e;
+
+/// RCC ADC peripherals number
+typedef enum
+{
+    PER_RCC_ADC_1 = 1,
+    PER_RCC_ADC_2,
+    PER_RCC_ADC_3,
+} per_rcc_adc_e;
+
+/// RCC CAN peripherals number
+typedef enum
+{
+    PER_RCC_CAN_0 = 0,
+    PER_RCC_CAN_1,
+    PER_RCC_CAN_2,
+    PER_RCC_CAN_3,
+} per_rcc_can_e;
+
+/// RCC I2C peripherals number
+typedef enum
+{
+    PER_RCC_I2C_0 = 0,
+    PER_RCC_I2C_1,
+    PER_RCC_I2C_2,
+    PER_RCC_I2C_3,
+    PER_RCC_I2C_4,
+} per_rcc_i2c_e;
+
+/// RCC I2S peripherals number
+typedef enum
+{
+    PER_RCC_I2S_0 = 0,
+    PER_RCC_I2S_1,
+    PER_RCC_I2S_2,
+    PER_RCC_I2S_3,
+    PER_RCC_I2S_4,
+    PER_RCC_I2S_5,
+} per_rcc_i2s_e;
+
+/// RCC GPIO peripherals number
+typedef enum
+{
+    PER_RCC_GPIO_0  = 0,
+    PER_RCC_GPIO_A,
+    PER_RCC_GPIO_B,
+    PER_RCC_GPIO_C,
+    PER_RCC_GPIO_D,
+    PER_RCC_GPIO_E,
+    PER_RCC_GPIO_F,
+    PER_RCC_GPIO_G,
+    PER_RCC_GPIO_H,
+    PER_RCC_GPIO_I,
+    PER_RCC_GPIO_J,
+    PER_RCC_GPIO_K,
+} per_rcc_gpio_e;
+
+/// RCC SPI peripherals number
+typedef enum
+{
+    PER_RCC_SPI_0 = 0,
+    PER_RCC_SPI_1,
+    PER_RCC_SPI_2,
+    PER_RCC_SPI_3,
+    PER_RCC_SPI_4,
+    PER_RCC_SPI_5,
+    PER_RCC_SPI_6,
+} per_rcc_spi_e;
+
+/// RCC UART peripherals number
+typedef enum
+{
+    PER_RCC_UART_0 = 0,
+    PER_RCC_UART_1,
+    PER_RCC_UART_2,
+    PER_RCC_UART_3,
+    PER_RCC_UART_4,
+    PER_RCC_UART_5,
+    PER_RCC_UART_6,
+} per_rcc_uart_e;
+
+/// RCC USART peripherals number
+typedef enum
+{
+    PER_RCC_USART_0 = 0,
+    PER_RCC_USART_1,
+    PER_RCC_USART_2,
+    PER_RCC_USART_3,
+    PER_RCC_USART_4,
+} per_rcc_usart_e;
+
+/// RCC System clock switch
+typedef enum
+{
+    PER_RCC_SW_HSI = 0b00, ///< HSI clock selected
+    PER_RCC_SW_HSE = 0b01, ///< HSE oscillator clock selected
+    PER_RCC_SW_PLL = 0b10, ///< PLL clock selected
+} per_rcc_sw_e;
+
+/// RCC MCO 1 clock source
+typedef enum
+{
+    PER_RCC_MCO_1_HSI = 0b00, ///< HSI clock selected
+    PER_RCC_MCO_1_LSE = 0b01, ///< LSE oscillator selected
+    PER_RCC_MCO_1_HSE = 0b10, ///< HSE oscillator clock selected
+    PER_RCC_MCO_1_PLL = 0b11, ///< PLL clock selected
+} per_rcc_mco_1_e;
+
+/// RCC MCO 2 clock source
+typedef enum
+{
+    PER_RCC_MCO_2_SYSCLK = 0b00, ///< System clock (SYSCLK) selected
+    PER_RCC_MCO_2_PLLI2S = 0b01, ///< PLLI2S clock selected
+    PER_RCC_MCO_2_HSE    = 0b10, ///< HSE oscillator clock selected
+    PER_RCC_MCO_2_PLL    = 0b11, ///< PLL clock selected
+} per_rcc_mco_2_e;
 
 /// RCC Peripheral Read-write enable bit
 typedef struct
@@ -97,6 +217,28 @@ static per_inline void per_rcc_en1_set(per_rcc_en1_t* self, bool val)
     self->Rw.Bit8 = (uint_fast8_t)val; // Cast is fast
     val = self->Rw.Bit8 != PER_BIT_0;  // Wait read back
 }
+
+/// RCC Peripheral 3 bit Prescaler
+typedef union
+{
+    per_bit_rw3_t Pre; ///< prescaler
+    struct
+    {
+        per_bit_n2_t Fill; ///< value
+        per_bit_w1_t Msb;  ///< most significant bit
+    };
+}per_rcc_pre3_t;
+
+/// RCC Peripheral 4 bit Prescaler
+typedef union
+{
+    per_bit_rw4_t Pre; ///< prescaler
+    struct
+    {
+        per_bit_n3_t Fill; ///< value
+        per_bit_w1_t Msb;  ///< most significant bit
+    };
+}per_rcc_pre4_t;
 
 typedef struct
 {
@@ -133,10 +275,10 @@ typedef struct
     // clock configuration register (RCC_CFGR)
     per_bit_rw2_t Sw; ///< System clock switch
     per_bit_r2_t Sws; ///< System clock switch status
-    per_bit_rw4_t Hpre; ///< AHB prescaler
+    per_rcc_pre4_t Hpre; ///< AHB prescaler
     per_bit_n2_t CirBit8; ///< Reserved
-    per_bit_rw3_t Ppre1; ///< APB Low speed prescaler (APB1)
-    per_bit_rw3_t Ppre2; ///< APB high-speed prescaler (APB2)
+    per_rcc_pre3_t Ppre1; ///< APB Low speed prescaler (APB1)
+    per_rcc_pre3_t Ppre2; ///< ///< APB high-speed prescaler (APB2)
     per_bit_rw5_t Rtcpre; ///< HSE division factor for RTC clock
     per_bit_rw2_t Mco1; ///< Microcontroller clock output 1
     per_bit_rw1_t I2sscr; ///< I2S clock selection
@@ -531,16 +673,193 @@ typedef struct
 /// RCC descriptor
 typedef struct
 {
-    per_rcc_per_t* const Per;       ///< Peripheral
-    const per_log_e Err;            ///< Peripheral error number
-    const per_rcc_gpio_nr_e GpioNr; ///< Number of GPIO ports
-    const bool Eth;                 ///< Ethernet present
+    per_rcc_per_t* const Per;     ///< Peripheral
+    const per_log_e Err;          ///< Peripheral error number
+    const per_rcc_adc_e Adc;      ///< Number of ADC peripherals
+    const per_rcc_can_e Can;      ///< Number of CAN peripherals
+    const per_rcc_i2c_e I2c;      ///< Number of I2C peripherals
+    const per_rcc_i2s_e I2s;      ///< Number of I2S peripherals
+    const per_rcc_gpio_e Gpio;    ///< Number of GPIO ports
+    const per_rcc_spi_e Spi;      ///< Number of SPI peripherals
+    const per_rcc_uart_e Uart;    ///< Number of UART peripherals
+    const per_rcc_usart_e Usart;  ///< Number of USART peripherals
+    const bool Eth;               ///< Ethernet present
 } per_rcc_t;
 
-/// Get peripheral clock frequency
-static per_inline uint32_t per_rcc_freq(void)
+/// RCC System clock switch
+static per_inline per_rcc_sw_e per_rcc_sw(const per_rcc_t* const rcc)
 {
-    return PER_RCC_FREQ;
+    return (per_rcc_sw_e)per_bit_rw2(&rcc->Per->Sw);
+}
+
+/// RCC System clock switch
+static per_inline void per_rcc_set_sw(const per_rcc_t* const rcc, per_rcc_sw_e val)
+{
+    per_bit_rw2_set(&rcc->Per->Sw, (uint_fast16_t)val);
+}
+
+/// RCC System clock switch status
+static per_inline per_rcc_sw_e per_rcc_sws(const per_rcc_t* const rcc)
+{
+    return (per_rcc_sw_e)per_bit_r2(&rcc->Per->Sws);
+}
+
+/// RCC AHB prescaler
+static per_inline uint_fast16_t per_rcc_hpre(const per_rcc_t* const rcc)
+{
+    uint_fast16_t hpre = per_bit_rw4(&rcc->Per->Hpre.Pre);
+    uint_fast16_t val = 1;
+
+    if ((hpre & PER_RCC_HPRE_MSB) != 0) // highest bit
+    {
+        val = (uint_fast16_t)per_bit_inv_log2(hpre & ~PER_RCC_HPRE_MSB); // inverse log of lowest three bits
+
+        val <<= 1; // multiply by 2
+
+        if (val >= PER_RCC_HPRE_INV)
+        {
+            val <<= 1; // multiply by 2
+        }
+    }
+
+    return val;
+}
+
+/// RCC AHB prescaler
+static per_inline bool per_rcc_set_hpre(const per_rcc_t* const rcc, uint_fast16_t val)
+{
+    if ((val > PER_RCC_HPRE_MAX) ||
+        (val == PER_RCC_HPRE_INV) ||
+        !per_bit_is_log2(val))
+    {
+        per_log_err(rcc->Err, PER_RCC_HPRE_ERR, val);
+        return false;
+    }
+
+    uint_fast16_t hpre = 0; // one
+
+    if (val > 1)
+    {
+        val >>= 1; // divide by 2
+
+        if (val > PER_RCC_HPRE_INV)
+        {
+            val >>= 1; // divide by 2
+        }
+
+        hpre = PER_RCC_HPRE_MSB | per_bit_log2(val);
+    }
+
+    per_bit_w1_set(&rcc->Per->Hpre.Msb, true); // Set this to prevent temporary illegal values during the next write
+
+    return per_bit_rw4_set(&rcc->Per->Hpre.Pre, hpre);
+}
+
+/// RCC 3 bit prescaler
+static per_inline uint_fast16_t per_rcc_ppre(const per_rcc_pre3_t* ppre)
+{
+    uint_fast16_t pre = per_bit_rw3(&ppre->Pre);
+    uint_fast16_t val = 1;
+
+    if ((pre & PER_RCC_PPRE_MSB) != 0) // highest bit
+    {
+        val = (uint_fast16_t)per_bit_inv_log2(pre & ~PER_RCC_PPRE_MSB); // inverse log of lowest two bits
+
+        val <<= 1; // multiply by 2
+    }
+
+    return val;
+}
+
+/// RCC 3 bit prescaler
+static per_inline bool per_rcc_set_ppre(const per_log_e Err, per_rcc_pre3_t* ppre, uint_fast16_t val)
+{
+    if ((val > PER_RCC_PPRE_MAX) ||
+        !per_bit_is_log2(val))
+    {
+        per_log_err(Err, PER_RCC_PPRE_ERR, val);
+        return false;
+    }
+
+    uint_fast16_t pre = 0; // one
+
+    if (val > 1)
+    {
+        val >>= 1; // divide by 2
+
+        pre = PER_RCC_PPRE_MSB | per_bit_log2(val);
+    }
+
+    per_bit_w1_set(&ppre->Msb, true); // Set this to prevent temporary illegal values during the next write
+
+    return per_bit_rw3_set(&ppre->Pre, pre);
+}
+
+/// RCC APB Low speed prescaler (APB1)
+static per_inline uint_fast16_t per_rcc_ppre1(const per_rcc_t* const rcc)
+{
+    return per_rcc_ppre(&rcc->Per->Ppre1);
+}
+
+/// RCC APB Low speed prescaler (APB1)
+static per_inline bool per_rcc_set_ppre1(const per_rcc_t* const rcc, uint_fast16_t val)
+{
+    return per_rcc_set_ppre(rcc->Err, &rcc->Per->Ppre1, val);
+}
+
+/// RCC APB high-speed prescaler (APB2)
+static per_inline uint_fast16_t per_rcc_ppre2(const per_rcc_t* const rcc)
+{
+    return per_rcc_ppre(&rcc->Per->Ppre2);
+}
+
+/// RCC APB high-speed prescaler (APB2)
+static per_inline bool per_rcc_set_ppre2(const per_rcc_t* const rcc, uint_fast16_t val)
+{
+    return per_rcc_set_ppre(rcc->Err, &rcc->Per->Ppre2, val);
+}
+
+/// RCC HSE division factor for RTC clock
+static per_inline uint_fast16_t per_rcc_rtcpre(const per_rcc_t* const rcc)
+{
+    return per_bit_rw5(&rcc->Per->Rtcpre);
+}
+
+/// RCC HSE division factor for RTC clock
+static per_inline bool per_rcc_set_rtcpre(const per_rcc_t* const rcc, uint_fast16_t val)
+{
+    if ((val > PER_RCC_RTCPRE_MAX) ||
+        (val < PER_RCC_RTCPRE_MIN))
+    {
+        per_log_err(rcc->Err, PER_RCC_RTCPRE_ERR, val);
+        return false;
+    }
+
+    per_bit_rw5_set(&rcc->Per->Rtcpre, val);
+}
+
+/// RCC Microcontroller clock output 1
+static per_inline per_rcc_mco_1_e per_rcc_mco1(const per_rcc_t* const rcc)
+{
+    return (per_rcc_mco_1_e)per_bit_rw2(&rcc->Per->Mco1);
+}
+
+/// RCC Microcontroller clock output 1
+static per_inline bool per_rcc_set_mco1(const per_rcc_t* const rcc, per_rcc_mco_1_e val)
+{
+    return per_bit_rw2_set(&rcc->Per->Mco1, (uint_fast16_t)val);
+}
+
+/// RCC I2S clock selection
+static per_inline bool per_rcc_i2sscr(const per_rcc_t* const rcc)
+{
+    return per_bit_rw1(&rcc->Per->I2sscr);
+}
+
+/// RCC I2S clock selection
+static per_inline void per_rcc_set_i2sscr(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_rw1_set(&rcc->Per->I2sscr, val);
 }
 
 /// Get MCO divider value
@@ -552,38 +871,216 @@ static per_inline uint32_t per_rcc_mco_div(per_bit_rw3_t* reg)
     return div + (val & (b3 * 0b011)); // adder is least two bits
 }
 
-/// Set MCO divider value
-static per_inline void per_rcc_set_mco_div(per_bit_rw3_t* reg, per_rcc_mco_div_e div)
+///// RCC MCO1 prescaler
+//static per_inline bool per_rcc_mco1pre(const per_rcc_t* const rcc)
+//{
+//    return per_bit_rw3(&rcc->Per->Mco1pre);
+//}
+//
+///// RCC MCO1 prescaler
+//static per_inline void per_rcc_set_mco1pre(const per_rcc_t* const rcc, bool val)
+//{
+//    per_bit_rw3_set(&rcc->Per->Mco1pre, val);
+//}
+
+///// RCC MCO2 prescaler
+//static per_inline bool per_rcc_mco2pre(const per_rcc_t* const rcc)
+//{
+//    return per_bit_rw3(&rcc->Per->Mco2pre);
+//}
+//
+///// RCC MCO2 prescaler
+//static per_inline void per_rcc_set_mco2pre(const per_rcc_t* const rcc, bool val)
+//{
+//    per_bit_rw3_set(&rcc->Per->Mco2pre, val);
+//}
+
+
+/// RCC Microcontroller clock output 2
+static per_inline per_rcc_mco_2_e per_rcc_mco2(const per_rcc_t* const rcc)
 {
-    per_bit_rw3_set((per_bit_rw3_t*)reg, (uint32_t)div);
+    return (per_rcc_mco_2_e)per_bit_rw2(&rcc->Per->Mco2);
 }
 
-/// Get APB divider value
-static per_inline uint32_t per_rcc_apb_div(per_bit_rw3_t* reg)
+/// RCC Microcontroller clock output 2
+static per_inline bool per_rcc_set_mco2(const per_rcc_t* const rcc, per_rcc_mco_2_e val)
 {
-    uint32_t val = per_bit_rw3(reg);
-    uint32_t b3 = (val >> 2) & 0b001; // bit three value
-    uint32_t div = 1 + b3; // start at one and add bit three
-    return div << (val & (b3 * 0b011)); // multiplier is least two bits
+    return per_bit_rw2_set(&rcc->Per->Mco2, (uint_fast16_t)val);
 }
 
-/// Set APB divider value
-static per_inline void per_rcc_set_apb_div(per_bit_rw3_t* reg, per_rcc_apb_div_e div)
+/// RCC LSI ready interrupt flag
+static per_inline bool per_rcc_lsirdyf(const per_rcc_t* const rcc)
 {
-    per_bit_rw3_set(reg, (uint32_t)div);
+    return per_bit_r1(&rcc->Per->Lsirdyf);
 }
 
+/// RCC LSE ready interrupt flag
+static per_inline bool per_rcc_lserdyf(const per_rcc_t* const rcc)
+{
+    return per_bit_r1(&rcc->Per->Lserdyf);
+}
 
+/// RCC HSI ready interrupt flag
+static per_inline bool per_rcc_hsirdyf(const per_rcc_t* const rcc)
+{
+    return per_bit_r1(&rcc->Per->Hsirdyf);
+}
 
+/// RCC HSE ready interrupt flag
+static per_inline bool per_rcc_hserdyf(const per_rcc_t* const rcc)
+{
+    return per_bit_r1(&rcc->Per->Hserdyf);
+}
 
+/// RCC Main PLL (PLL) ready interrupt flag
+static per_inline bool per_rcc_pllrdyf(const per_rcc_t* const rcc)
+{
+    return per_bit_r1(&rcc->Per->Pllrdyf);
+}
 
+/// RCC PLLI2S ready interrupt flag
+static per_inline bool per_rcc_plli2srdyf(const per_rcc_t* const rcc)
+{
+    return per_bit_r1(&rcc->Per->Plli2srdyf);
+}
 
+/// RCC PLLSAI Ready Interrupt flag
+static per_inline bool per_rcc_pllsairdyf(const per_rcc_t* const rcc)
+{
+    return per_bit_r1(&rcc->Per->Pllsairdyf);
+}
 
+/// RCC Clock security system interrupt flag
+static per_inline bool per_rcc_cssf(const per_rcc_t* const rcc)
+{
+    return per_bit_r1(&rcc->Per->Cssf);
+}
 
+/// RCC LSI ready interrupt enable
+static per_inline bool per_rcc_lsirdyie(const per_rcc_t* const rcc)
+{
+    return per_bit_rw1(&rcc->Per->Lsirdyie);
+}
 
+/// RCC LSI ready interrupt enable
+static per_inline void per_rcc_set_lsirdyie(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_rw1_set(&rcc->Per->Lsirdyie, val);
+}
+/// RCC LSE ready interrupt enable
+static per_inline bool per_rcc_lserdyie(const per_rcc_t* const rcc)
+{
+    return per_bit_rw1(&rcc->Per->Lserdyie);
+}
 
+/// RCC LSE ready interrupt enable
+static per_inline void per_rcc_set_lserdyie(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_rw1_set(&rcc->Per->Lserdyie, val);
+}
+/// RCC HSI ready interrupt enable
+static per_inline bool per_rcc_hsirdyie(const per_rcc_t* const rcc)
+{
+    return per_bit_rw1(&rcc->Per->Hsirdyie);
+}
 
+/// RCC HSI ready interrupt enable
+static per_inline void per_rcc_set_hsirdyie(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_rw1_set(&rcc->Per->Hsirdyie, val);
+}
+/// RCC HSE ready interrupt enable
+static per_inline bool per_rcc_hserdyie(const per_rcc_t* const rcc)
+{
+    return per_bit_rw1(&rcc->Per->Hserdyie);
+}
 
+/// RCC HSE ready interrupt enable
+static per_inline void per_rcc_set_hserdyie(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_rw1_set(&rcc->Per->Hserdyie, val);
+}
+/// RCC Main PLL (PLL) ready interrupt enable
+static per_inline bool per_rcc_pllrdyie(const per_rcc_t* const rcc)
+{
+    return per_bit_rw1(&rcc->Per->Pllrdyie);
+}
+
+/// RCC Main PLL (PLL) ready interrupt enable
+static per_inline void per_rcc_set_pllrdyie(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_rw1_set(&rcc->Per->Pllrdyie, val);
+}
+/// RCC PLLI2S ready interrupt enable
+static per_inline bool per_rcc_plli2srdyie(const per_rcc_t* const rcc)
+{
+    return per_bit_rw1(&rcc->Per->Plli2srdyie);
+}
+
+/// RCC PLLI2S ready interrupt enable
+static per_inline void per_rcc_set_plli2srdyie(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_rw1_set(&rcc->Per->Plli2srdyie, val);
+}
+/// RCC PLLSAI Ready Interrupt Enable
+static per_inline bool per_rcc_pllsairdyie(const per_rcc_t* const rcc)
+{
+    return per_bit_rw1(&rcc->Per->Pllsairdyie);
+}
+
+/// RCC PLLSAI Ready Interrupt Enable
+static per_inline void per_rcc_set_pllsairdyie(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_rw1_set(&rcc->Per->Pllsairdyie, val);
+}
+
+/// RCC LSI ready interrupt clear
+static per_inline void per_rcc_set_lsirdyc(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_w1_set(&rcc->Per->Lsirdyc, val);
+}
+
+/// RCC LSE ready interrupt clear
+static per_inline void per_rcc_set_lserdyc(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_w1_set(&rcc->Per->Lserdyc, val);
+}
+
+/// RCC HSI ready interrupt clear
+static per_inline void per_rcc_set_hsirdyc(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_w1_set(&rcc->Per->Hsirdyc, val);
+}
+
+/// RCC HSE ready interrupt clear
+static per_inline void per_rcc_set_hserdyc(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_w1_set(&rcc->Per->Hserdyc, val);
+}
+
+/// RCC Main PLL(PLL) ready interrupt clear
+static per_inline void per_rcc_set_pllrdyc(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_w1_set(&rcc->Per->Pllrdyc, val);
+}
+
+/// RCC PLLI2S ready interrupt clear
+static per_inline void per_rcc_set_plli2srdyc(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_w1_set(&rcc->Per->Plli2srdyc, val);
+}
+
+/// RCC PLLSAI Ready Interrupt Clear
+static per_inline void per_rcc_set_pllsairdyc(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_w1_set(&rcc->Per->Pllsairdyc, val);
+}
+
+/// RCC Clock security system interrupt clear
+static per_inline void per_rcc_set_cssc(const per_rcc_t* const rcc, bool val)
+{
+    per_bit_w1_set(&rcc->Per->Cssc, val);
+}
 
 /// RCC IO port A clock reset
 static per_inline bool per_rcc_gpioarst(const per_rcc_t* const rcc)
@@ -696,7 +1193,7 @@ static per_inline void per_rcc_set_gpioirst(const per_rcc_t* const rcc, bool val
 /// RCC IO port J clock reset
 static per_inline bool per_rcc_gpiojrst(const per_rcc_t* const rcc)
 {
-    if (rcc->GpioNr < PER_RCC_GPIO_NR_11)
+    if (rcc->Gpio < PER_RCC_GPIO_J)
     {
         per_log_err_function_not_supported();
     }
@@ -707,7 +1204,7 @@ static per_inline bool per_rcc_gpiojrst(const per_rcc_t* const rcc)
 /// RCC IO port J clock reset
 static per_inline void per_rcc_set_gpiojrst(const per_rcc_t* const rcc, bool val)
 {
-    if (rcc->GpioNr < PER_RCC_GPIO_NR_11)
+    if (rcc->Gpio < PER_RCC_GPIO_J)
     {
         per_log_err_function_not_supported();
     }
@@ -718,7 +1215,7 @@ static per_inline void per_rcc_set_gpiojrst(const per_rcc_t* const rcc, bool val
 /// RCC IO port K clock reset
 static per_inline bool per_rcc_gpiokrst(const per_rcc_t* const rcc)
 {
-    if (rcc->GpioNr < PER_RCC_GPIO_NR_11)
+    if (rcc->Gpio < PER_RCC_GPIO_K)
     {
         per_log_err_function_not_supported();
     }
@@ -729,7 +1226,7 @@ static per_inline bool per_rcc_gpiokrst(const per_rcc_t* const rcc)
 /// RCC IO port K clock reset
 static per_inline void per_rcc_set_gpiokrst(const per_rcc_t* const rcc, bool val)
 {
-    if (rcc->GpioNr < PER_RCC_GPIO_NR_11)
+    if (rcc->Gpio < PER_RCC_GPIO_K)
     {
         per_log_err_function_not_supported();
     }
@@ -1494,7 +1991,7 @@ static per_inline void per_rcc_set_gpioien(const per_rcc_t* const rcc, bool val)
 /// RCC IO port J clock enable
 static per_inline bool per_rcc_gpiojen(const per_rcc_t* const rcc)
 {
-    if (rcc->GpioNr < PER_RCC_GPIO_NR_11)
+    if (rcc->Gpio < PER_RCC_GPIO_J)
     {
         per_log_err_function_not_supported();
     }
@@ -1505,7 +2002,7 @@ static per_inline bool per_rcc_gpiojen(const per_rcc_t* const rcc)
 /// RCC IO port J clock enable
 static per_inline void per_rcc_set_gpiojen(const per_rcc_t* const rcc, bool val)
 {
-    if (rcc->GpioNr < PER_RCC_GPIO_NR_11)
+    if (rcc->Gpio < PER_RCC_GPIO_J)
     {
         per_log_err_function_not_supported();
     }
@@ -1516,7 +2013,7 @@ static per_inline void per_rcc_set_gpiojen(const per_rcc_t* const rcc, bool val)
 /// RCC IO port K clock enable
 static per_inline bool per_rcc_gpioken(const per_rcc_t* const rcc)
 {
-    if (rcc->GpioNr < PER_RCC_GPIO_NR_11)
+    if (rcc->Gpio < PER_RCC_GPIO_K)
     {
         per_log_err_function_not_supported();
     }
@@ -1527,7 +2024,7 @@ static per_inline bool per_rcc_gpioken(const per_rcc_t* const rcc)
 /// RCC IO port K clock enable
 static per_inline void per_rcc_set_gpioken(const per_rcc_t* const rcc, bool val)
 {
-    if (rcc->GpioNr < PER_RCC_GPIO_NR_11)
+    if (rcc->Gpio < PER_RCC_GPIO_K)
     {
         per_log_err_function_not_supported();
     }
@@ -2418,7 +2915,7 @@ static per_inline void per_rcc_set_gpioilpen(const per_rcc_t* const rcc, bool va
 /// RCC IO port J clock enable during Sleep mode
 static per_inline bool per_rcc_gpiojlpen(const per_rcc_t* const rcc)
 {
-    if (rcc->GpioNr < PER_RCC_GPIO_NR_11)
+    if (rcc->Gpio < PER_RCC_GPIO_J)
     {
         per_log_err_function_not_supported();
     }
@@ -2429,7 +2926,7 @@ static per_inline bool per_rcc_gpiojlpen(const per_rcc_t* const rcc)
 /// RCC IO port J clock enable during Sleep mode
 static per_inline void per_rcc_set_gpiojlpen(const per_rcc_t* const rcc, bool val)
 {
-    if (rcc->GpioNr < PER_RCC_GPIO_NR_11)
+    if (rcc->Gpio < PER_RCC_GPIO_J)
     {
         per_log_err_function_not_supported();
     }
@@ -2440,7 +2937,7 @@ static per_inline void per_rcc_set_gpiojlpen(const per_rcc_t* const rcc, bool va
 /// RCC IO port K clock enable during Sleep mode
 static per_inline bool per_rcc_gpioklpen(const per_rcc_t* const rcc)
 {
-    if (rcc->GpioNr < PER_RCC_GPIO_NR_11)
+    if (rcc->Gpio < PER_RCC_GPIO_K)
     {
         per_log_err_function_not_supported();
     }
@@ -2451,7 +2948,7 @@ static per_inline bool per_rcc_gpioklpen(const per_rcc_t* const rcc)
 /// RCC IO port K clock enable during Sleep mode
 static per_inline void per_rcc_set_gpioklpen(const per_rcc_t* const rcc, bool val)
 {
-    if (rcc->GpioNr < PER_RCC_GPIO_NR_11)
+    if (rcc->Gpio < PER_RCC_GPIO_K)
     {
         per_log_err_function_not_supported();
     }
@@ -3249,6 +3746,35 @@ static per_inline void per_rcc_set_ltdclpen(const per_rcc_t* const rcc, bool val
 
 
 
+
+
+///// RCC
+//static per_inline bool per_rcc_(const per_rcc_t* const rcc)
+//{
+//    return per_bit_r1(&rcc->Per->);
+//}
+//
+
+
+
+///// RCC
+//static per_inline bool per_rcc_(const per_rcc_t* const rcc)
+//{
+//    return per_bit_rw1(&rcc->Per->);
+//}
+//
+///// RCC
+//static per_inline void per_rcc_set_(const per_rcc_t* const rcc, bool val)
+//{
+//    per_rcc_rw1_set(&rcc->Per->, val);
+//}
+
+
+///// RCC
+//static per_inline void per_rcc_set_(const per_rcc_t* const rcc, bool val)
+//{
+//    per_rcc_w1_set(&rcc->Per->, val);
+//}
 
 
 
