@@ -197,5 +197,5 @@ Add the include libraries: F4/inc, F439ZI/inc, Nucleo/inc
 If required, compile the files: per_bit.c, per_gpio.c, per_dep.c and bsp_dep.c  
 
 ## THE END
-If you have any tips, remarks, questions and suggestions please send an email.  
+If you have any tips, remarks, questions or suggestions please send an email.  
 Developing more efficient software can decrease energy consumption, decrease carbon footprint and help our planet :-)  

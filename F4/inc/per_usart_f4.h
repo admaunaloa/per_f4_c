@@ -104,6 +104,10 @@ typedef enum
                          PER_USART_SR_TC |
                          PER_USART_SR_LBD |
                          PER_USART_SR_CTS,
+    PER_USART_SR_ERR   = PER_USART_SR_PE | ///< Error flags
+                         PER_USART_SR_FE |
+                         PER_USART_SR_NF |
+                         PER_USART_SR_ORE,
 } per_usart_sr_e;
 
 /// USART data bits enumeration
