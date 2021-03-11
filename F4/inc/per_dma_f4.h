@@ -492,7 +492,7 @@ static per_inline bool per_dma_set_chsel(const per_dma_stream_t* const dma, cons
 {
     if (dma->Conf != selection->Conf)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_rw3_set(&dma->Conf->Chsel, (uint_fast16_t)selection->Chan);

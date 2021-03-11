@@ -318,7 +318,7 @@ static per_inline bool per_usart_cts(const per_usart_t* const usart)
 {
     if (usart->Uart)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
     
     return per_bit_rc1(&usart->Per->Cts);
@@ -329,7 +329,7 @@ static per_inline bool per_usart_rdclr_cts(const per_usart_t* const usart)
 {
     if (usart->Uart)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
     
     return per_bit_rc1_rdclr(&usart->Per->Cts);
@@ -654,7 +654,7 @@ static per_inline bool per_usart_lbcl(const per_usart_t* const usart)
 {
     if (usart->Uart)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
     
     return per_bit_rw1(&usart->Per->Lbcl);
@@ -665,7 +665,7 @@ static per_inline void per_usart_set_lbcl(const per_usart_t* const usart, bool v
 {
     if (usart->Uart)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     per_bit_rw1_set(&usart->Per->Lbcl, val);
@@ -676,7 +676,7 @@ static per_inline bool per_usart_cpha(const per_usart_t* const usart)
 {
     if (usart->Uart)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
     
     return per_bit_rw1(&usart->Per->Cpha);
@@ -687,7 +687,7 @@ static per_inline void per_usart_set_cpha(const per_usart_t* const usart, bool v
 {
     if (usart->Uart)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     per_bit_rw1_set(&usart->Per->Cpha, val);
@@ -698,7 +698,7 @@ static per_inline bool per_usart_cpol(const per_usart_t* const usart)
 {
     if (usart->Uart)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
     
     return per_bit_rw1(&usart->Per->Cpol);
@@ -709,7 +709,7 @@ static per_inline void per_usart_set_cpol(const per_usart_t* const usart, bool v
 {
     if (usart->Uart)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     per_bit_rw1_set(&usart->Per->Cpol, val);
@@ -720,7 +720,7 @@ static per_inline bool per_usart_clken(const per_usart_t* const usart)
 {
     if (usart->Uart)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
     
     return per_bit_rw1(&usart->Per->Clken);
@@ -731,7 +731,7 @@ static per_inline void per_usart_set_clken(const per_usart_t* const usart, bool 
 {
     if (usart->Uart)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     per_bit_rw1_set(&usart->Per->Clken, val);
@@ -814,7 +814,7 @@ static per_inline bool per_usart_nack(const per_usart_t* const usart)
 {
     if (usart->Uart)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
     
     return per_bit_rw1(&usart->Per->Nack);
@@ -825,7 +825,7 @@ static per_inline void per_usart_set_nack(const per_usart_t* const usart, bool v
 {
     if (usart->Uart)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     per_bit_rw1_set(&usart->Per->Nack, val);
@@ -836,7 +836,7 @@ static per_inline bool per_usart_scen(const per_usart_t* const usart)
 {
     if (usart->Uart)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
     
     return per_bit_rw1(&usart->Per->Scen);
@@ -847,7 +847,7 @@ static per_inline void per_usart_set_scen(const per_usart_t* const usart, bool v
 {
     if (usart->Uart)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     per_bit_rw1_set(&usart->Per->Scen, val);
@@ -882,7 +882,7 @@ static per_inline bool per_usart_rtse(const per_usart_t* const usart)
 {
     if (usart->Uart)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
     
     return per_bit_rw1(&usart->Per->Rtse);
@@ -893,7 +893,7 @@ static per_inline void per_usart_set_rtse(const per_usart_t* const usart, bool v
 {
     if (usart->Uart)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     per_bit_rw1_set(&usart->Per->Rtse, val);
@@ -904,7 +904,7 @@ static per_inline bool per_usart_ctse(const per_usart_t* const usart)
 {
     if (usart->Uart)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
     
     return per_bit_rw1(&usart->Per->Ctse);
@@ -915,7 +915,7 @@ static per_inline void per_usart_set_ctse(const per_usart_t* const usart, bool v
 {
     if (usart->Uart)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     per_bit_rw1_set(&usart->Per->Ctse, val);
@@ -926,7 +926,7 @@ static per_inline bool per_usart_ctsie(const per_usart_t* const usart)
 {
     if (usart->Uart)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
     
     return per_bit_rw1(&usart->Per->Ctsie);
@@ -937,7 +937,7 @@ static per_inline void per_usart_set_ctsie(const per_usart_t* const usart, bool 
 {
     if (usart->Uart)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     per_bit_rw1_set(&usart->Per->Ctsie, val);
@@ -960,7 +960,7 @@ static per_inline uint_fast16_t per_usart_psc_irda(const per_usart_t* const usar
 {
     if (usart->Uart)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
     
     return per_bit_rw8(&usart->Per->Psc);
@@ -971,7 +971,7 @@ static per_inline bool per_usart_set_psc_irda(const per_usart_t* const usart, ui
 {
     if (usart->Uart)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     if ((psc == 0) || (psc > per_bit_rw8_max()))
@@ -988,7 +988,7 @@ static per_inline uint_fast16_t per_usart_psc_sc(const per_usart_t* const usart)
 {
     if (usart->Uart)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
     
     return per_bit_rw8(&usart->Per->Psc) << 1; // multiply by 2
@@ -999,7 +999,7 @@ static per_inline bool per_usart_set_psc_sc(const per_usart_t* const usart, uint
 {
     if (usart->Uart)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     if ((psc < 2) || (psc > per_bit_rw8_max()))
@@ -1016,7 +1016,7 @@ static per_inline uint_fast16_t per_usart_gt(const per_usart_t* const usart)
 {
     if (usart->Uart)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
     
     return per_bit_rw8(&usart->Per->Gt);
@@ -1027,7 +1027,7 @@ static per_inline bool per_usart_set_gt(const per_usart_t* const usart, uint_fas
 {
     if (usart->Uart)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     if (gt > per_bit_rw8_max())

@@ -557,7 +557,7 @@ static per_inline bool per_tim_gp_dir(const per_tim_gp_t* const tim)
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_rw1(&tim->Per->Dir);
@@ -568,7 +568,7 @@ static per_inline void per_tim_gp_set_dir(const per_tim_gp_t* const tim, bool va
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     per_bit_rw1_set(&tim->Per->Dir, val);
@@ -579,7 +579,7 @@ static per_inline per_tim_gp_cms_e per_tim_gp_cms(const per_tim_gp_t* const tim)
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return (per_tim_gp_cms_e)per_bit_rw2(&tim->Per->Cms);
@@ -590,7 +590,7 @@ static per_inline bool per_tim_gp_set_cms(const per_tim_gp_t* const tim, per_tim
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_rw2_set(&tim->Per->Cms, (uint_fast16_t)val);
@@ -632,7 +632,7 @@ static per_inline bool per_tim_gp_ccds(const per_tim_gp_t* const tim)
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_rw1(&tim->Per->Ccds);
@@ -643,7 +643,7 @@ static per_inline void per_tim_gp_set_ccds(const per_tim_gp_t* const tim, bool v
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     per_bit_rw1_set(&tim->Per->Ccds, val);
@@ -654,7 +654,7 @@ static per_inline per_tim_gp_mms_e per_tim_gp_mms(const per_tim_gp_t* const tim)
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return (per_tim_gp_mms_e)per_bit_rw3(&tim->Per->Mms);
@@ -665,7 +665,7 @@ static per_inline bool per_tim_gp_set_mms(const per_tim_gp_t* const tim, per_tim
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_rw3_set(&tim->Per->Mms, (uint_fast16_t)val);
@@ -676,7 +676,7 @@ static per_inline bool per_tim_gp_ti1s(const per_tim_gp_t* const tim)
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_rw1(&tim->Per->Ti1s);
@@ -687,7 +687,7 @@ static per_inline void per_tim_gp_set_ti1s(const per_tim_gp_t* const tim, bool v
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     per_bit_rw1_set(&tim->Per->Ti1s, val);
@@ -698,7 +698,7 @@ static per_inline per_tim_gp_sms_e per_tim_gp_sms(const per_tim_gp_t* const tim)
 {
     if (tim->Chan < PER_TIM_GP_CHAN_2)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return (per_tim_gp_sms_e)per_bit_rw3(&tim->Per->Sms);
@@ -709,7 +709,7 @@ static per_inline bool per_tim_gp_set_sms(const per_tim_gp_t* const tim, per_tim
 {
     if (tim->Chan < PER_TIM_GP_CHAN_2)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_rw3_set(&tim->Per->Sms, (uint_fast16_t)val);
@@ -720,7 +720,7 @@ static per_inline per_tim_gp_ts_e per_tim_gp_ts(const per_tim_gp_t* const tim)
 {
     if (tim->Chan < PER_TIM_GP_CHAN_2)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return (per_tim_gp_ts_e)per_bit_rw3(&tim->Per->Ts);
@@ -731,7 +731,7 @@ static per_inline bool per_tim_gp_set_ts(const per_tim_gp_t* const tim, per_tim_
 {
     if (tim->Chan < PER_TIM_GP_CHAN_2)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_rw3_set(&tim->Per->Ts, (uint_fast16_t)val);
@@ -742,7 +742,7 @@ static per_inline bool per_tim_gp_msm(const per_tim_gp_t* const tim)
 {
     if (tim->Chan < PER_TIM_GP_CHAN_2)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_rw1(&tim->Per->Msm);
@@ -753,7 +753,7 @@ static per_inline void per_tim_gp_set_msm(const per_tim_gp_t* const tim, bool va
 {
     if (tim->Chan < PER_TIM_GP_CHAN_2)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     per_bit_rw1_set(&tim->Per->Msm, val);
@@ -764,7 +764,7 @@ static per_inline per_tim_gp_etf_e per_tim_gp_etf(const per_tim_gp_t* const tim)
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return (per_tim_gp_etf_e)per_bit_rw4(&tim->Per->Etf);
@@ -775,7 +775,7 @@ static per_inline bool per_tim_gp_set_etf(const per_tim_gp_t* const tim, per_tim
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_rw4_set(&tim->Per->Etf, (uint_fast16_t)val);
@@ -786,7 +786,7 @@ static per_inline uint_fast32_t per_tim_gp_etps(const per_tim_gp_t* const tim)
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_inv_log2(per_bit_rw2(&tim->Per->Etps));
@@ -797,7 +797,7 @@ static per_inline bool per_tim_gp_set_etps(const per_tim_gp_t* const tim, uint_f
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     if ((val > PER_TIM_GP_ETPS_MAX) ||
@@ -815,7 +815,7 @@ static per_inline bool per_tim_gp_ece(const per_tim_gp_t* const tim)
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_rw1(&tim->Per->Ece);
@@ -826,7 +826,7 @@ static per_inline void per_tim_gp_set_ece(const per_tim_gp_t* const tim, bool va
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     per_bit_rw1_set(&tim->Per->Ece, val);
@@ -837,7 +837,7 @@ static per_inline bool per_tim_gp_etp(const per_tim_gp_t* const tim)
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_rw1(&tim->Per->Etp);
@@ -848,7 +848,7 @@ static per_inline void per_tim_gp_set_etp(const per_tim_gp_t* const tim, bool va
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     per_bit_rw1_set(&tim->Per->Etp, val);
@@ -883,7 +883,7 @@ static per_inline bool per_tim_gp_cc2ie(const per_tim_gp_t* const tim)
 {
     if (tim->Chan < PER_TIM_GP_CHAN_2)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_rw1(&tim->Per->Cc2ie);
@@ -894,7 +894,7 @@ static per_inline void per_tim_gp_set_cc2ie(const per_tim_gp_t* const tim, bool 
 {
     if (tim->Chan < PER_TIM_GP_CHAN_2)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     per_bit_rw1_set(&tim->Per->Cc2ie, val);
@@ -905,7 +905,7 @@ static per_inline bool per_tim_gp_cc3ie(const per_tim_gp_t* const tim)
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_rw1(&tim->Per->Cc3ie);
@@ -916,7 +916,7 @@ static per_inline void per_tim_gp_set_cc3ie(const per_tim_gp_t* const tim, bool 
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     per_bit_rw1_set(&tim->Per->Cc3ie, val);
@@ -927,7 +927,7 @@ static per_inline bool per_tim_gp_cc4ie(const per_tim_gp_t* const tim)
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_rw1(&tim->Per->Cc4ie);
@@ -938,7 +938,7 @@ static per_inline void per_tim_gp_set_cc4ie(const per_tim_gp_t* const tim, bool 
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     per_bit_rw1_set(&tim->Per->Cc4ie, val);
@@ -949,7 +949,7 @@ static per_inline bool per_tim_gp_tie(const per_tim_gp_t* const tim)
 {
     if (tim->Chan < PER_TIM_GP_CHAN_2)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_rw1(&tim->Per->Tie);
@@ -960,7 +960,7 @@ static per_inline void per_tim_gp_set_tie(const per_tim_gp_t* const tim, bool va
 {
     if (tim->Chan < PER_TIM_GP_CHAN_2)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     per_bit_rw1_set(&tim->Per->Tie, val);
@@ -971,7 +971,7 @@ static per_inline bool per_tim_gp_ude(const per_tim_gp_t* const tim)
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_rw1(&tim->Per->Ude);
@@ -982,7 +982,7 @@ static per_inline void per_tim_gp_set_ude(const per_tim_gp_t* const tim, bool va
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     per_bit_rw1_set(&tim->Per->Ude, val);
@@ -993,7 +993,7 @@ static per_inline bool per_tim_gp_cc1de(const per_tim_gp_t* const tim)
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_rw1(&tim->Per->Cc1de);
@@ -1004,7 +1004,7 @@ static per_inline void per_tim_gp_set_cc1de(const per_tim_gp_t* const tim, bool 
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     per_bit_rw1_set(&tim->Per->Cc1de, val);
@@ -1015,7 +1015,7 @@ static per_inline bool per_tim_gp_cc2de(const per_tim_gp_t* const tim)
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_rw1(&tim->Per->Cc2de);
@@ -1026,7 +1026,7 @@ static per_inline void per_tim_gp_set_cc2de(const per_tim_gp_t* const tim, bool 
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     per_bit_rw1_set(&tim->Per->Cc2de, val);
@@ -1037,7 +1037,7 @@ static per_inline bool per_tim_gp_cc3de(const per_tim_gp_t* const tim)
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_rw1(&tim->Per->Cc3de);
@@ -1048,7 +1048,7 @@ static per_inline void per_tim_gp_set_cc3de(const per_tim_gp_t* const tim, bool 
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     per_bit_rw1_set(&tim->Per->Cc3de, val);
@@ -1059,7 +1059,7 @@ static per_inline bool per_tim_gp_cc4de(const per_tim_gp_t* const tim)
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_rw1(&tim->Per->Cc4de);
@@ -1070,7 +1070,7 @@ static per_inline void per_tim_gp_set_cc4de(const per_tim_gp_t* const tim, bool 
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     per_bit_rw1_set(&tim->Per->Cc4de, val);
@@ -1081,7 +1081,7 @@ static per_inline bool per_tim_gp_tde(const per_tim_gp_t* const tim)
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_rw1(&tim->Per->Tde);
@@ -1092,7 +1092,7 @@ static per_inline void per_tim_gp_set_tde(const per_tim_gp_t* const tim, bool va
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     per_bit_rw1_set(&tim->Per->Tde, val);
@@ -1139,7 +1139,7 @@ static per_inline bool per_tim_gp_cc2if(const per_tim_gp_t* const tim)
 {
     if (tim->Chan < PER_TIM_GP_CHAN_2)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_rc1(&tim->Per->Cc2if);
@@ -1150,7 +1150,7 @@ static per_inline bool per_tim_gp_rdclr_cc2if(const per_tim_gp_t* const tim)
 {
     if (tim->Chan < PER_TIM_GP_CHAN_2)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_rc1_rdclr(&tim->Per->Cc2if);
@@ -1161,7 +1161,7 @@ static per_inline bool per_tim_gp_cc3if(const per_tim_gp_t* const tim)
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_rc1(&tim->Per->Cc3if);
@@ -1172,7 +1172,7 @@ static per_inline bool per_tim_gp_rdclr_cc3if(const per_tim_gp_t* const tim)
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_rc1_rdclr(&tim->Per->Cc3if);
@@ -1183,7 +1183,7 @@ static per_inline bool per_tim_gp_cc4if(const per_tim_gp_t* const tim)
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_rc1(&tim->Per->Cc4if);
@@ -1194,7 +1194,7 @@ static per_inline bool per_tim_gp_rdclr_cc4if(const per_tim_gp_t* const tim)
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_rc1_rdclr(&tim->Per->Cc4if);
@@ -1205,7 +1205,7 @@ static per_inline bool per_tim_gp_tif(const per_tim_gp_t* const tim)
 {
     if (tim->Chan < PER_TIM_GP_CHAN_2)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_rc1(&tim->Per->Tif);
@@ -1216,7 +1216,7 @@ static per_inline bool per_tim_gp_rdclr_tif(const per_tim_gp_t* const tim)
 {
     if (tim->Chan < PER_TIM_GP_CHAN_2)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_rc1_rdclr(&tim->Per->Tif);
@@ -1239,7 +1239,7 @@ static per_inline bool per_tim_gp_cc2of(const per_tim_gp_t* const tim)
 {
     if (tim->Chan < PER_TIM_GP_CHAN_2)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_rc1(&tim->Per->Cc2of);
@@ -1250,7 +1250,7 @@ static per_inline bool per_tim_gp_rdclr_cc2of(const per_tim_gp_t* const tim)
 {
     if (tim->Chan < PER_TIM_GP_CHAN_2)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_rc1_rdclr(&tim->Per->Cc2of);
@@ -1261,7 +1261,7 @@ static per_inline bool per_tim_gp_cc3of(const per_tim_gp_t* const tim)
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_rc1(&tim->Per->Cc3of);
@@ -1272,7 +1272,7 @@ static per_inline bool per_tim_gp_rdclr_cc3of(const per_tim_gp_t* const tim)
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_rc1_rdclr(&tim->Per->Cc3of);
@@ -1283,7 +1283,7 @@ static per_inline bool per_tim_gp_cc4of(const per_tim_gp_t* const tim)
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_rc1(&tim->Per->Cc4of);
@@ -1294,7 +1294,7 @@ static per_inline bool per_tim_gp_rdclr_cc4of(const per_tim_gp_t* const tim)
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_rc1_rdclr(&tim->Per->Cc4of);
@@ -1329,7 +1329,7 @@ static per_inline void per_tim_gp_set_cc2g(const per_tim_gp_t* const tim, bool v
 {
     if (tim->Chan < PER_TIM_GP_CHAN_2)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     per_bit_w1_set(&tim->Per->Cc2g, val);
@@ -1340,7 +1340,7 @@ static per_inline void per_tim_gp_set_cc3g(const per_tim_gp_t* const tim, bool v
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     per_bit_w1_set(&tim->Per->Cc3g, val);
@@ -1351,7 +1351,7 @@ static per_inline void per_tim_gp_set_cc4g(const per_tim_gp_t* const tim, bool v
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     per_bit_w1_set(&tim->Per->Cc4g, val);
@@ -1362,7 +1362,7 @@ static per_inline void per_tim_gp_set_tg(const per_tim_gp_t* const tim, bool val
 {
     if (tim->Chan < PER_TIM_GP_CHAN_2)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     per_bit_w1_set(&tim->Per->Tg, val);
@@ -1385,7 +1385,7 @@ static per_inline per_tim_gp_ccs_e per_tim_gp_cc2s(const per_tim_gp_t* const tim
 {
     if (tim->Chan < PER_TIM_GP_CHAN_2)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return (per_tim_gp_ccs_e)per_bit_rw2(&tim->Per->Ccm2.Ccs);
@@ -1396,7 +1396,7 @@ static per_inline void per_tim_gp_set_cc2s(const per_tim_gp_t* const tim, per_ti
 {
     if (tim->Chan < PER_TIM_GP_CHAN_2)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     per_bit_rw2_set(&tim->Per->Ccm2.Ccs, (uint_fast16_t)val);
@@ -1407,7 +1407,7 @@ static per_inline per_tim_gp_ccs_e per_tim_gp_cc3s(const per_tim_gp_t* const tim
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return (per_tim_gp_ccs_e)per_bit_rw2(&tim->Per->Ccm3.Ccs);
@@ -1418,7 +1418,7 @@ static per_inline void per_tim_gp_set_cc3s(const per_tim_gp_t* const tim, per_ti
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     per_bit_rw2_set(&tim->Per->Ccm3.Ccs, (uint_fast16_t)val);
@@ -1429,7 +1429,7 @@ static per_inline per_tim_gp_ccs_e per_tim_gp_cc4s(const per_tim_gp_t* const tim
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return (per_tim_gp_ccs_e)per_bit_rw2(&tim->Per->Ccm4.Ccs);
@@ -1440,7 +1440,7 @@ static per_inline void per_tim_gp_set_cc4s(const per_tim_gp_t* const tim, per_ti
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     per_bit_rw2_set(&tim->Per->Ccm4.Ccs, (uint_fast16_t)val);
@@ -1463,7 +1463,7 @@ static per_inline bool per_tim_gp_oc2fe(const per_tim_gp_t* const tim)
 {
     if (tim->Chan < PER_TIM_GP_CHAN_2)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_rw1(&tim->Per->Ccm2.Ocfe);
@@ -1474,7 +1474,7 @@ static per_inline void per_tim_gp_set_oc2fe(const per_tim_gp_t* const tim, bool 
 {
     if (tim->Chan < PER_TIM_GP_CHAN_2)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     per_bit_rw1_set(&tim->Per->Ccm2.Ocfe, val);
@@ -1485,7 +1485,7 @@ static per_inline bool per_tim_gp_oc3fe(const per_tim_gp_t* const tim)
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_rw1(&tim->Per->Ccm3.Ocfe);
@@ -1496,7 +1496,7 @@ static per_inline void per_tim_gp_set_oc3fe(const per_tim_gp_t* const tim, bool 
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     per_bit_rw1_set(&tim->Per->Ccm3.Ocfe, val);
@@ -1507,7 +1507,7 @@ static per_inline bool per_tim_gp_oc4fe(const per_tim_gp_t* const tim)
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_rw1(&tim->Per->Ccm4.Ocfe);
@@ -1518,7 +1518,7 @@ static per_inline void per_tim_gp_set_oc4fe(const per_tim_gp_t* const tim, bool 
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     per_bit_rw1_set(&tim->Per->Ccm4.Ocfe, val);
@@ -1541,7 +1541,7 @@ static per_inline bool per_tim_gp_oc2pe(const per_tim_gp_t* const tim)
 {
     if (tim->Chan < PER_TIM_GP_CHAN_2)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_rw1(&tim->Per->Ccm2.Ocpe);
@@ -1552,7 +1552,7 @@ static per_inline void per_tim_gp_set_oc2pe(const per_tim_gp_t* const tim, bool 
 {
     if (tim->Chan < PER_TIM_GP_CHAN_2)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     per_bit_rw1_set(&tim->Per->Ccm2.Ocpe, val);
@@ -1563,7 +1563,7 @@ static per_inline bool per_tim_gp_oc3pe(const per_tim_gp_t* const tim)
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_rw1(&tim->Per->Ccm3.Ocpe);
@@ -1574,7 +1574,7 @@ static per_inline void per_tim_gp_set_oc3pe(const per_tim_gp_t* const tim, bool 
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     per_bit_rw1_set(&tim->Per->Ccm3.Ocpe, val);
@@ -1585,7 +1585,7 @@ static per_inline bool per_tim_gp_oc4pe(const per_tim_gp_t* const tim)
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_rw1(&tim->Per->Ccm4.Ocpe);
@@ -1596,7 +1596,7 @@ static per_inline void per_tim_gp_set_oc4pe(const per_tim_gp_t* const tim, bool 
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     per_bit_rw1_set(&tim->Per->Ccm4.Ocpe, val);
@@ -1619,7 +1619,7 @@ static per_inline per_tim_gp_ocm_e per_tim_gp_oc2m(const per_tim_gp_t* const tim
 {
     if (tim->Chan < PER_TIM_GP_CHAN_2)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return (per_tim_gp_ocm_e)per_bit_rw3(&tim->Per->Ccm2.Ocm);
@@ -1630,7 +1630,7 @@ static per_inline void per_tim_gp_set_oc2m(const per_tim_gp_t* const tim, per_ti
 {
     if (tim->Chan < PER_TIM_GP_CHAN_2)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     per_bit_rw3_set(&tim->Per->Ccm2.Ocm, (uint_fast16_t)val);
@@ -1641,7 +1641,7 @@ static per_inline per_tim_gp_ocm_e per_tim_gp_oc3m(const per_tim_gp_t* const tim
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return (per_tim_gp_ocm_e)per_bit_rw3(&tim->Per->Ccm3.Ocm);
@@ -1652,7 +1652,7 @@ static per_inline void per_tim_gp_set_oc3m(const per_tim_gp_t* const tim, per_ti
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     per_bit_rw3_set(&tim->Per->Ccm3.Ocm, (uint_fast16_t)val);
@@ -1663,7 +1663,7 @@ static per_inline per_tim_gp_ocm_e per_tim_gp_oc4m(const per_tim_gp_t* const tim
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return (per_tim_gp_ocm_e)per_bit_rw3(&tim->Per->Ccm4.Ocm);
@@ -1674,7 +1674,7 @@ static per_inline void per_tim_gp_set_oc4m(const per_tim_gp_t* const tim, per_ti
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     per_bit_rw3_set(&tim->Per->Ccm4.Ocm, (uint_fast16_t)val);
@@ -1685,7 +1685,7 @@ static per_inline bool per_tim_gp_oc1ce(const per_tim_gp_t* const tim)
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_rw1(&tim->Per->Ccm1.Occe);
@@ -1696,7 +1696,7 @@ static per_inline void per_tim_gp_set_oc1ce(const per_tim_gp_t* const tim, bool 
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     per_bit_rw1_set(&tim->Per->Ccm1.Occe, val);
@@ -1707,7 +1707,7 @@ static per_inline bool per_tim_gp_oc2ce(const per_tim_gp_t* const tim)
 {
     if (tim->Chan < PER_TIM_GP_CHAN_2)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_rw1(&tim->Per->Ccm2.Occe);
@@ -1718,7 +1718,7 @@ static per_inline void per_tim_gp_set_oc2ce(const per_tim_gp_t* const tim, bool 
 {
     if (tim->Chan < PER_TIM_GP_CHAN_2)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     per_bit_rw1_set(&tim->Per->Ccm2.Occe, val);
@@ -1729,7 +1729,7 @@ static per_inline bool per_tim_gp_oc3ce(const per_tim_gp_t* const tim)
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_rw1(&tim->Per->Ccm3.Occe);
@@ -1740,7 +1740,7 @@ static per_inline void per_tim_gp_set_oc3ce(const per_tim_gp_t* const tim, bool 
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     per_bit_rw1_set(&tim->Per->Ccm3.Occe, val);
@@ -1751,7 +1751,7 @@ static per_inline bool per_tim_gp_oc4ce(const per_tim_gp_t* const tim)
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_rw1(&tim->Per->Ccm4.Occe);
@@ -1762,7 +1762,7 @@ static per_inline void per_tim_gp_set_oc4ce(const per_tim_gp_t* const tim, bool 
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     per_bit_rw1_set(&tim->Per->Ccm4.Occe, val);
@@ -1792,7 +1792,7 @@ static per_inline uint_fast32_t per_tim_gp_ic2psc(const per_tim_gp_t* const tim)
 {
     if (tim->Chan < PER_TIM_GP_CHAN_2)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_inv_log2(per_bit_rw2(&tim->Per->Ccm2.Icpsc));
@@ -1803,7 +1803,7 @@ static per_inline bool per_tim_gp_set_ic2psc(const per_tim_gp_t* const tim, uint
 {
     if (tim->Chan < PER_TIM_GP_CHAN_2)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     if ((div > PER_TIM_GP_ICPSC_MAX) ||
@@ -1821,7 +1821,7 @@ static per_inline uint_fast32_t per_tim_gp_ic3psc(const per_tim_gp_t* const tim)
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_inv_log2(per_bit_rw2(&tim->Per->Ccm3.Icpsc));
@@ -1832,7 +1832,7 @@ static per_inline bool per_tim_gp_set_ic3psc(const per_tim_gp_t* const tim, uint
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     if ((div > PER_TIM_GP_ICPSC_MAX) ||
@@ -1850,7 +1850,7 @@ static per_inline uint_fast32_t per_tim_gp_ic4psc(const per_tim_gp_t* const tim)
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_inv_log2(per_bit_rw2(&tim->Per->Ccm4.Icpsc));
@@ -1861,7 +1861,7 @@ static per_inline bool per_tim_gp_set_ic4psc(const per_tim_gp_t* const tim, uint
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     if ((div > PER_TIM_GP_ICPSC_MAX) ||
@@ -1891,7 +1891,7 @@ static per_inline per_tim_gp_icf_e per_tim_gp_ic2f(const per_tim_gp_t* const tim
 {
     if (tim->Chan < PER_TIM_GP_CHAN_2)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return (per_tim_gp_icf_e)per_bit_rw4(&tim->Per->Ccm2.Icf);
@@ -1902,7 +1902,7 @@ static per_inline bool per_tim_gp_set_ic2f(const per_tim_gp_t* const tim, per_ti
 {
     if (tim->Chan < PER_TIM_GP_CHAN_2)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_rw4_set(&tim->Per->Ccm2.Icf, (uint_fast16_t)val);
@@ -1913,7 +1913,7 @@ static per_inline per_tim_gp_icf_e per_tim_gp_ic3f(const per_tim_gp_t* const tim
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return (per_tim_gp_icf_e)per_bit_rw4(&tim->Per->Ccm3.Icf);
@@ -1924,7 +1924,7 @@ static per_inline bool per_tim_gp_set_ic3f(const per_tim_gp_t* const tim, per_ti
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_rw4_set(&tim->Per->Ccm3.Icf, (uint_fast16_t)val);
@@ -1935,7 +1935,7 @@ static per_inline per_tim_gp_icf_e per_tim_gp_ic4f(const per_tim_gp_t* const tim
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return (per_tim_gp_icf_e)per_bit_rw4(&tim->Per->Ccm4.Icf);
@@ -1946,7 +1946,7 @@ static per_inline bool per_tim_gp_set_ic4f(const per_tim_gp_t* const tim, per_ti
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_rw4_set(&tim->Per->Ccm4.Icf, (uint_fast16_t)val);
@@ -1993,7 +1993,7 @@ static per_inline bool per_tim_gp_cc2e(const per_tim_gp_t* const tim)
 {
     if (tim->Chan < PER_TIM_GP_CHAN_2)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_rw1(&tim->Per->Cc2e);
@@ -2004,7 +2004,7 @@ static per_inline void per_tim_gp_set_cc2e(const per_tim_gp_t* const tim, bool v
 {
     if (tim->Chan < PER_TIM_GP_CHAN_2)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     per_bit_rw1_set(&tim->Per->Cc2e, val);
@@ -2015,7 +2015,7 @@ static per_inline bool per_tim_gp_cc2p(const per_tim_gp_t* const tim)
 {
     if (tim->Chan < PER_TIM_GP_CHAN_2)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_rw1(&tim->Per->Cc2p);
@@ -2026,7 +2026,7 @@ static per_inline void per_tim_gp_set_cc2p(const per_tim_gp_t* const tim, bool v
 {
     if (tim->Chan < PER_TIM_GP_CHAN_2)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     per_bit_rw1_set(&tim->Per->Cc2p, val);
@@ -2037,7 +2037,7 @@ static per_inline bool per_tim_gp_cc2np(const per_tim_gp_t* const tim)
 {
     if (tim->Chan < PER_TIM_GP_CHAN_2)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_rw1(&tim->Per->Cc2np);
@@ -2048,7 +2048,7 @@ static per_inline void per_tim_gp_set_cc2np(const per_tim_gp_t* const tim, bool 
 {
     if (tim->Chan < PER_TIM_GP_CHAN_2)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     per_bit_rw1_set(&tim->Per->Cc2np, val);
@@ -2059,7 +2059,7 @@ static per_inline bool per_tim_gp_cc3e(const per_tim_gp_t* const tim)
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_rw1(&tim->Per->Cc3e);
@@ -2070,7 +2070,7 @@ static per_inline void per_tim_gp_set_cc3e(const per_tim_gp_t* const tim, bool v
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     per_bit_rw1_set(&tim->Per->Cc3e, val);
@@ -2081,7 +2081,7 @@ static per_inline bool per_tim_gp_cc3p(const per_tim_gp_t* const tim)
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_rw1(&tim->Per->Cc3p);
@@ -2092,7 +2092,7 @@ static per_inline void per_tim_gp_set_cc3p(const per_tim_gp_t* const tim, bool v
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     per_bit_rw1_set(&tim->Per->Cc3p, val);
@@ -2103,7 +2103,7 @@ static per_inline bool per_tim_gp_cc3np(const per_tim_gp_t* const tim)
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_rw1(&tim->Per->Cc3np);
@@ -2114,7 +2114,7 @@ static per_inline void per_tim_gp_set_cc3np(const per_tim_gp_t* const tim, bool 
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     per_bit_rw1_set(&tim->Per->Cc3np, val);
@@ -2125,7 +2125,7 @@ static per_inline bool per_tim_gp_cc4e(const per_tim_gp_t* const tim)
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_rw1(&tim->Per->Cc4e);
@@ -2136,7 +2136,7 @@ static per_inline void per_tim_gp_set_cc4e(const per_tim_gp_t* const tim, bool v
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     per_bit_rw1_set(&tim->Per->Cc4e, val);
@@ -2147,7 +2147,7 @@ static per_inline bool per_tim_gp_cc4p(const per_tim_gp_t* const tim)
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_rw1(&tim->Per->Cc4p);
@@ -2158,7 +2158,7 @@ static per_inline void per_tim_gp_set_cc4p(const per_tim_gp_t* const tim, bool v
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     per_bit_rw1_set(&tim->Per->Cc4p, val);
@@ -2169,7 +2169,7 @@ static per_inline bool per_tim_gp_cc4np(const per_tim_gp_t* const tim)
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_rw1(&tim->Per->Cc4np);
@@ -2180,7 +2180,7 @@ static per_inline void per_tim_gp_set_cc4np(const per_tim_gp_t* const tim, bool 
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     per_bit_rw1_set(&tim->Per->Cc4np, val);
@@ -2239,7 +2239,7 @@ static per_inline uint_fast16_t per_tim_gp_ccr2(const per_tim_gp_t* const tim)
 {
     if (tim->Chan < PER_TIM_GP_CHAN_2)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_rw16_reg(&tim->Per->Size16.Ccr2);
@@ -2250,7 +2250,7 @@ static per_inline void per_tim_gp_set_ccr2(const per_tim_gp_t* const tim, uint16
 {
     if (tim->Chan < PER_TIM_GP_CHAN_2)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     per_bit_rw16_reg_set(&tim->Per->Size16.Ccr2, val);
@@ -2261,7 +2261,7 @@ static per_inline uint_fast16_t per_tim_gp_ccr3(const per_tim_gp_t* const tim)
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_rw16_reg(&tim->Per->Size16.Ccr3);
@@ -2272,7 +2272,7 @@ static per_inline void per_tim_gp_set_ccr3(const per_tim_gp_t* const tim, uint16
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     per_bit_rw16_reg_set(&tim->Per->Size16.Ccr3, val);
@@ -2283,7 +2283,7 @@ static per_inline uint_fast16_t per_tim_gp_ccr4(const per_tim_gp_t* const tim)
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_rw16_reg(&tim->Per->Size16.Ccr4);
@@ -2294,7 +2294,7 @@ static per_inline void per_tim_gp_set_ccr4(const per_tim_gp_t* const tim, uint16
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     per_bit_rw16_reg_set(&tim->Per->Size16.Ccr4, val);
@@ -2305,7 +2305,7 @@ static per_inline uint_fast32_t per_tim_gp_32_cnt(const per_tim_gp_t* const tim)
 {
     if (tim->Size != PER_TIM_GP_SIZE_32)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_rw32_reg(&tim->Per->Size32.Cnt);
@@ -2316,7 +2316,7 @@ static per_inline void per_tim_gp_32_set_cnt(const per_tim_gp_t* const tim, uint
 {
     if (tim->Size != PER_TIM_GP_SIZE_32)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     per_bit_rw32_reg_set(&tim->Per->Size32.Cnt, val);
@@ -2327,7 +2327,7 @@ static per_inline uint_fast32_t per_tim_gp_32_arr(const per_tim_gp_t* const tim)
 {
     if (tim->Size != PER_TIM_GP_SIZE_32)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_rw32_reg(&tim->Per->Size32.Arr);
@@ -2338,7 +2338,7 @@ static per_inline void per_tim_gp_32_set_arr(const per_tim_gp_t* const tim, uint
 {
     if (tim->Size != PER_TIM_GP_SIZE_32)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     per_bit_rw32_reg_set(&tim->Per->Size32.Arr, val);
@@ -2349,7 +2349,7 @@ static per_inline uint_fast32_t per_tim_gp_32_ccr1(const per_tim_gp_t* const tim
 {
     if (tim->Size != PER_TIM_GP_SIZE_32)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_rw32_reg(&tim->Per->Size32.Ccr1);
@@ -2360,7 +2360,7 @@ static per_inline void per_tim_gp_32_set_ccr1(const per_tim_gp_t* const tim, uin
 {
     if (tim->Size != PER_TIM_GP_SIZE_32)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     per_bit_rw32_reg_set(&tim->Per->Size32.Ccr1, val);
@@ -2372,7 +2372,7 @@ static per_inline uint_fast32_t per_tim_gp_32_ccr2(const per_tim_gp_t* const tim
     if ((tim->Size != PER_TIM_GP_SIZE_32) ||
         (tim->Chan < PER_TIM_GP_CHAN_2))
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_rw32_reg(&tim->Per->Size32.Ccr2);
@@ -2384,7 +2384,7 @@ static per_inline void per_tim_gp_32_set_ccr2(const per_tim_gp_t* const tim, uin
     if ((tim->Size != PER_TIM_GP_SIZE_32) ||
         (tim->Chan < PER_TIM_GP_CHAN_2))
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     per_bit_rw32_reg_set(&tim->Per->Size32.Ccr2, val);
@@ -2396,7 +2396,7 @@ static per_inline uint_fast32_t per_tim_gp_32_ccr3(const per_tim_gp_t* const tim
     if ((tim->Size != PER_TIM_GP_SIZE_32) ||
         (tim->Chan < PER_TIM_GP_CHAN_4))
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_rw32_reg(&tim->Per->Size32.Ccr3);
@@ -2408,7 +2408,7 @@ static per_inline void per_tim_gp_32_set_ccr3(const per_tim_gp_t* const tim, uin
     if ((tim->Size != PER_TIM_GP_SIZE_32) ||
         (tim->Chan < PER_TIM_GP_CHAN_4))
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     per_bit_rw32_reg_set(&tim->Per->Size32.Ccr3, val);
@@ -2420,7 +2420,7 @@ static per_inline uint_fast32_t per_tim_gp_32_ccr4(const per_tim_gp_t* const tim
     if ((tim->Size != PER_TIM_GP_SIZE_32) ||
         (tim->Chan < PER_TIM_GP_CHAN_4))
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_rw32_reg(&tim->Per->Size32.Ccr4);
@@ -2432,7 +2432,7 @@ static per_inline void per_tim_gp_32_set_ccr4(const per_tim_gp_t* const tim, uin
     if ((tim->Size != PER_TIM_GP_SIZE_32) ||
         (tim->Chan < PER_TIM_GP_CHAN_4))
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     per_bit_rw32_reg_set(&tim->Per->Size32.Ccr4, val);
@@ -2443,7 +2443,7 @@ static per_inline uint_fast16_t per_tim_gp_dba(const per_tim_gp_t* const tim)
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_rw5(&tim->Per->Dba);
@@ -2454,7 +2454,7 @@ static per_inline bool per_tim_gp_set_dba(const per_tim_gp_t* const tim, uint_fa
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     if (val > per_bit_rw5_max())
@@ -2471,7 +2471,7 @@ static per_inline uint_fast16_t per_tim_gp_dbl(const per_tim_gp_t* const tim)
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_rw5(&tim->Per->Dbl) + 1;
@@ -2482,7 +2482,7 @@ static per_inline bool per_tim_gp_set_dbl(const per_tim_gp_t* const tim, uint_fa
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     if ((val > PER_TIM_GP_DBL_MAX) ||
@@ -2500,7 +2500,7 @@ static per_inline uint_fast16_t per_tim_gp_dmab(const per_tim_gp_t* const tim)
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_rw16_reg(&tim->Per->Dmab);
@@ -2511,7 +2511,7 @@ static per_inline void per_tim_gp_set_dmab(const per_tim_gp_t* const tim, uint16
 {
     if (tim->Chan < PER_TIM_GP_CHAN_4)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     per_bit_rw16_reg_set(&tim->Per->Dmab, val);
@@ -2522,7 +2522,7 @@ static per_inline per_tim_gp_itr1_rmp_e per_tim_gp_itr1_rmp(const per_tim_gp_t* 
 {
     if (tim->Opt != PER_TIM_GP_OR_TIM2)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return (per_tim_gp_itr1_rmp_e)per_bit_rw2(&tim->Per->Itr1_rmp);
@@ -2533,7 +2533,7 @@ static per_inline bool per_tim_gp_set_itr1_rmp(const per_tim_gp_t* const tim, pe
 {
     if (tim->Opt != PER_TIM_GP_OR_TIM2)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_rw2_set(&tim->Per->Itr1_rmp, (uint_fast16_t)val);
@@ -2544,7 +2544,7 @@ static per_inline per_tim_gp_ti4_rmp_e per_tim_gp_ti4_rmp(const per_tim_gp_t* co
 {
     if (tim->Opt != PER_TIM_GP_OR_TIM5)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return (per_tim_gp_ti4_rmp_e)per_bit_rw2(&tim->Per->Ti4_rmp);
@@ -2555,7 +2555,7 @@ static per_inline bool per_tim_gp_set_ti4_rmp(const per_tim_gp_t* const tim, per
 {
     if (tim->Opt != PER_TIM_GP_OR_TIM5)
     {
-        per_log_err_function_not_supported();
+        per_dep_err_unsupported();
     }
 
     return per_bit_rw2_set(&tim->Per->Ti4_rmp, (uint_fast16_t)val);

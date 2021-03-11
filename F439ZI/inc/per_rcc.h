@@ -53,8 +53,8 @@ static per_inline const per_rcc_t* const per_rcc(void)
         .I2s = PER_RCC_I2S_2,
         .Gpio = PER_RCC_GPIO_K,
         .Spi = PER_RCC_SPI_6,
-        .Uart = PER_RCC_UART_4,
-        .Usart = PER_RCC_USART_4,
+        .Uart = PER_RCC_UART_8,
+        .Usart = PER_RCC_USART_6,
     };
     return &rcc;
 }
