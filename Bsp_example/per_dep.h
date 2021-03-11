@@ -44,6 +44,9 @@ extern "C" {
 /// Logging peripheral error event with value
 void per_dep_log_err(uint_fast32_t per, uint_fast32_t ev, uint_fast32_t val);
 
+/// Mark unsupported functions and generate a compile/link time error
+__attribute((error("\nError: function does not exists on this peripheral"))) void per_dep_err_unsupported(void);
+
 #ifdef __cplusplus
 }
 #endif
