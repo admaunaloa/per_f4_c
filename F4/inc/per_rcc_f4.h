@@ -64,6 +64,9 @@ extern "C" {
 /// Main PLL (PLL) division factor for USB OTG FS, SDIO and random number generator clocks
 #define PER_RCC_PLLQ_MAX (15)
 
+/// Main PLL (PLL) division factor for I2S, DFSDM clocks
+#define PER_RCC_PLLR_MAX (7)
+
 /// RCC AHB prescaler maximum
 #define PER_RCC_HPRE_MAX (512)
 
@@ -129,6 +132,7 @@ typedef enum
     PER_RCC_PLLN_ERR,      ///< Main PLL (PLL) multiplication factor for VCO invalid
     PER_RCC_PLLP_ERR,      ///< Main PLL (PLL) division factor for main system clock invalid
     PER_RCC_PLLQ_ERR,      ///< RCC Main PLL (PLL) division factor for USB OTG FS, SDIO and random number generator clocks
+    PER_RCC_PLLR_ERR,      ///< Main PLL (PLL) division factor for I2S, DFSDM clocks
     PER_RCC_HPRE_ERR,      ///< AHB prescaler invalid
     PER_RCC_PPRE1_ERR,     ///< APB1 prescaler invalid
     PER_RCC_PPRE2_ERR,     ///< APB2 prescaler invalid
@@ -174,17 +178,6 @@ typedef enum
     PER_RCC_I2C_4,
 } per_rcc_i2c_e;
 
-/// RCC I2S peripherals number
-typedef enum
-{
-    PER_RCC_I2S_0 = 0,
-    PER_RCC_I2S_1,
-    PER_RCC_I2S_2,
-    PER_RCC_I2S_3,
-    PER_RCC_I2S_4,
-    PER_RCC_I2S_5,
-} per_rcc_i2s_e;
-
 /// RCC GPIO peripherals number
 typedef enum
 {
@@ -213,6 +206,32 @@ typedef enum
     PER_RCC_SPI_5,
     PER_RCC_SPI_6,
 } per_rcc_spi_e;
+
+/// RCC TIM 32Bit peripherals number
+typedef enum
+{
+    PER_RCC_TIM32_0 = 0,
+    PER_RCC_TIM32_2, ///< 1
+    PER_RCC_TIM32_5, ///< 2
+} per_rcc_tim32_e;
+
+/// RCC TIM 16Bit peripherals number
+typedef enum
+{
+    PER_RCC_TIM16_0 = 0,
+    PER_RCC_TIM16_1, ///< 1
+    PER_RCC_TIM16_3, ///< 2
+    PER_RCC_TIM16_4, ///< 3
+    PER_RCC_TIM16_6, ///< 4
+    PER_RCC_TIM16_7, ///< 5
+    PER_RCC_TIM16_8, ///< 6
+    PER_RCC_TIM16_9, ///< 7
+    PER_RCC_TIM16_10, ///< 8
+    PER_RCC_TIM16_11, ///< 9
+    PER_RCC_TIM16_12, ///< 10
+    PER_RCC_TIM16_13, ///< 11
+    PER_RCC_TIM16_14, ///< 12
+} per_rcc_tim16_e;
 
 /// RCC UART peripherals number
 typedef enum
@@ -350,7 +369,8 @@ typedef struct
     per_bit_rw1_t Pllsrc; ///< Main PLL(PLL) and audio PLL (PLLI2S) entry clock source
     per_bit_n1_t PllcfgrBit23; ///< Reserved
     per_bit_rw4_t Pllq; ///< Main PLL (PLL) division factor for USB OTG FS, SDIO and random number generator clocks
-    per_bit_n4_t PllcfgrBit28; ///< Reserved
+    per_bit_rw3_t Pllr; ///< Main PLL (PLL) division factor for I2S, DFSDM clocks
+    per_bit_n1_t PllcfgrBit28; ///< Reserved
 
     // clock configuration register (RCC_CFGR)
     per_bit_rw2_t Sw; ///< System clock switch
@@ -780,10 +800,14 @@ typedef struct
     const per_log_e Err;          ///< Peripheral error number
     const per_rcc_adc_e Adc;      ///< Number of ADC peripherals
     const per_rcc_can_e Can;      ///< Number of CAN peripherals
+    const bool Cryp;              ///< Crypto present
+    const bool Dac;               ///< DAC present
+    const bool Hash;              ///< Hash present
     const per_rcc_i2c_e I2c;      ///< Number of I2C peripherals
-    const per_rcc_i2s_e I2s;      ///< Number of I2S peripherals
     const per_rcc_gpio_e Gpio;    ///< Number of GPIO ports
     const per_rcc_spi_e Spi;      ///< Number of SPI peripherals
+    const per_rcc_tim16_e Tim16;  ///< Number of TIM 32bit peripherals
+    const per_rcc_tim32_e Tim32;  ///< Number of TIM 16bit peripherals
     const per_rcc_uart_e Uart;    ///< Number of UART peripherals
     const per_rcc_usart_e Usart;  ///< Number of USART peripherals
     const bool Eth;               ///< Ethernet present
@@ -1008,6 +1032,25 @@ static per_inline bool per_rcc_set_pllq(const per_rcc_t* const rcc, uint_fast16_
     }
 
     return per_bit_rw4_set(&rcc->Per->Pllq, val);
+}
+
+/// Main PLL (PLL) division factor for I2S, DFSDM clocks
+static per_inline uint_fast16_t per_rcc_pllr(const per_rcc_t* const rcc)
+{
+    return per_bit_rw3(&rcc->Per->Pllr);
+}
+
+/// Main PLL (PLL) division factor for I2S, DFSDM clocks
+static per_inline bool per_rcc_set_pllr(const per_rcc_t* const rcc, uint_fast16_t val)
+{
+    if ((val > PER_RCC_PLLR_MAX) ||
+        (val < PER_RCC_PLL_MIN))
+    {
+        per_log_err(rcc->Err, PER_RCC_PLLR_ERR, val);
+        return false;
+    }
+
+    return per_bit_rw3_set(&rcc->Per->Pllr, val);
 }
 
 /// RCC System clock switch
@@ -1799,24 +1842,44 @@ static per_inline void per_rcc_set_dcmirst(const per_rcc_t* const rcc, bool val)
 /// RCC Cryptographic modules clock reset
 static per_inline bool per_rcc_cryprst(const per_rcc_t* const rcc)
 {
+    if (!rcc->Cryp)
+    {
+        per_dep_err_unsupported();
+    }
+
     return per_bit_rw1(&rcc->Per->Cryprst);
 }
 
 /// RCC Cryptographic modules clock reset
 static per_inline void per_rcc_set_cryprst(const per_rcc_t* const rcc, bool val)
 {
+    if (!rcc->Cryp)
+    {
+        per_dep_err_unsupported();
+    }
+
     per_bit_rw1_set(&rcc->Per->Cryprst, val);
 }
 
 /// RCC Hash modules clock reset
 static per_inline bool per_rcc_hashrst(const per_rcc_t* const rcc)
 {
+    if (!rcc->Hash)
+    {
+        per_dep_err_unsupported();
+    }
+
     return per_bit_rw1(&rcc->Per->Hashrst);
 }
 
 /// RCC Hash modules clock reset
 static per_inline void per_rcc_set_hashrst(const per_rcc_t* const rcc, bool val)
 {
+    if (!rcc->Hash)
+    {
+        per_dep_err_unsupported();
+    }
+
     per_bit_rw1_set(&rcc->Per->Hashrst, val);
 }
 
@@ -1859,108 +1922,198 @@ static per_inline void per_rcc_set_fmcrst(const per_rcc_t* const rcc, bool val)
 /// RCC TIM2 clock reset
 static per_inline bool per_rcc_tim2rst(const per_rcc_t* const rcc)
 {
+    if (rcc->Tim32 < PER_RCC_TIM32_2)
+    {
+        per_dep_err_unsupported();
+    }
+
     return per_bit_rw1(&rcc->Per->Tim2rst);
 }
 
 /// RCC TIM2 clock reset
 static per_inline void per_rcc_set_tim2rst(const per_rcc_t* const rcc, bool val)
 {
+    if (rcc->Tim32 < PER_RCC_TIM32_2)
+    {
+        per_dep_err_unsupported();
+    }
+
     per_bit_rw1_set(&rcc->Per->Tim2rst, val);
 }
 
 /// RCC TIM3 clock reset
 static per_inline bool per_rcc_tim3rst(const per_rcc_t* const rcc)
 {
+    if (rcc->Tim16 < PER_RCC_TIM16_3)
+    {
+        per_dep_err_unsupported();
+    }
+
     return per_bit_rw1(&rcc->Per->Tim3rst);
 }
 
 /// RCC TIM3 clock reset
 static per_inline void per_rcc_set_tim3rst(const per_rcc_t* const rcc, bool val)
 {
+    if (rcc->Tim16 < PER_RCC_TIM16_3)
+    {
+        per_dep_err_unsupported();
+    }
+
     per_bit_rw1_set(&rcc->Per->Tim3rst, val);
 }
-per_bit_rw1_t Tim4en; ///< TIM4 clock reset
+
 /// RCC TIM4 clock reset
 static per_inline bool per_rcc_tim4rst(const per_rcc_t* const rcc)
 {
+    if (rcc->Tim16 < PER_RCC_TIM16_4)
+    {
+        per_dep_err_unsupported();
+    }
+
     return per_bit_rw1(&rcc->Per->Tim4rst);
 }
 
 /// RCC TIM4 clock reset
 static per_inline void per_rcc_set_tim4rst(const per_rcc_t* const rcc, bool val)
 {
+    if (rcc->Tim16 < PER_RCC_TIM16_4)
+    {
+        per_dep_err_unsupported();
+    }
+
     per_bit_rw1_set(&rcc->Per->Tim4rst, val);
 }
 
 /// RCC TIM5 clock reset
 static per_inline bool per_rcc_tim5rst(const per_rcc_t* const rcc)
 {
+    if (rcc->Tim32 < PER_RCC_TIM32_5)
+    {
+        per_dep_err_unsupported();
+    }
+
     return per_bit_rw1(&rcc->Per->Tim5rst);
 }
 
 /// RCC TIM5 clock reset
 static per_inline void per_rcc_set_tim5rst(const per_rcc_t* const rcc, bool val)
 {
+    if (rcc->Tim32 < PER_RCC_TIM32_5)
+    {
+        per_dep_err_unsupported();
+    }
+
     per_bit_rw1_set(&rcc->Per->Tim5rst, val);
 }
 
 /// RCC TIM6 clock reset
 static per_inline bool per_rcc_tim6rst(const per_rcc_t* const rcc)
 {
+    if (rcc->Tim16 < PER_RCC_TIM16_6)
+    {
+        per_dep_err_unsupported();
+    }
+
     return per_bit_rw1(&rcc->Per->Tim6rst);
 }
 
 /// RCC TIM6 clock reset
 static per_inline void per_rcc_set_tim6rst(const per_rcc_t* const rcc, bool val)
 {
+    if (rcc->Tim16 < PER_RCC_TIM16_6)
+    {
+        per_dep_err_unsupported();
+    }
+
     per_bit_rw1_set(&rcc->Per->Tim6rst, val);
 }
 
 /// RCC TIM7 clock reset
 static per_inline bool per_rcc_tim7rst(const per_rcc_t* const rcc)
 {
+    if (rcc->Tim16 < PER_RCC_TIM16_7)
+    {
+        per_dep_err_unsupported();
+    }
+
     return per_bit_rw1(&rcc->Per->Tim7rst);
 }
 
 /// RCC TIM7 clock reset
 static per_inline void per_rcc_set_tim7rst(const per_rcc_t* const rcc, bool val)
 {
+    if (rcc->Tim16 < PER_RCC_TIM16_7)
+    {
+        per_dep_err_unsupported();
+    }
+
     per_bit_rw1_set(&rcc->Per->Tim7rst, val);
 }
 
 /// RCC TIM12 clock reset
 static per_inline bool per_rcc_tim12rst(const per_rcc_t* const rcc)
 {
+    if (rcc->Tim16 < PER_RCC_TIM16_12)
+    {
+        per_dep_err_unsupported();
+    }
+
     return per_bit_rw1(&rcc->Per->Tim12rst);
 }
 
 /// RCC TIM12 clock reset
 static per_inline void per_rcc_set_tim12rst(const per_rcc_t* const rcc, bool val)
 {
+    if (rcc->Tim16 < PER_RCC_TIM16_12)
+    {
+        per_dep_err_unsupported();
+    }
+
     per_bit_rw1_set(&rcc->Per->Tim12rst, val);
 }
 
 /// RCC TIM13 clock reset
 static per_inline bool per_rcc_tim13rst(const per_rcc_t* const rcc)
 {
+    if (rcc->Tim16 < PER_RCC_TIM16_13)
+    {
+        per_dep_err_unsupported();
+    }
+
     return per_bit_rw1(&rcc->Per->Tim13rst);
 }
 
 /// RCC TIM13 clock reset
 static per_inline void per_rcc_set_tim13rst(const per_rcc_t* const rcc, bool val)
 {
+    if (rcc->Tim16 < PER_RCC_TIM16_13)
+    {
+        per_dep_err_unsupported();
+    }
+
     per_bit_rw1_set(&rcc->Per->Tim13rst, val);
 }
 
 /// RCC TIM14 clock reset
 static per_inline bool per_rcc_tim14rst(const per_rcc_t* const rcc)
 {
+    if (rcc->Tim16 < PER_RCC_TIM16_14)
+    {
+        per_dep_err_unsupported();
+    }
+
     return per_bit_rw1(&rcc->Per->Tim14rst);
 }
 
 /// RCC TIM14 clock reset
 static per_inline void per_rcc_set_tim14rst(const per_rcc_t* const rcc, bool val)
 {
+    if (rcc->Tim16 < PER_RCC_TIM16_14)
+    {
+        per_dep_err_unsupported();
+    }
+
     per_bit_rw1_set(&rcc->Per->Tim14rst, val);
 }
 
@@ -2111,36 +2264,66 @@ static per_inline void per_rcc_set_uart5rst(const per_rcc_t* const rcc, bool val
 /// RCC I2C1 clock reset
 static per_inline bool per_rcc_i2c1rst(const per_rcc_t* const rcc)
 {
+    if (rcc->I2c < PER_RCC_I2C_1)
+    {
+        per_dep_err_unsupported();
+    }
+
     return per_bit_rw1(&rcc->Per->I2c1rst);
 }
 
 /// RCC I2C1 clock reset
 static per_inline void per_rcc_set_i2c1rst(const per_rcc_t* const rcc, bool val)
 {
+    if (rcc->I2c < PER_RCC_I2C_1)
+    {
+        per_dep_err_unsupported();
+    }
+
     per_bit_rw1_set(&rcc->Per->I2c1rst, val);
 }
 
 /// RCC I2C2 clock reset
 static per_inline bool per_rcc_i2c2rst(const per_rcc_t* const rcc)
 {
+    if (rcc->I2c < PER_RCC_I2C_2)
+    {
+        per_dep_err_unsupported();
+    }
+
     return per_bit_rw1(&rcc->Per->I2c2rst);
 }
 
 /// RCC I2C2 clock reset
 static per_inline void per_rcc_set_i2c2rst(const per_rcc_t* const rcc, bool val)
 {
+    if (rcc->I2c < PER_RCC_I2C_2)
+    {
+        per_dep_err_unsupported();
+    }
+
     per_bit_rw1_set(&rcc->Per->I2c2rst, val);
 }
 
 /// RCC I2C3 clock reset
 static per_inline bool per_rcc_i2c3rst(const per_rcc_t* const rcc)
 {
+    if (rcc->I2c < PER_RCC_I2C_3)
+    {
+        per_dep_err_unsupported();
+    }
+
     return per_bit_rw1(&rcc->Per->I2c3rst);
 }
 
 /// RCC I2C3 clock reset
 static per_inline void per_rcc_set_i2c3rst(const per_rcc_t* const rcc, bool val)
 {
+    if (rcc->I2c < PER_RCC_I2C_3)
+    {
+        per_dep_err_unsupported();
+    }
+
     per_bit_rw1_set(&rcc->Per->I2c3rst, val);
 }
 
@@ -2225,12 +2408,22 @@ static per_inline void per_rcc_set_pwrrst(const per_rcc_t* const rcc, bool val)
 /// RCC DAC interface clock reset
 static per_inline bool per_rcc_dacrst(const per_rcc_t* const rcc)
 {
+    if (!rcc->Dac)
+    {
+        per_dep_err_unsupported();
+    }
+
     return per_bit_rw1(&rcc->Per->Dacrst);
 }
 
 /// RCC DAC interface clock reset
 static per_inline void per_rcc_set_dacrst(const per_rcc_t* const rcc, bool val)
 {
+    if (!rcc->Dac)
+    {
+        per_dep_err_unsupported();
+    }
+
     per_bit_rw1_set(&rcc->Per->Dacrst, val);
 }
 
@@ -2281,24 +2474,44 @@ static per_inline void per_rcc_set_uart8rst(const per_rcc_t* const rcc, bool val
 /// RCC TIM1 clock reset
 static per_inline bool per_rcc_tim1rst(const per_rcc_t* const rcc)
 {
+    if (rcc->Tim16 < PER_RCC_TIM16_1)
+    {
+        per_dep_err_unsupported();
+    }
+
     return per_bit_rw1(&rcc->Per->Tim1rst);
 }
 
 /// RCC TIM1 clock reset
 static per_inline void per_rcc_set_tim1rst(const per_rcc_t* const rcc, bool val)
 {
+    if (rcc->Tim16 < PER_RCC_TIM16_1)
+    {
+        per_dep_err_unsupported();
+    }
+
     per_bit_rw1_set(&rcc->Per->Tim1rst, val);
 }
 
 /// RCC TIM8 clock reset
 static per_inline bool per_rcc_tim8rst(const per_rcc_t* const rcc)
 {
+    if (rcc->Tim16 < PER_RCC_TIM16_8)
+    {
+        per_dep_err_unsupported();
+    }
+
     return per_bit_rw1(&rcc->Per->Tim8rst);
 }
 
 /// RCC TIM8 clock reset
 static per_inline void per_rcc_set_tim8rst(const per_rcc_t* const rcc, bool val)
 {
+    if (rcc->Tim16 < PER_RCC_TIM16_8)
+    {
+        per_dep_err_unsupported();
+    }
+
     per_bit_rw1_set(&rcc->Per->Tim8rst, val);
 }
 
@@ -2393,12 +2606,22 @@ static per_inline void per_rcc_set_uart10rst(const per_rcc_t* const rcc, bool va
 /// RCC ADC1 clock reset
 static per_inline bool per_rcc_adcrst(const per_rcc_t* const rcc)
 {
+    if (rcc->Adc < PER_RCC_ADC_1)
+    {
+        per_dep_err_unsupported();
+    }
+
     return per_bit_rw1(&rcc->Per->Adcrst);
 }
 
 /// RCC ADC1 clock reset
 static per_inline void per_rcc_set_adcrst(const per_rcc_t* const rcc, bool val)
 {
+    if (rcc->Adc < PER_RCC_ADC_1)
+    {
+        per_dep_err_unsupported();
+    }
+
     per_bit_rw1_set(&rcc->Per->Adcrst, val);
 }
 
@@ -2473,36 +2696,66 @@ static per_inline void per_rcc_set_syscfgrst(const per_rcc_t* const rcc, bool va
 /// RCC TIM9 clock reset
 static per_inline bool per_rcc_tim9rst(const per_rcc_t* const rcc)
 {
+    if (rcc->Tim16 < PER_RCC_TIM16_9)
+    {
+        per_dep_err_unsupported();
+    }
+
     return per_bit_rw1(&rcc->Per->Tim9rst);
 }
 
 /// RCC TIM9 clock reset
 static per_inline void per_rcc_set_tim9rst(const per_rcc_t* const rcc, bool val)
 {
+    if (rcc->Tim16 < PER_RCC_TIM16_9)
+    {
+        per_dep_err_unsupported();
+    }
+
     per_bit_rw1_set(&rcc->Per->Tim9rst, val);
 }
 
 /// RCC TIM10 clock reset
 static per_inline bool per_rcc_tim10rst(const per_rcc_t* const rcc)
 {
+    if (rcc->Tim16 < PER_RCC_TIM16_10)
+    {
+        per_dep_err_unsupported();
+    }
+
     return per_bit_rw1(&rcc->Per->Tim10rst);
 }
 
 /// RCC TIM10 clock reset
 static per_inline void per_rcc_set_tim10rst(const per_rcc_t* const rcc, bool val)
 {
+    if (rcc->Tim16 < PER_RCC_TIM16_10)
+    {
+        per_dep_err_unsupported();
+    }
+
     per_bit_rw1_set(&rcc->Per->Tim10rst, val);
 }
 
 /// RCC TIM11 clock reset
 static per_inline bool per_rcc_tim11rst(const per_rcc_t* const rcc)
 {
+    if (rcc->Tim16 < PER_RCC_TIM16_11)
+    {
+        per_dep_err_unsupported();
+    }
+
     return per_bit_rw1(&rcc->Per->Tim11rst);
 }
 
 /// RCC TIM11 clock reset
 static per_inline void per_rcc_set_tim11rst(const per_rcc_t* const rcc, bool val)
 {
+    if (rcc->Tim16 < PER_RCC_TIM16_11)
+    {
+        per_dep_err_unsupported();
+    }
+
     per_bit_rw1_set(&rcc->Per->Tim11rst, val);
 }
 
@@ -3015,24 +3268,44 @@ static per_inline void per_rcc_set_dcmien(const per_rcc_t* const rcc, bool val)
 /// RCC Cryptographic modules clock enable
 static per_inline bool per_rcc_crypen(const per_rcc_t* const rcc)
 {
+    if (!rcc->Cryp)
+    {
+        per_dep_err_unsupported();
+    }
+
     return per_rcc_en1(&rcc->Per->Crypen);
 }
 
 /// RCC Cryptographic modules clock enable
 static per_inline void per_rcc_set_crypen(const per_rcc_t* const rcc, bool val)
 {
+    if (!rcc->Cryp)
+    {
+        per_dep_err_unsupported();
+    }
+
     per_rcc_en1_set(&rcc->Per->Crypen, val);
 }
 
 /// RCC Hash modules clock enable
 static per_inline bool per_rcc_hashen(const per_rcc_t* const rcc)
 {
+    if (!rcc->Hash)
+    {
+        per_dep_err_unsupported();
+    }
+
     return per_rcc_en1(&rcc->Per->Hashen);
 }
 
 /// RCC Hash modules clock enable
 static per_inline void per_rcc_set_hashen(const per_rcc_t* const rcc, bool val)
 {
+    if (!rcc->Hash)
+    {
+        per_dep_err_unsupported();
+    }
+
     per_rcc_en1_set(&rcc->Per->Hashen, val);
 }
 
@@ -3075,108 +3348,198 @@ static per_inline void per_rcc_set_fmcen(const per_rcc_t* const rcc, bool val)
 /// RCC TIM2 clock enable
 static per_inline bool per_rcc_tim2en(const per_rcc_t* const rcc)
 {
+    if (rcc->Tim32 < PER_RCC_TIM32_2)
+    {
+        per_dep_err_unsupported();
+    }
+
     return per_rcc_en1(&rcc->Per->Tim2en);
 }
 
 /// RCC TIM2 clock enable
 static per_inline void per_rcc_set_tim2en(const per_rcc_t* const rcc, bool val)
 {
+    if (rcc->Tim32 < PER_RCC_TIM32_2)
+    {
+        per_dep_err_unsupported();
+    }
+
     per_rcc_en1_set(&rcc->Per->Tim2en, val);
 }
 
 /// RCC TIM3 clock enable
 static per_inline bool per_rcc_tim3en(const per_rcc_t* const rcc)
 {
+    if (rcc->Tim16 < PER_RCC_TIM16_3)
+    {
+        per_dep_err_unsupported();
+    }
+
     return per_rcc_en1(&rcc->Per->Tim3en);
 }
 
 /// RCC TIM3 clock enable
 static per_inline void per_rcc_set_tim3en(const per_rcc_t* const rcc, bool val)
 {
+    if (rcc->Tim16 < PER_RCC_TIM16_3)
+    {
+        per_dep_err_unsupported();
+    }
+
     per_rcc_en1_set(&rcc->Per->Tim3en, val);
 }
 
 /// RCC TIM4 clock enable
 static per_inline bool per_rcc_tim4en(const per_rcc_t* const rcc)
 {
+    if (rcc->Tim16 < PER_RCC_TIM16_4)
+    {
+        per_dep_err_unsupported();
+    }
+
     return per_rcc_en1(&rcc->Per->Tim4en);
 }
 
 /// RCC TIM4 clock enable
 static per_inline void per_rcc_set_tim4en(const per_rcc_t* const rcc, bool val)
 {
+    if (rcc->Tim16 < PER_RCC_TIM16_4)
+    {
+        per_dep_err_unsupported();
+    }
+
     per_rcc_en1_set(&rcc->Per->Tim4en, val);
 }
 
 /// RCC TIM5 clock enable
 static per_inline bool per_rcc_tim5en(const per_rcc_t* const rcc)
 {
+    if (rcc->Tim32 < PER_RCC_TIM32_5)
+    {
+        per_dep_err_unsupported();
+    }
+
     return per_rcc_en1(&rcc->Per->Tim5en);
 }
 
 /// RCC TIM5 clock enable
 static per_inline void per_rcc_set_tim5en(const per_rcc_t* const rcc, bool val)
 {
+    if (rcc->Tim32 < PER_RCC_TIM32_5)
+    {
+        per_dep_err_unsupported();
+    }
+
     per_rcc_en1_set(&rcc->Per->Tim5en, val);
 }
 
 /// RCC TIM6 clock enable
 static per_inline bool per_rcc_tim6en(const per_rcc_t* const rcc)
 {
+    if (rcc->Tim16 < PER_RCC_TIM16_6)
+    {
+        per_dep_err_unsupported();
+    }
+
     return per_rcc_en1(&rcc->Per->Tim6en);
 }
 
 /// RCC TIM6 clock enable
 static per_inline void per_rcc_set_tim6en(const per_rcc_t* const rcc, bool val)
 {
+    if (rcc->Tim16 < PER_RCC_TIM16_6)
+    {
+        per_dep_err_unsupported();
+    }
+
     per_rcc_en1_set(&rcc->Per->Tim6en, val);
 }
 
 /// RCC TIM7 clock enable
 static per_inline bool per_rcc_tim7en(const per_rcc_t* const rcc)
 {
+    if (rcc->Tim16 < PER_RCC_TIM16_7)
+    {
+        per_dep_err_unsupported();
+    }
+
     return per_rcc_en1(&rcc->Per->Tim7en);
 }
 
 /// RCC TIM7 clock enable
 static per_inline void per_rcc_set_tim7en(const per_rcc_t* const rcc, bool val)
 {
+    if (rcc->Tim16 < PER_RCC_TIM16_7)
+    {
+        per_dep_err_unsupported();
+    }
+
     per_rcc_en1_set(&rcc->Per->Tim7en, val);
 }
 
 /// RCC TIM12 clock enable
 static per_inline bool per_rcc_tim12en(const per_rcc_t* const rcc)
 {
+    if (rcc->Tim16 < PER_RCC_TIM16_12)
+    {
+        per_dep_err_unsupported();
+    }
+
     return per_rcc_en1(&rcc->Per->Tim12en);
 }
 
 /// RCC TIM12 clock enable
 static per_inline void per_rcc_set_tim12en(const per_rcc_t* const rcc, bool val)
 {
+    if (rcc->Tim16 < PER_RCC_TIM16_12)
+    {
+        per_dep_err_unsupported();
+    }
+
     per_rcc_en1_set(&rcc->Per->Tim12en, val);
 }
 
 /// RCC TIM13 clock enable
 static per_inline bool per_rcc_tim13en(const per_rcc_t* const rcc)
 {
+    if (rcc->Tim16 < PER_RCC_TIM16_13)
+    {
+        per_dep_err_unsupported();
+    }
+
     return per_rcc_en1(&rcc->Per->Tim13en);
 }
 
 /// RCC TIM13 clock enable
 static per_inline void per_rcc_set_tim13en(const per_rcc_t* const rcc, bool val)
 {
+    if (rcc->Tim16 < PER_RCC_TIM16_13)
+    {
+        per_dep_err_unsupported();
+    }
+
     per_rcc_en1_set(&rcc->Per->Tim13en, val);
 }
 
 /// RCC TIM14 clock enable
 static per_inline bool per_rcc_tim14en(const per_rcc_t* const rcc)
 {
+    if (rcc->Tim16 < PER_RCC_TIM16_14)
+    {
+        per_dep_err_unsupported();
+    }
+
     return per_rcc_en1(&rcc->Per->Tim14en);
 }
 
 /// RCC TIM14 clock enable
 static per_inline void per_rcc_set_tim14en(const per_rcc_t* const rcc, bool val)
 {
+    if (rcc->Tim16 < PER_RCC_TIM16_14)
+    {
+        per_dep_err_unsupported();
+    }
+
     per_rcc_en1_set(&rcc->Per->Tim14en, val);
 }
 
@@ -3327,36 +3690,66 @@ static per_inline void per_rcc_set_uart5en(const per_rcc_t* const rcc, bool val)
 /// RCC I2C1 clock enable
 static per_inline bool per_rcc_i2c1en(const per_rcc_t* const rcc)
 {
+    if (rcc->I2c < PER_RCC_I2C_1)
+    {
+        per_dep_err_unsupported();
+    }
+
     return per_rcc_en1(&rcc->Per->I2c1en);
 }
 
 /// RCC I2C1 clock enable
 static per_inline void per_rcc_set_i2c1en(const per_rcc_t* const rcc, bool val)
 {
+    if (rcc->I2c < PER_RCC_I2C_1)
+    {
+        per_dep_err_unsupported();
+    }
+
     per_rcc_en1_set(&rcc->Per->I2c1en, val);
 }
 
 /// RCC I2C2 clock enable
 static per_inline bool per_rcc_i2c2en(const per_rcc_t* const rcc)
 {
+    if (rcc->I2c < PER_RCC_I2C_2)
+    {
+        per_dep_err_unsupported();
+    }
+
     return per_rcc_en1(&rcc->Per->I2c2en);
 }
 
 /// RCC I2C2 clock enable
 static per_inline void per_rcc_set_i2c2en(const per_rcc_t* const rcc, bool val)
 {
+    if (rcc->I2c < PER_RCC_I2C_2)
+    {
+        per_dep_err_unsupported();
+    }
+
     per_rcc_en1_set(&rcc->Per->I2c2en, val);
 }
 
 /// RCC I2C3 clock enable
 static per_inline bool per_rcc_i2c3en(const per_rcc_t* const rcc)
 {
+    if (rcc->I2c < PER_RCC_I2C_3)
+    {
+        per_dep_err_unsupported();
+    }
+
     return per_rcc_en1(&rcc->Per->I2c3en);
 }
 
 /// RCC I2C3 clock enable
 static per_inline void per_rcc_set_i2c3en(const per_rcc_t* const rcc, bool val)
 {
+    if (rcc->I2c < PER_RCC_I2C_3)
+    {
+        per_dep_err_unsupported();
+    }
+
     per_rcc_en1_set(&rcc->Per->I2c3en, val);
 }
 
@@ -3441,12 +3834,22 @@ static per_inline void per_rcc_set_pwren(const per_rcc_t* const rcc, bool val)
 /// RCC DAC interface clock enable
 static per_inline bool per_rcc_dacen(const per_rcc_t* const rcc)
 {
+    if (!rcc->Dac)
+    {
+        per_dep_err_unsupported();
+    }
+
     return per_rcc_en1(&rcc->Per->Dacen);
 }
 
 /// RCC DAC interface clock enable
 static per_inline void per_rcc_set_dacen(const per_rcc_t* const rcc, bool val)
 {
+    if (!rcc->Dac)
+    {
+        per_dep_err_unsupported();
+    }
+
     per_rcc_en1_set(&rcc->Per->Dacen, val);
 }
 
@@ -3497,24 +3900,44 @@ static per_inline void per_rcc_set_uart8en(const per_rcc_t* const rcc, bool val)
 /// RCC TIM1 clock enable
 static per_inline bool per_rcc_tim1en(const per_rcc_t* const rcc)
 {
+    if (rcc->Tim16 < PER_RCC_TIM16_1)
+    {
+        per_dep_err_unsupported();
+    }
+
     return per_rcc_en1(&rcc->Per->Tim1en);
 }
 
 /// RCC TIM1 clock enable
 static per_inline void per_rcc_set_tim1en(const per_rcc_t* const rcc, bool val)
 {
+    if (rcc->Tim16 < PER_RCC_TIM16_1)
+    {
+        per_dep_err_unsupported();
+    }
+
     per_rcc_en1_set(&rcc->Per->Tim1en, val);
 }
 
 /// RCC TIM8 clock enable
 static per_inline bool per_rcc_tim8en(const per_rcc_t* const rcc)
 {
+    if (rcc->Tim16 < PER_RCC_TIM16_8)
+    {
+        per_dep_err_unsupported();
+    }
+
     return per_rcc_en1(&rcc->Per->Tim8en);
 }
 
 /// RCC TIM8 clock enable
 static per_inline void per_rcc_set_tim8en(const per_rcc_t* const rcc, bool val)
 {
+    if (rcc->Tim16 < PER_RCC_TIM16_8)
+    {
+        per_dep_err_unsupported();
+    }
+
     per_rcc_en1_set(&rcc->Per->Tim8en, val);
 }
 
@@ -3609,36 +4032,66 @@ static per_inline void per_rcc_set_uart10en(const per_rcc_t* const rcc, bool val
 /// RCC ADC1 clock enable
 static per_inline bool per_rcc_adc1en(const per_rcc_t* const rcc)
 {
+    if (rcc->Adc < PER_RCC_ADC_1)
+    {
+        per_dep_err_unsupported();
+    }
+
     return per_rcc_en1(&rcc->Per->Adc1en);
 }
 
 /// RCC ADC1 clock enable
 static per_inline void per_rcc_set_adc1en(const per_rcc_t* const rcc, bool val)
 {
+    if (rcc->Adc < PER_RCC_ADC_1)
+    {
+        per_dep_err_unsupported();
+    }
+
     per_rcc_en1_set(&rcc->Per->Adc1en, val);
 }
 
 /// RCC ADC2 clock enable
 static per_inline bool per_rcc_adc2en(const per_rcc_t* const rcc)
 {
+    if (rcc->Adc < PER_RCC_ADC_2)
+    {
+        per_dep_err_unsupported();
+    }
+
     return per_rcc_en1(&rcc->Per->Adc2en);
 }
 
 /// RCC ADC2 clock enable
 static per_inline void per_rcc_set_adc2en(const per_rcc_t* const rcc, bool val)
 {
+    if (rcc->Adc < PER_RCC_ADC_2)
+    {
+        per_dep_err_unsupported();
+    }
+
     per_rcc_en1_set(&rcc->Per->Adc2en, val);
 }
 
 /// RCC ADC3 clock enable
 static per_inline bool per_rcc_adc3en(const per_rcc_t* const rcc)
 {
+    if (rcc->Adc < PER_RCC_ADC_3)
+    {
+        per_dep_err_unsupported();
+    }
+
     return per_rcc_en1(&rcc->Per->Adc3en);
 }
 
 /// RCC ADC3 clock enable
 static per_inline void per_rcc_set_adc3en(const per_rcc_t* const rcc, bool val)
 {
+    if (rcc->Adc < PER_RCC_ADC_3)
+    {
+        per_dep_err_unsupported();
+    }
+
     per_rcc_en1_set(&rcc->Per->Adc3en, val);
 }
 
@@ -3713,36 +4166,66 @@ static per_inline void per_rcc_set_syscfgen(const per_rcc_t* const rcc, bool val
 /// RCC TIM9 clock enable
 static per_inline bool per_rcc_tim9en(const per_rcc_t* const rcc)
 {
+    if (rcc->Tim16 < PER_RCC_TIM16_9)
+    {
+        per_dep_err_unsupported();
+    }
+
     return per_rcc_en1(&rcc->Per->Tim9en);
 }
 
 /// RCC TIM9 clock enable
 static per_inline void per_rcc_set_tim9en(const per_rcc_t* const rcc, bool val)
 {
+    if (rcc->Tim16 < PER_RCC_TIM16_9)
+    {
+        per_dep_err_unsupported();
+    }
+
     per_rcc_en1_set(&rcc->Per->Tim9en, val);
 }
 
 /// RCC TIM10 clock enable
 static per_inline bool per_rcc_tim10en(const per_rcc_t* const rcc)
 {
+    if (rcc->Tim16 < PER_RCC_TIM16_10)
+    {
+        per_dep_err_unsupported();
+    }
+
     return per_rcc_en1(&rcc->Per->Tim10en);
 }
 
 /// RCC TIM10 clock enable
 static per_inline void per_rcc_set_tim10en(const per_rcc_t* const rcc, bool val)
 {
+    if (rcc->Tim16 < PER_RCC_TIM16_10)
+    {
+        per_dep_err_unsupported();
+    }
+
     per_rcc_en1_set(&rcc->Per->Tim10en, val);
 }
 
 /// RCC TIM11 clock enable
 static per_inline bool per_rcc_tim11en(const per_rcc_t* const rcc)
 {
+    if (rcc->Tim16 < PER_RCC_TIM16_11)
+    {
+        per_dep_err_unsupported();
+    }
+
     return per_rcc_en1(&rcc->Per->Tim11en);
 }
 
 /// RCC TIM11 clock enable
 static per_inline void per_rcc_set_tim11en(const per_rcc_t* const rcc, bool val)
 {
+    if (rcc->Tim16 < PER_RCC_TIM16_11)
+    {
+        per_dep_err_unsupported();
+    }
+
     per_rcc_en1_set(&rcc->Per->Tim11en, val);
 }
 
@@ -4167,48 +4650,88 @@ static per_inline void per_rcc_set_dma2dlpen(const per_rcc_t* const rcc, bool va
 /// RCC Ethernet MAC clock enable during Sleep mode
 static per_inline bool per_rcc_ethmaclpen(const per_rcc_t* const rcc)
 {
+    if (!rcc->Eth)
+    {
+        per_dep_err_unsupported();
+    }
+
     return per_rcc_en1(&rcc->Per->Ethmaclpen);
 }
 
 /// RCC Ethernet MAC clock enable during Sleep mode
 static per_inline void per_rcc_set_ethmaclpen(const per_rcc_t* const rcc, bool val)
 {
+    if (!rcc->Eth)
+    {
+        per_dep_err_unsupported();
+    }
+
     per_rcc_en1_set(&rcc->Per->Ethmaclpen, val);
 }
 
 /// RCC Ethernet Transmission clock enable during Sleep mode
 static per_inline bool per_rcc_ethmactxlpen(const per_rcc_t* const rcc)
 {
+    if (!rcc->Eth)
+    {
+        per_dep_err_unsupported();
+    }
+
     return per_rcc_en1(&rcc->Per->Ethmactxlpen);
 }
 
 /// RCC Ethernet Transmission clock enable during Sleep mode
 static per_inline void per_rcc_set_ethmactxlpen(const per_rcc_t* const rcc, bool val)
 {
+    if (!rcc->Eth)
+    {
+        per_dep_err_unsupported();
+    }
+
     per_rcc_en1_set(&rcc->Per->Ethmactxlpen, val);
 }
 
 /// RCC Ethernet Reception clock enable during Sleep mode
 static per_inline bool per_rcc_ethmacrxlpen(const per_rcc_t* const rcc)
 {
+    if (!rcc->Eth)
+    {
+        per_dep_err_unsupported();
+    }
+
     return per_rcc_en1(&rcc->Per->Ethmacrxlpen);
 }
 
 /// RCC Ethernet Reception clock enable during Sleep mode
 static per_inline void per_rcc_set_ethmacrxlpen(const per_rcc_t* const rcc, bool val)
 {
+    if (!rcc->Eth)
+    {
+        per_dep_err_unsupported();
+    }
+
     per_rcc_en1_set(&rcc->Per->Ethmacrxlpen, val);
 }
 
 /// RCC Ethernet PTP clock enable during Sleep mode
 static per_inline bool per_rcc_ethmacptplpen(const per_rcc_t* const rcc)
 {
+    if (!rcc->Eth)
+    {
+        per_dep_err_unsupported();
+    }
+
     return per_rcc_en1(&rcc->Per->Ethmacptplpen);
 }
 
 /// RCC Ethernet PTP clock enable during Sleep mode
 static per_inline void per_rcc_set_ethmacptplpen(const per_rcc_t* const rcc, bool val)
 {
+    if (!rcc->Eth)
+    {
+        per_dep_err_unsupported();
+    }
+
     per_rcc_en1_set(&rcc->Per->Ethmacptplpen, val);
 }
 
@@ -4251,24 +4774,44 @@ static per_inline void per_rcc_set_dcmilpen(const per_rcc_t* const rcc, bool val
 /// RCC Cryptographic modules clock enable during Sleep mode
 static per_inline bool per_rcc_cryplpen(const per_rcc_t* const rcc)
 {
+    if (!rcc->Cryp)
+    {
+        per_dep_err_unsupported();
+    }
+
     return per_rcc_en1(&rcc->Per->Cryplpen);
 }
 
 /// RCC Cryptographic modules clock enable during Sleep mode
 static per_inline void per_rcc_set_cryplpen(const per_rcc_t* const rcc, bool val)
 {
+    if (!rcc->Cryp)
+    {
+        per_dep_err_unsupported();
+    }
+
     per_rcc_en1_set(&rcc->Per->Cryplpen, val);
 }
 
 /// RCC Hash modules clock enable during Sleep mode
 static per_inline bool per_rcc_hashlpen(const per_rcc_t* const rcc)
 {
+    if (!rcc->Hash)
+    {
+        per_dep_err_unsupported();
+    }
+
     return per_rcc_en1(&rcc->Per->Hashlpen);
 }
 
 /// RCC Hash modules clock enable during Sleep mode
 static per_inline void per_rcc_set_hashlpen(const per_rcc_t* const rcc, bool val)
 {
+    if (!rcc->Hash)
+    {
+        per_dep_err_unsupported();
+    }
+
     per_rcc_en1_set(&rcc->Per->Hashlpen, val);
 }
 
@@ -4311,108 +4854,198 @@ static per_inline void per_rcc_set_fmclpen(const per_rcc_t* const rcc, bool val)
 /// RCC TIM2 clock enable during Sleep mode
 static per_inline bool per_rcc_tim2lpen(const per_rcc_t* const rcc)
 {
+    if (rcc->Tim32 < PER_RCC_TIM32_2)
+    {
+        per_dep_err_unsupported();
+    }
+
     return per_rcc_en1(&rcc->Per->Tim2lpen);
 }
 
 /// RCC TIM2 clock enable during Sleep mode
 static per_inline void per_rcc_set_tim2lpen(const per_rcc_t* const rcc, bool val)
 {
+    if (rcc->Tim32 < PER_RCC_TIM32_2)
+    {
+        per_dep_err_unsupported();
+    }
+
     per_rcc_en1_set(&rcc->Per->Tim2lpen, val);
 }
 
 /// RCC TIM3 clock enable during Sleep mode
 static per_inline bool per_rcc_tim3lpen(const per_rcc_t* const rcc)
 {
+    if (rcc->Tim16 < PER_RCC_TIM16_3)
+    {
+        per_dep_err_unsupported();
+    }
+
     return per_rcc_en1(&rcc->Per->Tim3lpen);
 }
 
 /// RCC TIM3 clock enable during Sleep mode
 static per_inline void per_rcc_set_tim3lpen(const per_rcc_t* const rcc, bool val)
 {
+    if (rcc->Tim16 < PER_RCC_TIM16_3)
+    {
+        per_dep_err_unsupported();
+    }
+
     per_rcc_en1_set(&rcc->Per->Tim3lpen, val);
 }
 
 /// RCC TIM4 clock enable during Sleep mode
 static per_inline bool per_rcc_tim4lpen(const per_rcc_t* const rcc)
 {
+    if (rcc->Tim16 < PER_RCC_TIM16_4)
+    {
+        per_dep_err_unsupported();
+    }
+
     return per_rcc_en1(&rcc->Per->Tim4lpen);
 }
 
 /// RCC TIM4 clock enable during Sleep mode
 static per_inline void per_rcc_set_tim4lpen(const per_rcc_t* const rcc, bool val)
 {
+    if (rcc->Tim16 < PER_RCC_TIM16_4)
+    {
+        per_dep_err_unsupported();
+    }
+
     per_rcc_en1_set(&rcc->Per->Tim4lpen, val);
 }
 
 /// RCC TIM5 clock enable during Sleep mode
 static per_inline bool per_rcc_tim5lpen(const per_rcc_t* const rcc)
 {
+    if (rcc->Tim32 < PER_RCC_TIM32_5)
+    {
+        per_dep_err_unsupported();
+    }
+
     return per_rcc_en1(&rcc->Per->Tim5lpen);
 }
 
 /// RCC TIM5 clock enable during Sleep mode
 static per_inline void per_rcc_set_tim5lpen(const per_rcc_t* const rcc, bool val)
 {
+    if (rcc->Tim32 < PER_RCC_TIM32_5)
+    {
+        per_dep_err_unsupported();
+    }
+
     per_rcc_en1_set(&rcc->Per->Tim5lpen, val);
 }
 
 /// RCC TIM6 clock enable during Sleep mode
 static per_inline bool per_rcc_tim6lpen(const per_rcc_t* const rcc)
 {
+    if (rcc->Tim16 < PER_RCC_TIM16_6)
+    {
+        per_dep_err_unsupported();
+    }
+
     return per_rcc_en1(&rcc->Per->Tim6lpen);
 }
 
 /// RCC TIM6 clock enable during Sleep mode
 static per_inline void per_rcc_set_tim6lpen(const per_rcc_t* const rcc, bool val)
 {
+    if (rcc->Tim16 < PER_RCC_TIM16_6)
+    {
+        per_dep_err_unsupported();
+    }
+
     per_rcc_en1_set(&rcc->Per->Tim6lpen, val);
 }
 
 /// RCC TIM7 clock enable during Sleep mode
 static per_inline bool per_rcc_tim7lpen(const per_rcc_t* const rcc)
 {
+    if (rcc->Tim16 < PER_RCC_TIM16_7)
+    {
+        per_dep_err_unsupported();
+    }
+
     return per_rcc_en1(&rcc->Per->Tim7lpen);
 }
 
 /// RCC TIM7 clock enable during Sleep mode
 static per_inline void per_rcc_set_tim7lpen(const per_rcc_t* const rcc, bool val)
 {
+    if (rcc->Tim16 < PER_RCC_TIM16_7)
+    {
+        per_dep_err_unsupported();
+    }
+
     per_rcc_en1_set(&rcc->Per->Tim7lpen, val);
 }
 
 /// RCC TIM12 clock enable during Sleep mode
 static per_inline bool per_rcc_tim12lpen(const per_rcc_t* const rcc)
 {
+    if (rcc->Tim16 < PER_RCC_TIM16_12)
+    {
+        per_dep_err_unsupported();
+    }
+
     return per_rcc_en1(&rcc->Per->Tim12lpen);
 }
 
 /// RCC TIM12 clock enable during Sleep mode
 static per_inline void per_rcc_set_tim12lpen(const per_rcc_t* const rcc, bool val)
 {
+    if (rcc->Tim16 < PER_RCC_TIM16_12)
+    {
+        per_dep_err_unsupported();
+    }
+
     per_rcc_en1_set(&rcc->Per->Tim12lpen, val);
 }
 
 /// RCC TIM13 clock enable during Sleep mode
 static per_inline bool per_rcc_tim13lpen(const per_rcc_t* const rcc)
 {
+    if (rcc->Tim16 < PER_RCC_TIM16_13)
+    {
+        per_dep_err_unsupported();
+    }
+
     return per_rcc_en1(&rcc->Per->Tim13lpen);
 }
 
 /// RCC TIM13 clock enable during Sleep mode
 static per_inline void per_rcc_set_tim13lpen(const per_rcc_t* const rcc, bool val)
 {
+    if (rcc->Tim16 < PER_RCC_TIM16_13)
+    {
+        per_dep_err_unsupported();
+    }
+
     per_rcc_en1_set(&rcc->Per->Tim13lpen, val);
 }
 
 /// RCC TIM14 clock enable during Sleep mode
 static per_inline bool per_rcc_tim14lpen(const per_rcc_t* const rcc)
 {
+    if (rcc->Tim16 < PER_RCC_TIM16_14)
+    {
+        per_dep_err_unsupported();
+    }
+
     return per_rcc_en1(&rcc->Per->Tim14lpen);
 }
 
 /// RCC TIM14 clock enable during Sleep mode
 static per_inline void per_rcc_set_tim14lpen(const per_rcc_t* const rcc, bool val)
 {
+    if (rcc->Tim16 < PER_RCC_TIM16_14)
+    {
+        per_dep_err_unsupported();
+    }
+
     per_rcc_en1_set(&rcc->Per->Tim14lpen, val);
 }
 
@@ -4563,36 +5196,66 @@ static per_inline void per_rcc_set_uart5lpen(const per_rcc_t* const rcc, bool va
 /// RCC I2C1 clock enable during Sleep mode
 static per_inline bool per_rcc_i2c1lpen(const per_rcc_t* const rcc)
 {
+    if (rcc->I2c < PER_RCC_I2C_1)
+    {
+        per_dep_err_unsupported();
+    }
+
     return per_rcc_en1(&rcc->Per->I2c1lpen);
 }
 
 /// RCC I2C1 clock enable during Sleep mode
 static per_inline void per_rcc_set_i2c1lpen(const per_rcc_t* const rcc, bool val)
 {
+    if (rcc->I2c < PER_RCC_I2C_1)
+    {
+        per_dep_err_unsupported();
+    }
+
     per_rcc_en1_set(&rcc->Per->I2c1lpen, val);
 }
 
 /// RCC I2C2 clock enable during Sleep mode
 static per_inline bool per_rcc_i2c2lpen(const per_rcc_t* const rcc)
 {
+    if (rcc->I2c < PER_RCC_I2C_2)
+    {
+        per_dep_err_unsupported();
+    }
+
     return per_rcc_en1(&rcc->Per->I2c2lpen);
 }
 
 /// RCC I2C2 clock enable during Sleep mode
 static per_inline void per_rcc_set_i2c2lpen(const per_rcc_t* const rcc, bool val)
 {
+    if (rcc->I2c < PER_RCC_I2C_2)
+    {
+        per_dep_err_unsupported();
+    }
+
     per_rcc_en1_set(&rcc->Per->I2c2lpen, val);
 }
 
 /// RCC I2C3 clock enable during Sleep mode
 static per_inline bool per_rcc_i2c3lpen(const per_rcc_t* const rcc)
 {
+    if (rcc->I2c < PER_RCC_I2C_3)
+    {
+        per_dep_err_unsupported();
+    }
+
     return per_rcc_en1(&rcc->Per->I2c3lpen);
 }
 
 /// RCC I2C3 clock enable during Sleep mode
 static per_inline void per_rcc_set_i2c3lpen(const per_rcc_t* const rcc, bool val)
 {
+    if (rcc->I2c < PER_RCC_I2C_3)
+    {
+        per_dep_err_unsupported();
+    }
+
     per_rcc_en1_set(&rcc->Per->I2c3lpen, val);
 }
 
@@ -4677,12 +5340,22 @@ static per_inline void per_rcc_set_pwrlpen(const per_rcc_t* const rcc, bool val)
 /// RCC DAC interface clock enable during Sleep mode
 static per_inline bool per_rcc_daclpen(const per_rcc_t* const rcc)
 {
+    if (!rcc->Dac)
+    {
+        per_dep_err_unsupported();
+    }
+
     return per_rcc_en1(&rcc->Per->Daclpen);
 }
 
 /// RCC DAC interface clock enable during Sleep mode
 static per_inline void per_rcc_set_daclpen(const per_rcc_t* const rcc, bool val)
 {
+    if (!rcc->Dac)
+    {
+        per_dep_err_unsupported();
+    }
+
     per_rcc_en1_set(&rcc->Per->Daclpen, val);
 }
 
@@ -4733,24 +5406,44 @@ static per_inline void per_rcc_set_uart8lpen(const per_rcc_t* const rcc, bool va
 /// RCC TIM1 clock enable during Sleep mode
 static per_inline bool per_rcc_tim1lpen(const per_rcc_t* const rcc)
 {
+    if (rcc->Tim16 < PER_RCC_TIM16_1)
+    {
+        per_dep_err_unsupported();
+    }
+
     return per_rcc_en1(&rcc->Per->Tim1lpen);
 }
 
 /// RCC TIM1 clock enable during Sleep mode
 static per_inline void per_rcc_set_tim1lpen(const per_rcc_t* const rcc, bool val)
 {
+    if (rcc->Tim16 < PER_RCC_TIM16_1)
+    {
+        per_dep_err_unsupported();
+    }
+
     per_rcc_en1_set(&rcc->Per->Tim1lpen, val);
 }
 
 /// RCC TIM8 clock enable during Sleep mode
 static per_inline bool per_rcc_tim8lpen(const per_rcc_t* const rcc)
 {
+    if (rcc->Tim16 < PER_RCC_TIM16_8)
+    {
+        per_dep_err_unsupported();
+    }
+
     return per_rcc_en1(&rcc->Per->Tim8lpen);
 }
 
 /// RCC TIM8 clock enable during Sleep mode
 static per_inline void per_rcc_set_tim8lpen(const per_rcc_t* const rcc, bool val)
 {
+    if (rcc->Tim16 < PER_RCC_TIM16_8)
+    {
+        per_dep_err_unsupported();
+    }
+
     per_rcc_en1_set(&rcc->Per->Tim8lpen, val);
 }
 
@@ -4845,36 +5538,66 @@ static per_inline void per_rcc_set_uart10lpen(const per_rcc_t* const rcc, bool v
 /// RCC ADC1 clock enable during Sleep mode
 static per_inline bool per_rcc_adc1lpen(const per_rcc_t* const rcc)
 {
+    if (rcc->Adc < PER_RCC_ADC_1)
+    {
+        per_dep_err_unsupported();
+    }
+
     return per_rcc_en1(&rcc->Per->Adc1lpen);
 }
 
 /// RCC ADC1 clock enable during Sleep mode
 static per_inline void per_rcc_set_adc1lpen(const per_rcc_t* const rcc, bool val)
 {
+    if (rcc->Adc < PER_RCC_ADC_1)
+    {
+        per_dep_err_unsupported();
+    }
+
     per_rcc_en1_set(&rcc->Per->Adc1lpen, val);
 }
 
 /// RCC ADC2 clock enable during Sleep mode
 static per_inline bool per_rcc_adc2lpen(const per_rcc_t* const rcc)
 {
+    if (rcc->Adc < PER_RCC_ADC_2)
+    {
+        per_dep_err_unsupported();
+    }
+
     return per_rcc_en1(&rcc->Per->Adc2lpen);
 }
 
 /// RCC ADC2 clock enable during Sleep mode
 static per_inline void per_rcc_set_adc2lpen(const per_rcc_t* const rcc, bool val)
 {
+    if (rcc->Adc < PER_RCC_ADC_2)
+    {
+        per_dep_err_unsupported();
+    }
+
     per_rcc_en1_set(&rcc->Per->Adc2lpen, val);
 }
 
 /// RCC ADC3 clock enable during Sleep mode
 static per_inline bool per_rcc_adc3lpen(const per_rcc_t* const rcc)
 {
+    if (rcc->Adc < PER_RCC_ADC_3)
+    {
+        per_dep_err_unsupported();
+    }
+
     return per_rcc_en1(&rcc->Per->Adc3lpen);
 }
 
 /// RCC ADC3 clock enable during Sleep mode
 static per_inline void per_rcc_set_adc3lpen(const per_rcc_t* const rcc, bool val)
 {
+    if (rcc->Adc < PER_RCC_ADC_3)
+    {
+        per_dep_err_unsupported();
+    }
+
     per_rcc_en1_set(&rcc->Per->Adc3lpen, val);
 }
 
@@ -4949,36 +5672,66 @@ static per_inline void per_rcc_set_syscfglpen(const per_rcc_t* const rcc, bool v
 /// RCC TIM9 clock enable during Sleep mode
 static per_inline bool per_rcc_tim9lpen(const per_rcc_t* const rcc)
 {
+    if (rcc->Tim16 < PER_RCC_TIM16_9)
+    {
+        per_dep_err_unsupported();
+    }
+
     return per_rcc_en1(&rcc->Per->Tim9lpen);
 }
 
 /// RCC TIM9 clock enable during Sleep mode
 static per_inline void per_rcc_set_tim9lpen(const per_rcc_t* const rcc, bool val)
 {
+    if (rcc->Tim16 < PER_RCC_TIM16_9)
+    {
+        per_dep_err_unsupported();
+    }
+
     per_rcc_en1_set(&rcc->Per->Tim9lpen, val);
 }
 
 /// RCC TIM10 clock enable during Sleep mode
 static per_inline bool per_rcc_tim10lpen(const per_rcc_t* const rcc)
 {
+    if (rcc->Tim16 < PER_RCC_TIM16_10)
+    {
+        per_dep_err_unsupported();
+    }
+
     return per_rcc_en1(&rcc->Per->Tim10lpen);
 }
 
 /// RCC TIM10 clock enable during Sleep mode
 static per_inline void per_rcc_set_tim10lpen(const per_rcc_t* const rcc, bool val)
 {
+    if (rcc->Tim16 < PER_RCC_TIM16_10)
+    {
+        per_dep_err_unsupported();
+    }
+
     per_rcc_en1_set(&rcc->Per->Tim10lpen, val);
 }
 
 /// RCC TIM11 clock enable during Sleep mode
 static per_inline bool per_rcc_tim11lpen(const per_rcc_t* const rcc)
 {
+    if (rcc->Tim16 < PER_RCC_TIM16_11)
+    {
+        per_dep_err_unsupported();
+    }
+
     return per_rcc_en1(&rcc->Per->Tim11lpen);
 }
 
 /// RCC TIM11 clock enable during Sleep mode
 static per_inline void per_rcc_set_tim11lpen(const per_rcc_t* const rcc, bool val)
 {
+    if (rcc->Tim16 < PER_RCC_TIM16_11)
+    {
+        per_dep_err_unsupported();
+    }
+
     per_rcc_en1_set(&rcc->Per->Tim11lpen, val);
 }
 
