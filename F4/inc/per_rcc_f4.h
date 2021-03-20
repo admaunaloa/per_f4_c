@@ -22,6 +22,13 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
+ *
+ * Convenience functions:
+ * per_rcc_setwait_hsi(const per_rcc_t* const rcc, bool val)
+ * per_rcc_setwait_hse(const per_rcc_t* const rcc, bool val)
+ * per_rcc_setwait_pll(const per_rcc_t* const rcc, bool val)
+ * per_rcc_setwait_plli2s(const per_rcc_t* const rcc, bool val)
+ * per_rcc_setwait_pllsai(const per_rcc_t* const rcc, bool val)
  */
 
 #ifndef per_rcc_f4_h_
@@ -50,46 +57,34 @@ extern "C" {
 #define PER_RCC_HSI_RC ((uint32_t)16000000)
 
 /// RCC PLL minimum value
-#define PER_RCC_PLL_MIN (2)
+#define PER_RCC_PLL_MIN ((uint_fast16_t)2)
 
-/// RCC Division factor for the main PLL (PLL) and audio PLL (PLLI2S) input clock
-#define PER_RCC_PLLM_MAX (63)
-
-/// RCC Main PLL (PLL) multiplication factor for VCO
-#define PER_RCC_PLLN_MAX (432)
+/// RCC Main PLL VCO multiplication factor for VCO
+#define PER_RCC_PLL_VCO_MAX ((uint_fast16_t)432)
 
 /// RCC Main PLL (PLL) division factor for main system clock
-#define PER_RCC_PLLP_MAX (8)
-
-/// Main PLL (PLL) division factor for USB OTG FS, SDIO and random number generator clocks
-#define PER_RCC_PLLQ_MAX (15)
-
-/// Main PLL (PLL) division factor for I2S, DFSDM clocks
-#define PER_RCC_PLLR_MAX (7)
+#define PER_RCC_PLLP_MAX ((uint_fast16_t)8)
 
 /// RCC AHB prescaler maximum
-#define PER_RCC_HPRE_MAX (512)
+#define PER_RCC_HPRE_MAX ((uint_fast16_t)512)
 
-/// RCC AHB prescaler invalid
-#define PER_RCC_HPRE_INV ((uint_fast16_t)32)
+/// RCC AHB prescaler unsupported value
+#define PER_RCC_HPRE_UNS ((uint_fast16_t)32)
 
 /// RCC AHB prescaler highest bit
 #define PER_RCC_HPRE_MSB ((uint_fast16_t)0b1000)
 
 /// RCC APB prescaler maximum
-#define PER_RCC_PPRE_MAX (16)
+#define PER_RCC_PPRE_MAX ((uint_fast16_t)16)
 
 /// RCC APB prescaler highest bit
 #define PER_RCC_PPRE_MSB ((uint_fast16_t)0b0100)
 
 /// RCC HSE division factor for RTC clock
-#define PER_RCC_RTCPRE_MAX (31)
-
-/// RCC HSE division factor for RTC clock
-#define PER_RCC_RTCPRE_MIN (2)
+#define PER_RCC_RTCPRE_MIN ((uint_fast16_t)2)
 
 /// RCC MCO prescaler maximum
-#define PER_RCC_MCO_MAX (5)
+#define PER_RCC_MCO_MAX ((uint_fast16_t)5)
 
 /// RCC MCO prescaler highest bit
 #define PER_RCC_MCO_MSB ((uint_fast16_t)0b0100)
@@ -97,32 +92,11 @@ extern "C" {
 /// RCC MCO prescaler base
 #define PER_RCC_MCO_BASE ((uint_fast16_t)2)
 
-/// RCC PLLI2S multiplication factor for VCO
-#define PER_RCC_PLLI2SN_MAX ((uint_fast16_t)432)
-
-/// RCC PLLI2S division factor for SAI1 clock
-#define PER_RCC_PLLI2SQ_MAX ((uint_fast16_t)15)
-
-/// RCC PLLI2S division factor for I2S clocks
-#define PER_RCC_PLLI2SR_MAX ((uint_fast16_t)7)
-
-/// RCC PLLSAI multiplication factor for VCO
-#define PER_RCC_PLLSAIN_MAX ((uint_fast16_t)432)
-
-/// RCC PLLSAI division factor for SAI1 clock
-#define PER_RCC_PLLSAIQ_MAX ((uint_fast16_t)15)
-
-/// RCC PLLSAI division factor for I2S clocks
-#define PER_RCC_PLLSAIR_MAX ((uint_fast16_t)7)
-
-/// PLLI2S division factor for SAI1 clock
-#define PER_RCC_PLLI2SDIVQ_MAX ((uint_fast16_t)32)
-
-/// PLLSAI division factor for SAI1 clock
-#define PER_RCC_PLLSAIDIVQ_MAX ((uint_fast16_t)32)
-
 /// division factor for LCD_CLK
 #define PER_RCC_PLLSAIDIVR_MAX ((uint_fast16_t)16)
+
+/// Timeout time for ready flags
+#define PER_RCC_RDY_TIMEOUT ((uint_fast16_t)UINT16_MAX)
 
 /// RCC error enumeration
 typedef enum
@@ -148,7 +122,11 @@ typedef enum
     PER_RCC_PLLI2SDIVQ_ERR,///< PLLI2S division factor for SAI1 clock
     PER_RCC_PLLSAIDIVQ_ERR,///< PLLSAI division factor for SAI1 clock
     PER_RCC_PLLSAIDIVR_ERR,///< division factor for LCD_CLK
-
+    PER_RCC_HSIRDY_ERR,    ///< Internal high-speed clock ready flag timeout
+    PER_RCC_HSERDY_ERR,    ///< HSE clock ready flag timeout
+    PER_RCC_PLLRDY_ERR,    ///< Main PLL (PLL) clock ready flag timeout
+    PER_RCC_PLLI2SRDY_ERR, ///< PLLI2S clock ready flag timeout
+    PER_RCC_PLLSAIRDY_ERR, ///< PLLSAI clock ready flag timeout
 } per_rcc_error_e;
 
 /// RCC ADC peripherals number
@@ -802,15 +780,18 @@ typedef struct
     const per_rcc_can_e Can;      ///< Number of CAN peripherals
     const bool Cryp;              ///< Crypto present
     const bool Dac;               ///< DAC present
+    const bool Eth;               ///< Ethernet present
     const bool Hash;              ///< Hash present
     const per_rcc_i2c_e I2c;      ///< Number of I2C peripherals
     const per_rcc_gpio_e Gpio;    ///< Number of GPIO ports
+    const bool Rng;               ///< RNG present
+    const bool Sai;               ///< SAI present
     const per_rcc_spi_e Spi;      ///< Number of SPI peripherals
     const per_rcc_tim16_e Tim16;  ///< Number of TIM 32bit peripherals
     const per_rcc_tim32_e Tim32;  ///< Number of TIM 16bit peripherals
     const per_rcc_uart_e Uart;    ///< Number of UART peripherals
     const per_rcc_usart_e Usart;  ///< Number of USART peripherals
-    const bool Eth;               ///< Ethernet present
+    const bool Usb;               ///< USB present
 } per_rcc_t;
 
 /// RCC Internal high-speed clock enable
@@ -954,7 +935,7 @@ static per_inline uint_fast16_t per_rcc_pllm(const per_rcc_t* const rcc)
 /// RCC Division factor for the main PLL (PLL) and audio PLL (PLLI2S) input clock
 static per_inline bool per_rcc_set_pllm(const per_rcc_t* const rcc, uint_fast16_t val)
 {
-    if ((val > PER_RCC_PLLM_MAX) ||
+    if ((val > per_bit_rw6_max()) ||
         (val < PER_RCC_PLL_MIN))
     {
         per_log_err(rcc->Err, PER_RCC_PLLM_ERR, val);
@@ -973,7 +954,7 @@ static per_inline uint_fast16_t per_rcc_plln(const per_rcc_t* const rcc)
 /// RCC Main PLL (PLL) multiplication factor for VCO
 static per_inline bool per_rcc_set_plln(const per_rcc_t* const rcc, uint_fast16_t val)
 {
-    if ((val > PER_RCC_PLLN_MAX) ||
+    if ((val > PER_RCC_PLL_VCO_MAX) ||
         (val < PER_RCC_PLL_MIN))
     {
         per_log_err(rcc->Err, PER_RCC_PLLN_ERR, val);
@@ -1024,7 +1005,7 @@ static per_inline uint_fast16_t per_rcc_pllq(const per_rcc_t* const rcc)
 /// RCC Main PLL (PLL) division factor for USB OTG FS, SDIO and random number generator clocks
 static per_inline bool per_rcc_set_pllq(const per_rcc_t* const rcc, uint_fast16_t val)
 {
-    if ((val > PER_RCC_PLLQ_MAX) ||
+    if ((val > per_bit_rw4_max()) ||
         (val < PER_RCC_PLL_MIN))
     {
         per_log_err(rcc->Err, PER_RCC_PLLQ_ERR, val);
@@ -1043,7 +1024,7 @@ static per_inline uint_fast16_t per_rcc_pllr(const per_rcc_t* const rcc)
 /// Main PLL (PLL) division factor for I2S, DFSDM clocks
 static per_inline bool per_rcc_set_pllr(const per_rcc_t* const rcc, uint_fast16_t val)
 {
-    if ((val > PER_RCC_PLLR_MAX) ||
+    if ((val > per_bit_rw3_max()) ||
         (val < PER_RCC_PLL_MIN))
     {
         per_log_err(rcc->Err, PER_RCC_PLLR_ERR, val);
@@ -1083,7 +1064,7 @@ static per_inline uint_fast16_t per_rcc_hpre(const per_rcc_t* const rcc)
 
         val <<= 1; // multiply by 2
 
-        if (val >= PER_RCC_HPRE_INV)
+        if (val >= PER_RCC_HPRE_UNS)
         {
             val <<= 1; // multiply by 2
         }
@@ -1096,7 +1077,7 @@ static per_inline uint_fast16_t per_rcc_hpre(const per_rcc_t* const rcc)
 static per_inline bool per_rcc_set_hpre(const per_rcc_t* const rcc, uint_fast16_t val)
 {
     if ((val > PER_RCC_HPRE_MAX) ||
-        (val == PER_RCC_HPRE_INV) ||
+        (val == PER_RCC_HPRE_UNS) ||
         !per_bit_is_log2(val))
     {
         per_log_err(rcc->Err, PER_RCC_HPRE_ERR, val);
@@ -1109,7 +1090,7 @@ static per_inline bool per_rcc_set_hpre(const per_rcc_t* const rcc, uint_fast16_
     {
         val >>= 1; // divide by 2
 
-        if (val > PER_RCC_HPRE_INV)
+        if (val > PER_RCC_HPRE_UNS)
         {
             val >>= 1; // divide by 2
         }
@@ -1211,7 +1192,7 @@ static per_inline uint_fast16_t per_rcc_rtcpre(const per_rcc_t* const rcc)
 /// RCC HSE division factor for RTC clock
 static per_inline bool per_rcc_set_rtcpre(const per_rcc_t* const rcc, uint_fast16_t val)
 {
-    if ((val > PER_RCC_RTCPRE_MAX) ||
+    if ((val > per_bit_rw5_max()) ||
         (val < PER_RCC_RTCPRE_MIN))
     {
         per_log_err(rcc->Err, PER_RCC_RTCPRE_ERR, val);
@@ -6006,7 +5987,7 @@ static per_inline uint_fast16_t per_rcc_plli2sn(const per_rcc_t* const rcc)
 /// RCC PLLI2S multiplication factor for VCO
 static per_inline bool per_rcc_set_plli2sn(const per_rcc_t* const rcc, uint_fast16_t val)
 {
-    if ((val > PER_RCC_PLLI2SN_MAX) ||
+    if ((val > PER_RCC_PLL_VCO_MAX) ||
         (val < PER_RCC_PLL_MIN))
     {
         per_log_err(rcc->Err, PER_RCC_PLLI2SN_ERR, val);
@@ -6025,7 +6006,7 @@ static per_inline uint_fast16_t per_rcc_plli2sq(const per_rcc_t* const rcc)
 /// RCC PLLI2S division factor for SAI1 clock
 static per_inline bool per_rcc_set_plli2sq(const per_rcc_t* const rcc, uint_fast16_t val)
 {
-    if ((val > PER_RCC_PLLI2SQ_MAX) ||
+    if ((val > per_bit_rw4_max()) ||
         (val < PER_RCC_PLL_MIN))
     {
         per_log_err(rcc->Err, PER_RCC_PLLI2SQ_ERR, val);
@@ -6044,7 +6025,7 @@ static per_inline uint_fast16_t per_rcc_plli2sr(const per_rcc_t* const rcc)
 /// RCC PLLI2S division factor for I2S clocks
 static per_inline bool per_rcc_set_plli2sr(const per_rcc_t* const rcc, uint_fast16_t val)
 {
-    if ((val > PER_RCC_PLLI2SR_MAX) ||
+    if ((val > per_bit_rw3_max()) ||
         (val < PER_RCC_PLL_MIN))
     {
         per_log_err(rcc->Err, PER_RCC_PLLI2SR_ERR, val);
@@ -6063,7 +6044,7 @@ static per_inline uint_fast16_t per_rcc_pllisain(const per_rcc_t* const rcc)
 /// RCC PLLSAI division factor for VCO
 static per_inline bool per_rcc_set_pllisain(const per_rcc_t* const rcc, uint_fast16_t val)
 {
-    if ((val > PER_RCC_PLLSAIN_MAX) ||
+    if ((val > PER_RCC_PLL_VCO_MAX) ||
         (val < PER_RCC_PLL_MIN))
     {
         per_log_err(rcc->Err, PER_RCC_PLLSAIN_ERR, val);
@@ -6082,7 +6063,7 @@ static per_inline uint_fast16_t per_rcc_pllsaiq(const per_rcc_t* const rcc)
 /// RCC PLLSAI division factor for SAI1 clock
 static per_inline bool per_rcc_set_pllsaiq(const per_rcc_t* const rcc, uint_fast16_t val)
 {
-    if ((val > PER_RCC_PLLSAIQ_MAX) ||
+    if ((val > per_bit_rw4_max()) ||
         (val < PER_RCC_PLL_MIN))
     {
         per_log_err(rcc->Err, PER_RCC_PLLSAIQ_ERR, val);
@@ -6101,7 +6082,7 @@ static per_inline uint_fast16_t per_rcc_pllsair(const per_rcc_t* const rcc)
 /// RCC PLLSAI division factor for LCD clock
 static per_inline bool per_rcc_set_pllsair(const per_rcc_t* const rcc, uint_fast16_t val)
 {
-    if ((val > PER_RCC_PLLSAIR_MAX) ||
+    if ((val > per_bit_rw3_max()) ||
         (val < PER_RCC_PLL_MIN))
     {
         per_log_err(rcc->Err, PER_RCC_PLLSAIR_ERR, val);
@@ -6120,7 +6101,7 @@ static per_inline uint_fast16_t per_rcc_plli2sdivq(const per_rcc_t* const rcc)
 /// RCC PLLI2S division factor for SAI1 clock
 static per_inline bool per_rcc_set_plli2sdivq(const per_rcc_t* const rcc, uint_fast16_t val)
 {
-    if ((val > PER_RCC_PLLI2SDIVQ_MAX) ||
+    if ((val > per_bit_rw5_max() + 1) ||
         (val == 0))
     {
         per_log_err(rcc->Err, PER_RCC_PLLI2SDIVQ_ERR, val);
@@ -6139,7 +6120,7 @@ static per_inline uint_fast16_t per_rcc_pllsaidivq(const per_rcc_t* const rcc)
 /// RCC PLLSAI division factor for SAI1 clock
 static per_inline bool per_rcc_set_pllsaidivq(const per_rcc_t* const rcc, uint_fast16_t val)
 {
-    if ((val > PER_RCC_PLLSAIDIVQ_MAX) ||
+    if ((val > per_bit_rw5_max() + 1) ||
         (val == 0))
     {
         per_log_err(rcc->Err, PER_RCC_PLLSAIDIVQ_ERR, val);
@@ -6203,6 +6184,116 @@ static per_inline bool per_rcc_timpre(const per_rcc_t* const rcc)
 static per_inline void per_rcc_set_timpre(const per_rcc_t* const rcc, bool val)
 {
     per_bit_rw1_set(&rcc->Per->Timpre, val);
+}
+
+/// RCC HSI Internal high-speed clock enable
+static per_inline bool per_rcc_setwait_hsi(const per_rcc_t* const rcc, bool val)
+{
+    uint_fast16_t count = PER_RCC_RDY_TIMEOUT;
+
+    per_rcc_set_hsion(rcc, val);
+
+    while (count != 0)
+    {
+        --count;
+
+        if (per_rcc_hsirdy(rcc) == val)
+        {
+            return true;
+        }
+    }
+
+    per_log_err(rcc->Err, PER_RCC_HSIRDY_ERR, val);
+
+    return false;
+}
+
+/// RCC HSE clock enable
+static per_inline bool per_rcc_setwait_hse(const per_rcc_t* const rcc, bool val)
+{
+    uint_fast16_t count = PER_RCC_RDY_TIMEOUT;
+
+    per_rcc_set_hseon(rcc, val);
+
+    while (count != 0)
+    {
+        --count;
+
+        if (per_rcc_hserdy(rcc) == val)
+        {
+            return true;
+        }
+    }
+
+    per_log_err(rcc->Err, PER_RCC_HSERDY_ERR, val);
+
+    return false;
+}
+
+/// RCC Main PLL (PLL) enable and wait for ready
+static per_inline bool per_rcc_setwait_pll(const per_rcc_t* const rcc, bool val)
+{
+    uint_fast16_t count = PER_RCC_RDY_TIMEOUT;
+
+    per_rcc_set_pllon(rcc, val);
+
+    while (count != 0)
+    {
+        --count;
+
+        if (per_rcc_pllrdy(rcc) == val)
+        {
+            return true;
+        }
+    }
+
+    per_log_err(rcc->Err, PER_RCC_PLLRDY_ERR, val);
+
+    return false;
+}
+
+/// RCC PLLI2S enable
+static per_inline bool per_rcc_setwait_plli2s(const per_rcc_t* const rcc, bool val)
+{
+    uint_fast16_t count = PER_RCC_RDY_TIMEOUT;
+
+    per_rcc_set_plli2son(rcc, val);
+
+    while (count != 0)
+    {
+        --count;
+
+        if (per_rcc_plli2srdy(rcc) == val)
+        {
+            return true;
+        }
+    }
+
+    per_log_err(rcc->Err, PER_RCC_PLLI2SRDY_ERR, val);
+
+    return false;
+}
+
+/// RCC PLLSAI enable
+static per_inline bool per_rcc_setwait_pllsai(const per_rcc_t* const rcc, bool val)
+{
+    uint_fast16_t count = PER_RCC_RDY_TIMEOUT;
+
+    per_rcc_set_pllsaion(rcc, val);
+
+    while (count != 0)
+    {
+        --count;
+
+        if (per_rcc_pllsairdy(rcc) == val)
+        {
+            return true;
+        }
+    }
+
+    per_log_err(rcc->Err, PER_RCC_PLLSAIRDY_ERR, val);
+
+    return false;
 }
 
 #ifdef __cplusplus

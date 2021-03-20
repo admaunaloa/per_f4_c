@@ -50,15 +50,18 @@ static per_inline const per_rcc_t* const per_rcc(void)
         .Can = PER_RCC_CAN_2,
         .Cryp = false,
         .Dac = true,
-        .Hash = false,
         .Eth = true,
+        .Hash = true,
         .I2c = PER_RCC_I2C_3,
         .Gpio = PER_RCC_GPIO_I,
+        .Rng = true,
+        .Sai = true,
         .Spi = PER_RCC_SPI_3,
         .Tim16 = PER_RCC_TIM16_14,
         .Tim32 = PER_RCC_TIM32_5,
         .Uart = PER_RCC_UART_5,
         .Usart = PER_RCC_USART_6,
+        .Usb = true,
     };
     return &rcc;
 }
