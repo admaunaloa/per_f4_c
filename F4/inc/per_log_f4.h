@@ -78,6 +78,7 @@ typedef enum
     PER_LOG_ETH_MAC, ///< ETH_MAC
     PER_LOG_ETH_MMC, ///< ETH_MMC
     PER_LOG_ETH, ///< ETH
+    PER_LOG_FLASH, ///< FLASH
     PER_LOG_FMC, ///< FMC
     PER_LOG_FSMC, ///< FSMC
     PER_LOG_GPIO_A, ///< GPIOA

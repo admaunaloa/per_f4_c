@@ -25,7 +25,7 @@
  */
 
 #ifndef per_pwr_f4_h_
-#define per_pwr_f2_h_
+#define per_pwr_f4_h_
 
 #ifdef __cplusplus
 extern "C" {
