@@ -31,6 +31,25 @@ void bsp_rcc_init(void)
 {
     const per_rcc_t* const rcc = per_rcc();
 
+    /// PLLCFGR
+    per_rcc_set_pllm(rcc, 4);      // 8M / 4 = 2M
+    per_rcc_set_plln(rcc, 168);    // 2M * 168 = 336M
+    per_rcc_set_pllp(rcc, 2);      // 336M / 2 = 168M
+    per_rcc_set_pllsrc(rcc, true); // HSE
+    per_rcc_set_pllq(rcc, 7);      // 336M / 7 = 48M
+
+    /// CFGR
+    per_rcc_set_hpre(rcc, 1);
+    per_rcc_set_ppre1(rcc, 4);
+    per_rcc_set_ppre2(rcc, 4);
+    per_rcc_set_sw(rcc, PER_RCC_SW_PLL);
+
+    /// CR
+    per_rcc_setwait_hsi(rcc, true);
+    per_rcc_set_hsebyp(rcc, true);
+    per_rcc_setwait_hse(rcc, true);
+    per_rcc_setwait_pll(rcc, true);
+
     per_rcc_set_gpioaen(rcc, true);
     per_rcc_set_gpioben(rcc, true);
     per_rcc_set_gpiocen(rcc, true);

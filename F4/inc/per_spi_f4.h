@@ -41,9 +41,9 @@ extern "C"
 /// SPI error enumeration
 typedef enum
 {
-    PER_SPI_ERR_OKK = PER_LOG_SPI * PER_LOG_MULT, ///< No error
-    PER_SPI_ERR_BR, ///< Baud-rate invalid
-    PER_SPI_ERR_I2SDIV, ///< I2S divider value invalid
+    PER_SPI_OK_ERR = PER_LOG_SPI * PER_LOG_MULT, ///< No error
+    PER_SPI_BR_ERR, ///< Baud-rate invalid
+    PER_SPI_I2SDIV_ERR, ///< I2S divider value invalid
 } per_spi_error_e;
 
 /// SPI datalength to be transferred enumeration
@@ -200,7 +200,7 @@ static per_inline bool per_spi_set_br(const per_spi_t* const spi, uint_fast32_t 
     if ((div > PER_SPI_BR_MAX) ||
         !per_bit_is_log2(div))
     {
-        per_log_err(spi->Err, PER_SPI_ERR_BR, div);
+        per_log_err(spi->Err, PER_SPI_BR_ERR, div);
         return false;
     }
 
@@ -620,7 +620,7 @@ static per_inline bool per_spi_set_i2sdiv(const per_spi_t* const spi, uint_fast1
 {
     if (pre < 2) // Values 0 and 1 are forbidden)
     {
-        per_log_err(spi->Err, PER_SPI_ERR_I2SDIV, pre);
+        per_log_err(spi->Err, PER_SPI_I2SDIV_ERR, pre);
         return false;
     }
 

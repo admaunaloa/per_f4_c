@@ -32,7 +32,7 @@
  */
 
 #ifndef per_rcc_f4_h_
-#define per_rcc_f2_h_
+#define per_rcc_f4_h_
 
 #ifdef __cplusplus
 extern "C" {
@@ -295,28 +295,6 @@ static per_inline void per_rcc_en1_set(per_rcc_en1_t* self, bool val)
     val = self->Rw.Bit8 != PER_BIT_0;  // Wait read back
 }
 
-/// RCC Peripheral 3 bit Prescaler
-typedef union
-{
-    per_bit_rw3_t Pre; ///< prescaler
-    struct
-    {
-        per_bit_n2_t Fill; ///< value
-        per_bit_w1_t Msb;  ///< most significant bit
-    };
-}per_rcc_pre3_t;
-
-/// RCC Peripheral 4 bit Prescaler
-typedef union
-{
-    per_bit_rw4_t Pre; ///< prescaler
-    struct
-    {
-        per_bit_n3_t Fill; ///< value
-        per_bit_w1_t Msb;  ///< most significant bit
-    };
-}per_rcc_pre4_t;
-
 typedef struct
 {
     // Control register (RCC_CR)
@@ -353,15 +331,15 @@ typedef struct
     // clock configuration register (RCC_CFGR)
     per_bit_rw2_t Sw; ///< System clock switch
     per_bit_r2_t Sws; ///< System clock switch status
-    per_rcc_pre4_t Hpre; ///< AHB prescaler
+    per_bit_rw4_t Hpre; ///< AHB prescaler
     per_bit_n2_t CirBit8; ///< Reserved
-    per_rcc_pre3_t Ppre1; ///< APB Low speed prescaler (APB1)
-    per_rcc_pre3_t Ppre2; ///< ///< APB high-speed prescaler (APB2)
+    per_bit_rw3_t Ppre1; ///< APB Low speed prescaler (APB1)
+    per_bit_rw3_t Ppre2; ///< ///< APB high-speed prescaler (APB2)
     per_bit_rw5_t Rtcpre; ///< HSE division factor for RTC clock
     per_bit_rw2_t Mco1; ///< Microcontroller clock output 1
     per_bit_rw1_t I2sscr; ///< I2S clock selection
-    per_rcc_pre3_t Mco1pre; ///< MCO1 prescaler
-    per_rcc_pre3_t Mco2pre; ///< MCO2 prescaler
+    per_bit_rw3_t Mco1pre; ///< MCO1 prescaler
+    per_bit_rw3_t Mco2pre; ///< MCO2 prescaler
     per_bit_rw2_t Mco2; ///< Microcontroller clock output 2
 
     // clock interrupt register (RCC_CIR)
@@ -1055,7 +1033,7 @@ static per_inline per_rcc_sw_e per_rcc_sws(const per_rcc_t* const rcc)
 /// RCC AHB prescaler
 static per_inline uint_fast16_t per_rcc_hpre(const per_rcc_t* const rcc)
 {
-    uint_fast16_t hpre = per_bit_rw4(&rcc->Per->Hpre.Pre);
+    uint_fast16_t hpre = per_bit_rw4(&rcc->Per->Hpre);
     uint_fast16_t val = 1;
 
     if ((hpre & PER_RCC_HPRE_MSB) != 0) // highest bit
@@ -1098,15 +1076,15 @@ static per_inline bool per_rcc_set_hpre(const per_rcc_t* const rcc, uint_fast16_
         hpre = PER_RCC_HPRE_MSB | per_bit_log2(val);
     }
 
-    per_bit_w1_set(&rcc->Per->Hpre.Msb, true); // Set this to prevent temporary illegal values during the next write
+    per_bit_rw4_set(&rcc->Per->Hpre, per_bit_rw4_max()); // Set this to prevent temporary illegal values during the next write
 
-    return per_bit_rw4_set(&rcc->Per->Hpre.Pre, hpre);
+    return per_bit_rw4_set(&rcc->Per->Hpre, hpre);
 }
 
 /// RCC APB Low speed prescaler (APB1)
 static per_inline uint_fast16_t per_rcc_ppre1(const per_rcc_t* const rcc)
 {
-    uint_fast16_t pre = per_bit_rw3(&rcc->Per->Ppre1.Pre);
+    uint_fast16_t pre = per_bit_rw3(&rcc->Per->Ppre1);
     uint_fast16_t val = 1;
 
     if ((pre & PER_RCC_PPRE_MSB) != 0) // highest bit
@@ -1138,15 +1116,15 @@ static per_inline bool per_rcc_set_ppre1(const per_rcc_t* const rcc, uint_fast16
         pre = PER_RCC_PPRE_MSB | per_bit_log2(val);
     }
 
-    per_bit_w1_set(&rcc->Per->Ppre2.Msb, true); // Set this to prevent temporary illegal values during the next write
+    per_bit_rw3_set(&rcc->Per->Ppre2, per_bit_rw3_max()); // Set this to prevent temporary illegal values during the next write
 
-    return per_bit_rw3_set(&rcc->Per->Ppre2.Pre, pre);
+    return per_bit_rw3_set(&rcc->Per->Ppre2, pre);
 }
 
 /// RCC APB high-speed prescaler (APB2)
 static per_inline uint_fast16_t per_rcc_ppre2(const per_rcc_t* const rcc)
 {
-    uint_fast16_t pre = per_bit_rw3(&rcc->Per->Ppre2.Pre);
+    uint_fast16_t pre = per_bit_rw3(&rcc->Per->Ppre2);
     uint_fast16_t val = 1;
 
     if ((pre & PER_RCC_PPRE_MSB) != 0) // highest bit
@@ -1178,9 +1156,9 @@ static per_inline bool per_rcc_set_ppre2(const per_rcc_t* const rcc, uint_fast16
         pre = PER_RCC_PPRE_MSB | per_bit_log2(val);
     }
 
-    per_bit_w1_set(&rcc->Per->Ppre2.Msb, true); // Set this to prevent temporary illegal values during the next write
+    per_bit_rw3_set(&rcc->Per->Ppre2, per_bit_rw3_max()); // Set this to prevent temporary illegal values during the next write
 
-    return per_bit_rw3_set(&rcc->Per->Ppre2.Pre, pre);
+    return per_bit_rw3_set(&rcc->Per->Ppre2, pre);
 }
 
 /// RCC HSE division factor for RTC clock
@@ -1229,7 +1207,7 @@ static per_inline void per_rcc_set_i2sscr(const per_rcc_t* const rcc, bool val)
 /// RCC MCO1 prescaler
 static per_inline uint_fast16_t per_rcc_mco1pre(const per_rcc_t* const rcc)
 {
-    uint_fast16_t pre = per_bit_rw3(&rcc->Per->Mco1pre.Pre);
+    uint_fast16_t pre = per_bit_rw3(&rcc->Per->Mco1pre);
     uint_fast16_t val = 1;
 
     if ((pre & PER_RCC_MCO_MSB) != 0) // highest bit
@@ -1257,15 +1235,15 @@ static per_inline bool per_rcc_set_mco1pre(const per_rcc_t* const rcc, uint_fast
         pre = PER_RCC_MCO_MSB | (val - PER_RCC_MCO_BASE);
     }
 
-    per_bit_w1_set(&rcc->Per->Mco1pre.Msb, true); // Set this to prevent temporary illegal values during the next write
+    per_bit_rw3_set(&rcc->Per->Mco1pre, per_bit_rw3_max()); // Set this to prevent temporary illegal values during the next write
 
-    return per_bit_rw3_set(&rcc->Per->Mco1pre.Pre, pre);
+    return per_bit_rw3_set(&rcc->Per->Mco1pre, pre);
 }
 
 /// RCC MCO2 prescaler
 static per_inline uint_fast16_t per_rcc_mco2pre(const per_rcc_t* const rcc)
 {
-    uint_fast16_t pre = per_bit_rw3(&rcc->Per->Mco2pre.Pre);
+    uint_fast16_t pre = per_bit_rw3(&rcc->Per->Mco2pre);
     uint_fast16_t val = 1;
 
     if ((pre & PER_RCC_MCO_MSB) != 0) // highest bit
@@ -1293,9 +1271,9 @@ static per_inline bool per_rcc_set_mco2pre(const per_rcc_t* const rcc, uint_fast
         pre = PER_RCC_MCO_MSB | (val - PER_RCC_MCO_BASE);
     }
 
-    per_bit_w1_set(&rcc->Per->Mco2pre.Msb, true); // Set this to prevent temporary illegal values during the next write
+    per_bit_rw3_set(&rcc->Per->Mco2pre, per_bit_rw3_max()); // Set this to prevent temporary illegal values during the next write
 
-    return per_bit_rw3_set(&rcc->Per->Mco2pre.Pre, pre);
+    return per_bit_rw3_set(&rcc->Per->Mco2pre, pre);
 }
 
 /// RCC Microcontroller clock output 2
