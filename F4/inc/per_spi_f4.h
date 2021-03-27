@@ -107,7 +107,7 @@ typedef struct
     per_bit_r1_t Txe; ///< Transmit buffer empty
     per_bit_r1_t Chside; ///< Channel side
     per_bit_r1_t Udr; ///< Underrun flag
-    per_bit_rc1_t Crcerr; ///< CRC error flag
+    per_bit_rc1_w0_t Crcerr; ///< CRC error flag
     per_bit_r1_t Modf; ///< Mode fault
     per_bit_r1_t Ovr; ///< Overrun flag
     per_bit_r1_t Bsy; ///< Busy flag
@@ -438,13 +438,13 @@ static per_inline bool per_spi_udr(const per_spi_t* const spi)
 /// SPI CRC error flag
 static per_inline bool per_spi_crcerr(const per_spi_t* const spi)
 {
-    return per_bit_rc1(&spi->Per->Crcerr);
+    return per_bit_rc1_w0(&spi->Per->Crcerr);
 }
 
 /// SPI clear CRC error flag
 static per_inline bool per_spi_rdclr_crcerr(const per_spi_t* const spi)
 {
-    return per_bit_rc1_rdclr(&spi->Per->Crcerr);
+    return per_bit_rc1_w0_rdclr(&spi->Per->Crcerr);
 }
 
 /// SPI Mode fault

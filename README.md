@@ -91,11 +91,11 @@ This set UE example results in a minimal number of assembly instructions because
 both functions are inlined and bitband is used. Both functions also make it
 type-safe and they enable features such as zero-cost error checking.
 
-## DEVELOPMENT STATUS (feb 2021)
-Status of peripheral code
-* 100% ADC, DMA, SPI, USART, GPIO, TIM_AD, TIM_GP, DES 
-* 50%  PWR, RCC, SYS_CFG
-* 10%  ETH
+## DEVELOPMENT STATUS (apr 2021)
+Supported peripherals
+* 100% ADC, DMA, SPI, USART, GPIO, TIM_AD, TIM_GP, DES, RCC, FLASH 
+* 50%  PWR, SYS_CFG
+* 20%  ETH
 
 Status generics
 * 100% BITBAND, LOGGING

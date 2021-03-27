@@ -66,8 +66,8 @@ typedef struct
     // power control register (PWR_CR)
     per_bit_rw1_t Lpds; ///< Low-power deepsleep
     per_bit_rw1_t Pdds; ///< Power-down deepsleep
-    per_bit_rc1_t Cwuf; ///< Clear wakeup flag
-    per_bit_rc1_t Csbf; ///< Clear standby flag
+    per_bit_rc1_w1_t Cwuf; ///< Clear wakeup flag
+    per_bit_rc1_w1_t Csbf; ///< Clear standby flag
     per_bit_rw1_t Pvde; ///< Power voltage detector enable
     per_bit_rw3_t Pls; ///< PVD level selection
     per_bit_rw1_t Dbp; ///< Disable backup domain write protection

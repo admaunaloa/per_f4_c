@@ -134,7 +134,7 @@ typedef struct
     {
         struct
         {
-            per_bit_rw1_t Mb; ///< MII busy. rc_w1
+            per_bit_rs1_t Mb; ///< MII busy
             per_bit_rw1_t Mw; ///< MII write
             per_bit_rw3_t Cr; ///< Clock range
             per_bit_n1_t MacmiiarBit5; ///< Reserved
@@ -511,13 +511,13 @@ static per_inline void per_eth_set_htl(const per_eth_t* const eth, uint_fast32_t
 /// ETH MII busy
 static per_inline bool per_eth_mb(const per_eth_t* const eth)
 {
-    return per_bit_rw1(&eth->Per->Mb);
+    return per_bit_rs1(&eth->Per->Mb);
 }
 
 /// ETH MII busy
-static per_inline void per_eth_set_mb(const per_eth_t* const eth, bool val)
+static per_inline void per_eth_set_mb(const per_eth_t* const eth)
 {
-    per_bit_rw1_set(&eth->Per->Mb, val);
+    per_bit_rs1(&eth->Per->Mb);
 }
 
 /// ETH MII write

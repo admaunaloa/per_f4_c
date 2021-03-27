@@ -153,11 +153,11 @@ typedef struct
             per_bit_r1_t Nf; ///< Noise detected flag
             per_bit_r1_t Ore; ///< Overrun error
             per_bit_r1_t Idle; ///< IDLE line detected
-            per_bit_rc1_t Rxne; ///< Read data register not empty
-            per_bit_rc1_t Tc; ///< Transmission complete
+            per_bit_rc1_w0_t Rxne; ///< Read data register not empty
+            per_bit_rc1_w0_t Tc; ///< Transmission complete
             per_bit_r1_t Txe; ///< Transmit data register empty
-            per_bit_rc1_t Lbd; ///< LIN break detection flag
-            per_bit_rc1_t Cts; ///< CTS flag
+            per_bit_rc1_w0_t Lbd; ///< LIN break detection flag
+            per_bit_rc1_w0_t Cts; ///< CTS flag
             per_bit_n22_t SrBit10; ///< Reserved
         };
         per_bit_rw16_reg_t Sr; ///< Status register
@@ -274,25 +274,25 @@ static per_inline bool per_usart_idle(const per_usart_t* const usart)
 /// USART Read data register not empty
 static per_inline bool per_usart_rxne(const per_usart_t* const usart)
 {
-    return per_bit_rc1(&usart->Per->Rxne);
+    return per_bit_rc1_w0(&usart->Per->Rxne);
 }
 
 /// USART Clear read data register not empty
 static per_inline bool per_usart_rdclr_rxne(const per_usart_t* const usart)
 {
-    return per_bit_rc1_rdclr(&usart->Per->Rxne);
+    return per_bit_rc1_w0_rdclr(&usart->Per->Rxne);
 }
 
 /// USART Transmission complete
 static per_inline bool per_usart_tc(const per_usart_t* const usart)
 {
-    return per_bit_rc1(&usart->Per->Tc);
+    return per_bit_rc1_w0(&usart->Per->Tc);
 }
 
 /// USART clear transmission complete
 static per_inline bool per_usart_rdclr_tc(const per_usart_t* const usart)
 {
-    return per_bit_rc1_rdclr(&usart->Per->Tc);
+    return per_bit_rc1_w0_rdclr(&usart->Per->Tc);
 }
 
 /// USART transmit data register empty
@@ -304,13 +304,13 @@ static per_inline bool per_usart_txe(const per_usart_t* const usart)
 /// USART LIN break detection flag
 static per_inline bool per_usart_lbd(const per_usart_t* const usart)
 {
-    return per_bit_rc1(&usart->Per->Lbd);
+    return per_bit_rc1_w0(&usart->Per->Lbd);
 }
 
 /// USART Clear LIN break detection flag
 static per_inline bool per_usart_rdclr_lbd(const per_usart_t* const usart)
 {
-    return per_bit_rc1_rdclr(&usart->Per->Lbd);
+    return per_bit_rc1_w0_rdclr(&usart->Per->Lbd);
 }
 
 /// USART CTS flag
@@ -321,7 +321,7 @@ static per_inline bool per_usart_cts(const per_usart_t* const usart)
         per_dep_err_unsupported();
     }
     
-    return per_bit_rc1(&usart->Per->Cts);
+    return per_bit_rc1_w0(&usart->Per->Cts);
 }
 
 /// USART Clear CTS flag
@@ -332,7 +332,7 @@ static per_inline bool per_usart_rdclr_cts(const per_usart_t* const usart)
         per_dep_err_unsupported();
     }
     
-    return per_bit_rc1_rdclr(&usart->Per->Cts);
+    return per_bit_rc1_w0_rdclr(&usart->Per->Cts);
 }
 
 /// USART Status register

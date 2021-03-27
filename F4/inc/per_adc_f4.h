@@ -231,12 +231,12 @@ typedef struct
 typedef struct
 {
     // status register (ADC_SR)
-    per_bit_rc1_t Awd; ///< Analog watchdog flag
-    per_bit_rc1_t Eoc; ///< Regular channel end of conversion
-    per_bit_rc1_t Jeoc; ///< Injected channel end of conversion
-    per_bit_rc1_t Jstrt; ///< Injected channel start flag
-    per_bit_rc1_t Strt; ///< Regular channel start flag
-    per_bit_rc1_t Ovr; ///< Overrun
+    per_bit_rc1_w0_t Awd; ///< Analog watchdog flag
+    per_bit_rc1_w0_t Eoc; ///< Regular channel end of conversion
+    per_bit_rc1_w0_t Jeoc; ///< Injected channel end of conversion
+    per_bit_rc1_w0_t Jstrt; ///< Injected channel start flag
+    per_bit_rc1_w0_t Strt; ///< Regular channel start flag
+    per_bit_rc1_w0_t Ovr; ///< Overrun
     per_bit_n26_t AdcsrBit6; ///< Reserved
 
     // control register 1 (ADC_CR1)
@@ -372,73 +372,73 @@ typedef struct
 /// ADC Analog watchdog flag
 static per_inline bool per_adc_awd(const per_adc_t* const adc)
 {
-    return per_bit_rc1(&adc->Per->Awd);
+    return per_bit_rc1_w0(&adc->Per->Awd);
 }
 
 /// ADC Analog watchdog flag
 static per_inline bool per_adc_rdclr_awd(const per_adc_t* const adc)
 {
-    return per_bit_rc1_rdclr(&adc->Per->Awd);
+    return per_bit_rc1_w0_rdclr(&adc->Per->Awd);
 }
 
 /// ADC Regular channel end of conversion
 static per_inline bool per_adc_eoc(const per_adc_t* const adc)
 {
-    return per_bit_rc1(&adc->Per->Eoc);
+    return per_bit_rc1_w0(&adc->Per->Eoc);
 }
 
 /// ADC Regular channel end of conversion
 static per_inline bool per_adc_rdclr_eoc(const per_adc_t* const adc)
 {
-    return per_bit_rc1_rdclr(&adc->Per->Eoc);
+    return per_bit_rc1_w0_rdclr(&adc->Per->Eoc);
 }
 
 /// ADC Injected channel end of conversion
 static per_inline bool per_adc_jeoc(const per_adc_t* const adc)
 {
-    return per_bit_rc1(&adc->Per->Jeoc);
+    return per_bit_rc1_w0(&adc->Per->Jeoc);
 }
 
 /// ADC Injected channel end of conversion
 static per_inline bool per_adc_rdclr_jeoc(const per_adc_t* const adc)
 {
-    return per_bit_rc1_rdclr(&adc->Per->Jeoc);
+    return per_bit_rc1_w0_rdclr(&adc->Per->Jeoc);
 }
 
 /// ADC Injected channel start flag
 static per_inline bool per_adc_jstrt(const per_adc_t* const adc)
 {
-    return per_bit_rc1(&adc->Per->Jstrt);
+    return per_bit_rc1_w0(&adc->Per->Jstrt);
 }
 
 /// ADC Injected channel start flag
 static per_inline bool per_adc_rdclr_jstrt(const per_adc_t* const adc)
 {
-    return per_bit_rc1_rdclr(&adc->Per->Jstrt);
+    return per_bit_rc1_w0_rdclr(&adc->Per->Jstrt);
 }
 
 /// ADC Regular channel start flag
 static per_inline bool per_adc_strt(const per_adc_t* const adc)
 {
-    return per_bit_rc1(&adc->Per->Strt);
+    return per_bit_rc1_w0(&adc->Per->Strt);
 }
 
 /// ADC Regular channel start flag
 static per_inline bool per_adc_rdclr_strt(const per_adc_t* const adc)
 {
-    return per_bit_rc1_rdclr(&adc->Per->Strt);
+    return per_bit_rc1_w0_rdclr(&adc->Per->Strt);
 }
 
 /// ADC Overrun
 static per_inline bool per_adc_ovr(const per_adc_t* const adc)
 {
-    return per_bit_rc1(&adc->Per->Ovr);
+    return per_bit_rc1_w0(&adc->Per->Ovr);
 }
 
 /// ADC Overrun
 static per_inline bool per_adc_rdclr_ovr(const per_adc_t* const adc)
 {
-    return per_bit_rc1_rdclr(&adc->Per->Ovr);
+    return per_bit_rc1_w0_rdclr(&adc->Per->Ovr);
 }
 
 /// ADC Analog watchdog channel select bits

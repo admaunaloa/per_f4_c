@@ -375,18 +375,18 @@ typedef struct
     {
         struct
         {
-            per_bit_rc1_t Uif; ///< Update interrupt flag
-            per_bit_rc1_t Cc1if; ///< Capture/Compare 1 interrupt flag
-            per_bit_rc1_t Cc2if; ///< Capture/Compare 2 interrupt flag
-            per_bit_rc1_t Cc3if; ///< Capture/Compare 3 interrupt flag
-            per_bit_rc1_t Cc4if; ///< Capture/Compare 4 interrupt flag
+            per_bit_rc1_w0_t Uif; ///< Update interrupt flag
+            per_bit_rc1_w0_t Cc1if; ///< Capture/Compare 1 interrupt flag
+            per_bit_rc1_w0_t Cc2if; ///< Capture/Compare 2 interrupt flag
+            per_bit_rc1_w0_t Cc3if; ///< Capture/Compare 3 interrupt flag
+            per_bit_rc1_w0_t Cc4if; ///< Capture/Compare 4 interrupt flag
             per_bit_n1_t Srbit5; ///< Reserved
-            per_bit_rc1_t Tif; ///< Trigger interrupt flag
+            per_bit_rc1_w0_t Tif; ///< Trigger interrupt flag
             per_bit_n2_t Srbit7; ///< Reserved
-            per_bit_rc1_t Cc1of; ///< Capture/Compare 1 overcapture flag
-            per_bit_rc1_t Cc2of; ///< Capture/Compare 2 overcapture flag
-            per_bit_rc1_t Cc3of; ///< Capture/Compare 3 overcapture flag
-            per_bit_rc1_t Cc4of; ///< Capture/Compare 4 overcapture flag
+            per_bit_rc1_w0_t Cc1of; ///< Capture/Compare 1 overcapture flag
+            per_bit_rc1_w0_t Cc2of; ///< Capture/Compare 2 overcapture flag
+            per_bit_rc1_w0_t Cc3of; ///< Capture/Compare 3 overcapture flag
+            per_bit_rc1_w0_t Cc4of; ///< Capture/Compare 4 overcapture flag
             per_bit_n19_t Srbit13; ///< Reserved
         };
         per_bit_rw16_reg_t Sr; ///< Status register
@@ -1113,25 +1113,25 @@ static per_inline void per_tim_gp_set_dier(const per_tim_gp_t* const tim, uint16
 /// TIM_GP Update interrupt flag
 static per_inline bool per_tim_gp_uif(const per_tim_gp_t* const tim)
 {
-    return per_bit_rc1(&tim->Per->Uif);
+    return per_bit_rc1_w0(&tim->Per->Uif);
 }
 
 /// TIM_GP Update interrupt flag
 static per_inline bool per_tim_gp_rdclr_uif(const per_tim_gp_t* const tim)
 {
-    return per_bit_rc1_rdclr(&tim->Per->Uif);
+    return per_bit_rc1_w0_rdclr(&tim->Per->Uif);
 }
 
 /// TIM_GP Capture/Compare 1 interrupt flag
 static per_inline bool per_tim_gp_cc1if(const per_tim_gp_t* const tim)
 {
-    return per_bit_rc1(&tim->Per->Cc1if);
+    return per_bit_rc1_w0(&tim->Per->Cc1if);
 }
 
 /// TIM_GP Capture/Compare 1 interrupt flag
 static per_inline bool per_tim_gp_rdclr_cc1if(const per_tim_gp_t* const tim)
 {
-    return per_bit_rc1_rdclr(&tim->Per->Cc1if);
+    return per_bit_rc1_w0_rdclr(&tim->Per->Cc1if);
 }
 
 /// TIM_GP Capture/Compare 2 interrupt flag
@@ -1142,7 +1142,7 @@ static per_inline bool per_tim_gp_cc2if(const per_tim_gp_t* const tim)
         per_dep_err_unsupported();
     }
 
-    return per_bit_rc1(&tim->Per->Cc2if);
+    return per_bit_rc1_w0(&tim->Per->Cc2if);
 }
 
 /// TIM_GP Capture/Compare 2 interrupt flag
@@ -1153,7 +1153,7 @@ static per_inline bool per_tim_gp_rdclr_cc2if(const per_tim_gp_t* const tim)
         per_dep_err_unsupported();
     }
 
-    return per_bit_rc1_rdclr(&tim->Per->Cc2if);
+    return per_bit_rc1_w0_rdclr(&tim->Per->Cc2if);
 }
 
 /// TIM_GP Capture/Compare 3 interrupt flag
@@ -1164,7 +1164,7 @@ static per_inline bool per_tim_gp_cc3if(const per_tim_gp_t* const tim)
         per_dep_err_unsupported();
     }
 
-    return per_bit_rc1(&tim->Per->Cc3if);
+    return per_bit_rc1_w0(&tim->Per->Cc3if);
 }
 
 /// TIM_GP Capture/Compare 3 interrupt flag
@@ -1175,7 +1175,7 @@ static per_inline bool per_tim_gp_rdclr_cc3if(const per_tim_gp_t* const tim)
         per_dep_err_unsupported();
     }
 
-    return per_bit_rc1_rdclr(&tim->Per->Cc3if);
+    return per_bit_rc1_w0_rdclr(&tim->Per->Cc3if);
 }
 
 /// TIM_GP Capture/Compare 4 interrupt flag
@@ -1186,7 +1186,7 @@ static per_inline bool per_tim_gp_cc4if(const per_tim_gp_t* const tim)
         per_dep_err_unsupported();
     }
 
-    return per_bit_rc1(&tim->Per->Cc4if);
+    return per_bit_rc1_w0(&tim->Per->Cc4if);
 }
 
 /// TIM_GP Capture/Compare 4 interrupt flag
@@ -1197,7 +1197,7 @@ static per_inline bool per_tim_gp_rdclr_cc4if(const per_tim_gp_t* const tim)
         per_dep_err_unsupported();
     }
 
-    return per_bit_rc1_rdclr(&tim->Per->Cc4if);
+    return per_bit_rc1_w0_rdclr(&tim->Per->Cc4if);
 }
 
 /// TIM_GP Trigger interrupt flag
@@ -1208,7 +1208,7 @@ static per_inline bool per_tim_gp_tif(const per_tim_gp_t* const tim)
         per_dep_err_unsupported();
     }
 
-    return per_bit_rc1(&tim->Per->Tif);
+    return per_bit_rc1_w0(&tim->Per->Tif);
 }
 
 /// TIM_GP Trigger interrupt flag
@@ -1219,19 +1219,19 @@ static per_inline bool per_tim_gp_rdclr_tif(const per_tim_gp_t* const tim)
         per_dep_err_unsupported();
     }
 
-    return per_bit_rc1_rdclr(&tim->Per->Tif);
+    return per_bit_rc1_w0_rdclr(&tim->Per->Tif);
 }
 
 /// TIM_GP Capture/Compare 1 overcapture flag
 static per_inline bool per_tim_gp_cc1of(const per_tim_gp_t* const tim)
 {
-    return per_bit_rc1(&tim->Per->Cc1of);
+    return per_bit_rc1_w0(&tim->Per->Cc1of);
 }
 
 /// TIM_GP Capture/Compare 1 overcapture flag
 static per_inline bool per_tim_gp_rdclr_cc1of(const per_tim_gp_t* const tim)
 {
-    return per_bit_rc1_rdclr(&tim->Per->Cc1of);
+    return per_bit_rc1_w0_rdclr(&tim->Per->Cc1of);
 }
 
 /// TIM_GP Capture/Compare 2 overcapture flag
@@ -1242,7 +1242,7 @@ static per_inline bool per_tim_gp_cc2of(const per_tim_gp_t* const tim)
         per_dep_err_unsupported();
     }
 
-    return per_bit_rc1(&tim->Per->Cc2of);
+    return per_bit_rc1_w0(&tim->Per->Cc2of);
 }
 
 /// TIM_GP Capture/Compare 2 overcapture flag
@@ -1253,7 +1253,7 @@ static per_inline bool per_tim_gp_rdclr_cc2of(const per_tim_gp_t* const tim)
         per_dep_err_unsupported();
     }
 
-    return per_bit_rc1_rdclr(&tim->Per->Cc2of);
+    return per_bit_rc1_w0_rdclr(&tim->Per->Cc2of);
 }
 
 /// TIM_GP Capture/Compare 3 overcapture flag
@@ -1264,7 +1264,7 @@ static per_inline bool per_tim_gp_cc3of(const per_tim_gp_t* const tim)
         per_dep_err_unsupported();
     }
 
-    return per_bit_rc1(&tim->Per->Cc3of);
+    return per_bit_rc1_w0(&tim->Per->Cc3of);
 }
 
 /// TIM_GP Capture/Compare 3 overcapture flag
@@ -1275,7 +1275,7 @@ static per_inline bool per_tim_gp_rdclr_cc3of(const per_tim_gp_t* const tim)
         per_dep_err_unsupported();
     }
 
-    return per_bit_rc1_rdclr(&tim->Per->Cc3of);
+    return per_bit_rc1_w0_rdclr(&tim->Per->Cc3of);
 }
 
 /// TIM_GP Capture/Compare 4 overcapture flag
@@ -1286,7 +1286,7 @@ static per_inline bool per_tim_gp_cc4of(const per_tim_gp_t* const tim)
         per_dep_err_unsupported();
     }
 
-    return per_bit_rc1(&tim->Per->Cc4of);
+    return per_bit_rc1_w0(&tim->Per->Cc4of);
 }
 
 /// TIM_GP Capture/Compare 4 overcapture flag
@@ -1297,7 +1297,7 @@ static per_inline bool per_tim_gp_rdclr_cc4of(const per_tim_gp_t* const tim)
         per_dep_err_unsupported();
     }
 
-    return per_bit_rc1_rdclr(&tim->Per->Cc4of);
+    return per_bit_rc1_w0_rdclr(&tim->Per->Cc4of);
 }
 
 /// TIM_AD Status register

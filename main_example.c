@@ -1,7 +1,7 @@
 /**
- * @file per_flash.h
+ * @file main_example.c
  *
- * This file contains the flash interface (FLASH)
+ * This file contains an example of a minimal main program
  *
  * Copyright (c) 2021 admaunaloa admaunaloa@gmail.com
  *
@@ -24,34 +24,22 @@
  * SOFTWARE.
  */
 
-#ifndef per_flash_h_
-#define per_flash_h_
+#include "bsp_flash.h"
+#include "bsp_gpio.h"
+#include "bsp_rcc.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#include "per_flash_f4.h"
-
-/// FLASH base address
-#define PER_FLASH (PER_ADDR_AHB1 + (uintptr_t)0x3C00)
-
-/// FLASH pointer to interface
-static per_inline const per_flash_t* per_flash(void)
+/// Application entry
+int main(void)
 {
-    static const per_flash_t flash =
-    {
-        .Per = (per_flash_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_FLASH),
-        .Err = PER_LOG_FLASH,
-        .LatencySize = PER_FLASH_LATENCY_SIZE_4,
-        .Banks = 2,
-        .PropProt = true,
-    };
-    return &flash;
-}
+  bsp_flash_init();
+  bsp_rcc_init();
+  bsp_gpio_init();
 
-#ifdef __cplusplus
-}
-#endif
+  /// Loop
+  while (1)
+  {
+    bool button = per_gpio_in(bsp_user_button_1());
 
-#endif // per_flash_h_
+    per_gpio_set_out(bsp_gpio_led_green(), button);
+  }
+}

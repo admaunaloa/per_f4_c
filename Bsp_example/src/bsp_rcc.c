@@ -39,9 +39,9 @@ void bsp_rcc_init(void)
     per_rcc_set_pllq(rcc, 7);      // 336M / 7 = 48M
 
     /// CFGR
-    per_rcc_set_hpre(rcc, 1);
-    per_rcc_set_ppre1(rcc, 4);
-    per_rcc_set_ppre2(rcc, 4);
+    per_rcc_set_hpre(rcc, 1);      // 168M / 1 = 168M
+    per_rcc_set_ppre1(rcc, 4);     // 168M / 4 = 42M
+    per_rcc_set_ppre2(rcc, 4);     // 168M / 4 = 42M
     per_rcc_set_sw(rcc, PER_RCC_SW_PLL);
 
     /// CR
