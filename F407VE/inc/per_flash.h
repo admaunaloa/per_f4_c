@@ -44,6 +44,8 @@ static per_inline const per_flash_t* per_flash(void)
         .Per = (per_flash_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_FLASH),
         .Err = PER_LOG_FLASH,
         .LatencySize = PER_FLASH_LATENCY_SIZE_3,
+        .Banks = 1,
+        .PropProt = false,
     };
     return &flash;
 }

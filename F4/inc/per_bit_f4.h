@@ -129,28 +129,73 @@ static per_inline uint_fast8_t per_bit_rw1_shift(per_bit_rw1_t* self)
 {
     return PER_BIT_SHIFT(self);
 }
+/// Peripheral Read-set bit
+typedef struct
+{
+    per_bit_bitband_t Rs; ///< One read set bit
+} per_bit_rs1_t;
 
-/// Peripheral Read-clear bit
+/// One read and set bit get
+static per_inline bool per_bit_rs1(const per_bit_rs1_t* self)
+{
+    return self->Rs.Bit8 != PER_BIT_0;
+}
+
+/// One read and set bit set
+/// Set by writing one
+static per_inline void per_bit_rs1_set(per_bit_rs1_t* self)
+{
+    self->Rs.Bit8 = PER_BIT_1;
+}
+
+/// Peripheral Read-clear 0 bit
 typedef struct
 {
     per_bit_bitband_t Rc; ///< One read clear bit
-} per_bit_rc1_t;
+} per_bit_rc1_w0_t;
 
 /// One read and clear bit get
-static per_inline bool per_bit_rc1(const per_bit_rc1_t* self)
+static per_inline bool per_bit_rc1_w0(const per_bit_rc1_w0_t* self)
 {
     return self->Rc.Bit8 != PER_BIT_0;
 }
 
 /// One read and clear bit read and clear
+/// Cleared by writing zero
 /// Only if the bit was set it is cleared, safe, no misses
 /// Register way handling because bitband is not safe in this specific case
-static per_inline bool per_bit_rc1_rdclr(per_bit_rc1_t* self)
+static per_inline bool per_bit_rc1_w0_rdclr(per_bit_rc1_w0_t* self)
 {
     volatile uint32_t* const reg = &PER_BIT_BIT_BAND_TO_REG(self)->Reg32; // Register pointer
     uint32_t val = *reg & PER_BIT_REG_MASK_BIT(self); // Mask current value
 
     *reg = ~val; // Only write, clear only one bit if it was set
+
+    return val != 0;
+}
+
+/// Peripheral flash Read-clear 1 bit
+typedef struct
+{
+    per_bit_bitband_t Rc; ///< One read clear bit
+} per_bit_rc1_w1_t;
+
+/// FLASH One read and clear bit get
+static per_inline bool per_bit_rc1_w1(const per_bit_rc1_w1_t* self)
+{
+    return self->Rc.Bit8 != PER_BIT_0;
+}
+
+/// One read and clear bit read and clear
+/// Cleared by writing one
+/// Only if the bit was set it is cleared, safe, no misses
+/// Register way handling because bitband is not safe in this specific case
+static per_inline bool per_bit_rc1_w1_rdclr(per_bit_rc1_w1_t* self)
+{
+    volatile uint32_t* const reg = &PER_BIT_BIT_BAND_TO_REG(self)->Reg32; // Register pointer
+    uint32_t val = *reg & PER_BIT_REG_MASK_BIT(self); // Mask current value
+
+    *reg = val; // Only write, clear only one bit if it was set
 
     return val != 0;
 }

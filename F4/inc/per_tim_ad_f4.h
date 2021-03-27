@@ -349,19 +349,19 @@ typedef struct
     {
         struct
         {
-            per_bit_rc1_t Uif; ///< Update interrupt flag
-            per_bit_rc1_t Cc1if; ///< Capture/Compare 1 interrupt flag
-            per_bit_rc1_t Cc2if; ///< Capture/Compare 2 interrupt flag
-            per_bit_rc1_t Cc3if; ///< Capture/Compare 3 interrupt flag
-            per_bit_rc1_t Cc4if; ///< Capture/Compare 4 interrupt flag
-            per_bit_rc1_t Comif; ///< COM interrupt flag
-            per_bit_rc1_t Tif; ///< Trigger interrupt flag
-            per_bit_rc1_t Bif; ///< Break interrupt flag
+            per_bit_rc1_w0_t Uif; ///< Update interrupt flag
+            per_bit_rc1_w0_t Cc1if; ///< Capture/Compare 1 interrupt flag
+            per_bit_rc1_w0_t Cc2if; ///< Capture/Compare 2 interrupt flag
+            per_bit_rc1_w0_t Cc3if; ///< Capture/Compare 3 interrupt flag
+            per_bit_rc1_w0_t Cc4if; ///< Capture/Compare 4 interrupt flag
+            per_bit_rc1_w0_t Comif; ///< COM interrupt flag
+            per_bit_rc1_w0_t Tif; ///< Trigger interrupt flag
+            per_bit_rc1_w0_t Bif; ///< Break interrupt flag
             per_bit_n1_t Srbit8; ///< Reserved
-            per_bit_rc1_t Cc1of; ///< Capture/Compare 1 overcapture flag
-            per_bit_rc1_t Cc2of; ///< Capture/Compare 2 overcapture flag
-            per_bit_rc1_t Cc3of; ///< Capture/Compare 3 overcapture flag
-            per_bit_rc1_t Cc4of; ///< Capture/Compare 4 overcapture flag
+            per_bit_rc1_w0_t Cc1of; ///< Capture/Compare 1 overcapture flag
+            per_bit_rc1_w0_t Cc2of; ///< Capture/Compare 2 overcapture flag
+            per_bit_rc1_w0_t Cc3of; ///< Capture/Compare 3 overcapture flag
+            per_bit_rc1_w0_t Cc4of; ///< Capture/Compare 4 overcapture flag
             per_bit_n19_t Srbit13; ///< Reserved
         };
         per_bit_rw16_reg_t Sr; ///< Status register
@@ -979,145 +979,145 @@ static per_inline void per_tim_ad_set_dier(const per_tim_ad_t* const tim, uint16
 /// TIM_AD Update interrupt flag
 static per_inline bool per_tim_ad_uif(const per_tim_ad_t* const tim)
 {
-    return per_bit_rc1(&tim->Per->Uif);
+    return per_bit_rc1_w0(&tim->Per->Uif);
 }
 
 /// TIM_AD Update interrupt flag
 static per_inline bool per_tim_ad_rdclr_uif(const per_tim_ad_t* const tim)
 {
-    return per_bit_rc1_rdclr(&tim->Per->Uif);
+    return per_bit_rc1_w0_rdclr(&tim->Per->Uif);
 }
 
 /// TIM_AD Capture/Compare 1 interrupt flag
 static per_inline bool per_tim_ad_cc1if(const per_tim_ad_t* const tim)
 {
-    return per_bit_rc1(&tim->Per->Cc1if);
+    return per_bit_rc1_w0(&tim->Per->Cc1if);
 }
 
 /// TIM_AD Capture/Compare 1 interrupt flag
 static per_inline bool per_tim_ad_rdclr_cc1if(const per_tim_ad_t* const tim)
 {
-    return per_bit_rc1_rdclr(&tim->Per->Cc1if);
+    return per_bit_rc1_w0_rdclr(&tim->Per->Cc1if);
 }
 
 /// TIM_AD Capture/Compare 2 interrupt flag
 static per_inline bool per_tim_ad_cc2if(const per_tim_ad_t* const tim)
 {
-    return per_bit_rc1(&tim->Per->Cc2if);
+    return per_bit_rc1_w0(&tim->Per->Cc2if);
 }
 
 /// TIM_AD Capture/Compare 2 interrupt flag
 static per_inline bool per_tim_ad_rdclr_cc2if(const per_tim_ad_t* const tim)
 {
-    return per_bit_rc1_rdclr(&tim->Per->Cc2if);
+    return per_bit_rc1_w0_rdclr(&tim->Per->Cc2if);
 }
 
 /// TIM_AD Capture/Compare 3 interrupt flag
 static per_inline bool per_tim_ad_cc3if(const per_tim_ad_t* const tim)
 {
-    return per_bit_rc1(&tim->Per->Cc3if);
+    return per_bit_rc1_w0(&tim->Per->Cc3if);
 }
 
 /// TIM_AD Capture/Compare 3 interrupt flag
 static per_inline bool per_tim_ad_rdclr_cc3if(const per_tim_ad_t* const tim)
 {
-    return per_bit_rc1_rdclr(&tim->Per->Cc3if);
+    return per_bit_rc1_w0_rdclr(&tim->Per->Cc3if);
 }
 
 /// TIM_AD Capture/Compare 4 interrupt flag
 static per_inline bool per_tim_ad_cc4if(const per_tim_ad_t* const tim)
 {
-    return per_bit_rc1(&tim->Per->Cc4if);
+    return per_bit_rc1_w0(&tim->Per->Cc4if);
 }
 
 /// TIM_AD Capture/Compare 4 interrupt flag
 static per_inline bool per_tim_ad_rdclr_cc4if(const per_tim_ad_t* const tim)
 {
-    return per_bit_rc1_rdclr(&tim->Per->Cc4if);
+    return per_bit_rc1_w0_rdclr(&tim->Per->Cc4if);
 }
 
 /// TIM_AD COM interrupt flag
 static per_inline bool per_tim_ad_comif(const per_tim_ad_t* const tim)
 {
-    return per_bit_rc1(&tim->Per->Comif);
+    return per_bit_rc1_w0(&tim->Per->Comif);
 }
 
 /// TIM_AD COM interrupt flag
 static per_inline bool per_tim_ad_rdclr_comif(const per_tim_ad_t* const tim)
 {
-    return per_bit_rc1_rdclr(&tim->Per->Comif);
+    return per_bit_rc1_w0_rdclr(&tim->Per->Comif);
 }
 
 /// TIM_AD Trigger interrupt flag
 static per_inline bool per_tim_ad_tif(const per_tim_ad_t* const tim)
 {
-    return per_bit_rc1(&tim->Per->Tif);
+    return per_bit_rc1_w0(&tim->Per->Tif);
 }
 
 /// TIM_AD Trigger interrupt flag
 static per_inline bool per_tim_ad_rdclr_tif(const per_tim_ad_t* const tim)
 {
-    return per_bit_rc1_rdclr(&tim->Per->Tif);
+    return per_bit_rc1_w0_rdclr(&tim->Per->Tif);
 }
 
 /// TIM_AD Break interrupt flag
 static per_inline bool per_tim_ad_bif(const per_tim_ad_t* const tim)
 {
-    return per_bit_rc1(&tim->Per->Bif);
+    return per_bit_rc1_w0(&tim->Per->Bif);
 }
 
 /// TIM_AD Break interrupt flag
 static per_inline bool per_tim_ad_rdclr_bif(const per_tim_ad_t* const tim)
 {
-    return per_bit_rc1_rdclr(&tim->Per->Bif);
+    return per_bit_rc1_w0_rdclr(&tim->Per->Bif);
 }
 
 /// TIM_AD Capture/Compare 1 overcapture flag
 static per_inline bool per_tim_ad_cc1of(const per_tim_ad_t* const tim)
 {
-    return per_bit_rc1(&tim->Per->Cc1of);
+    return per_bit_rc1_w0(&tim->Per->Cc1of);
 }
 
 /// TIM_AD Capture/Compare 1 overcapture flag
 static per_inline bool per_tim_ad_rdclr_cc1of(const per_tim_ad_t* const tim)
 {
-    return per_bit_rc1_rdclr(&tim->Per->Cc1of);
+    return per_bit_rc1_w0_rdclr(&tim->Per->Cc1of);
 }
 
 /// TIM_AD Capture/Compare 2 overcapture flag
 static per_inline bool per_tim_ad_cc2of(const per_tim_ad_t* const tim)
 {
-    return per_bit_rc1(&tim->Per->Cc2of);
+    return per_bit_rc1_w0(&tim->Per->Cc2of);
 }
 
 /// TIM_AD Capture/Compare 2 overcapture flag
 static per_inline bool per_tim_ad_rdclr_cc2of(const per_tim_ad_t* const tim)
 {
-    return per_bit_rc1_rdclr(&tim->Per->Cc2of);
+    return per_bit_rc1_w0_rdclr(&tim->Per->Cc2of);
 }
 
 /// TIM_AD Capture/Compare 3 overcapture flag
 static per_inline bool per_tim_ad_cc3of(const per_tim_ad_t* const tim)
 {
-    return per_bit_rc1(&tim->Per->Cc3of);
+    return per_bit_rc1_w0(&tim->Per->Cc3of);
 }
 
 /// TIM_AD Capture/Compare 3 overcapture flag
 static per_inline bool per_tim_ad_rdclr_cc3of(const per_tim_ad_t* const tim)
 {
-    return per_bit_rc1_rdclr(&tim->Per->Cc3of);
+    return per_bit_rc1_w0_rdclr(&tim->Per->Cc3of);
 }
 
 /// TIM_AD Capture/Compare 4 overcapture flag
 static per_inline bool per_tim_ad_cc4of(const per_tim_ad_t* const tim)
 {
-    return per_bit_rc1(&tim->Per->Cc4of);
+    return per_bit_rc1_w0(&tim->Per->Cc4of);
 }
 
 /// TIM_AD Capture/Compare 4 overcapture flag
 static per_inline bool per_tim_ad_rdclr_cc4of(const per_tim_ad_t* const tim)
 {
-    return per_bit_rc1_rdclr(&tim->Per->Cc4of);
+    return per_bit_rc1_w0_rdclr(&tim->Per->Cc4of);
 }
 
 /// TIM_AD Status register
