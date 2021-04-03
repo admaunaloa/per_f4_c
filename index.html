@@ -1,8 +1,9 @@
 <html>
   <head>
-   <meta name="google-site-verification" content="LRh-NOnBtxH0oF4fEHKJDm8nBBLzDV1U09QCOvJf4uA" />
-   <meta name="keywords" content="STM32, HAL, peripheral, bitband, bit-band, C, alternative, safe, fast, small, speed, F3, F4, STM32F3, STM32F4, consistent, footprint, performance" />
-   <style> body {font-family: verdana;} code {font-size: large;}</style>
+    <meta charset="utf-8"/>
+    <meta name="google-site-verification" content="LRh-NOnBtxH0oF4fEHKJDm8nBBLzDV1U09QCOvJf4uA" />
+    <meta name="keywords" content="STM32, HAL, peripheral, bitband, bit-band, C, alternative, safe, fast, small, speed, F3, F4, STM32F3, STM32F4, consistent, footprint, performance" />
+    <style> body {font-family: verdana;} code {font-size: large;}</style>
   </head>
   <body>
   
@@ -21,37 +22,45 @@ Bitband technology is used extensively and implicit.<br>
 This library gives existing bare-metal projects a performance boost, it unleashes the full power of the peripherals hardware.<br></p>
 <p><a href="https://github.com/admaunaloa/per_f4_c" rel="nofollow">REPOSITORY</a></p>
 
-<h3><a id="user-content-bitband" class="anchor" aria-hidden="true" href="#bitband"></a>Bitband</h3>
+<h3>Bitband</h3>
 <p>This technique is excellently explained by: <a href="http://www.martinhubacek.cz/arm/advanced-arm-cortex-tips/bit-banding---fast-and-safe-bit-manipulation" rel="nofollow">Martin Hubacek</a></p>
-<h2><a id="user-content-usage" class="anchor" aria-hidden="true" href="#usage"></a>USAGE</h2>
+<h2>USAGE</h2>
 <p>Three examples. The first two GPIO get and set, the third is an interrupt handler.</p>
-<h3><a id="user-content-gpio-get" class="anchor" aria-hidden="true" href="#gpio-get"></a>GPIO GET</h3>
-<div class="highlight highlight-source-c++"><pre>    #<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>per_gpio.h<span class="pl-pds">"</span></span>
+<h3>GPIO GET</h3>
+<pre>
+    #include "per_gpio.h"
    
-    #<span class="pl-k">define</span> <span class="pl-en">bsp_user_button_1</span>() (&amp;PER_GPIOC-&gt;Idr[PER_GPIO_PIN_13])
+    #define bsp_user_button_1() (&PER_GPIOC->Idr[PER_GPIO_PIN_13])
 
-    <span class="pl-c"><span class="pl-c">//</span> Get status of the button input</span>
-    <span class="pl-k">bool</span> button_state = per_gpio_in(bsp_user_button_1());</pre></div>
-<h3><a id="user-content-gpio-set" class="anchor" aria-hidden="true" href="#gpio-set"></a>GPIO SET</h3>
-<div class="highlight highlight-source-c++"><pre>    #<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>per_gpio.h<span class="pl-pds">"</span></span>
+    // Get status of the button input
+    bool button_state = per_gpio_in(bsp_user_button_1());
+</pre>
+<h3>GPIO SET</h3>
+<pre>
+    #include "per_gpio.h"
    
-    #<span class="pl-k">define</span> <span class="pl-en">bsp_gpio_led_green</span>() (&amp;PER_GPIOB-&gt;Odr[PER_GPIO_PIN_0])
+    #define bsp_gpio_led_green() (&PER_GPIOB->Odr[PER_GPIO_PIN_0])
 
-    <span class="pl-c"><span class="pl-c">//</span> Enable the green LED</span>
-    <span class="pl-en">per_gpio_set_out</span>(bsp_gpio_led_green(), true);</pre></div>
-<h3><a id="user-content-irq" class="anchor" aria-hidden="true" href="#irq"></a>IRQ</h3>
-<div class="highlight highlight-source-c++"><pre>    #<span class="pl-k">include</span> <span class="pl-s"><span class="pl-pds">"</span>per_tim_gp.h<span class="pl-pds">"</span></span>
+    // Enable the green LED
+    per_gpio_set_out(bsp_gpio_led_green(), true);
+</pre>
+<h3>TIM3_IRQHandler</h3>
+<pre>
+    #include "per_tim_gp.h"
 
-    <span class="pl-k">void</span> <span class="pl-en">TIM3_IRQHandler</span>(<span class="pl-k">void</span>)
+    void TIM3_IRQHandler(void)
     {
-        <span class="pl-c"><span class="pl-c">//</span> Read and clear the Timer _ GeneralPurpose _ Update Interrupt Flag	</span>
-        <span class="pl-k">if</span> (<span class="pl-c1">per_tim_gp_rdclr_uif</span>(<span class="pl-c1">per_tim_gp_3</span>()))
+        // Read and clear the Timer _ GeneralPurpose _ Update Interrupt Flag	
+        if (per_tim_gp_rdclr_uif(per_tim_gp_3()))
         {
-            <span class="pl-c"><span class="pl-c">//</span> user code to handle interrupt reason</span>
-            <span class="pl-c"><span class="pl-c">//</span> ...</span>
+            // user code to handle interrupt reason
+            // ...
         }
-    }</pre></div>
-<h3><a id="user-content-try-it-out" class="anchor" aria-hidden="true" href="#try-it-out"></a>TRY IT OUT</h3>
+    }
+</pre>
+
+<h3>TRY IT OUT</h3>
+The F439ZI from the example is usable for <u>all</u> F4.. types.
 <ol>
 <li>Copy the libraries F4, F439ZI and Bsp_example in an existing project, F439ZI supports most other types too,</li>
 <li>Add the directories F4/inc F439ZI/inc and Bsp_example  to the include directories of the project/makefile.</li>
@@ -60,7 +69,7 @@ This library gives existing bare-metal projects a performance boost, it unleashe
 <li>Compile</li>
 <li>Test</li>
 </ol>
-<h2><a id="user-content-syntax" class="anchor" aria-hidden="true" href="#syntax"></a>SYNTAX</h2>
+<h2>SYNTAX</h2>
 <p>For each peripheral bit the possible get and set functions are provided.
 The syntax is</p>
 <ol>
@@ -70,18 +79,24 @@ The syntax is</p>
 <li><strong>(...)</strong>     Function</li>
 </ol>
 <p>Example:</p>
-<div class="highlight highlight-source-c++"><pre>    <span class="pl-k">bool</span> <span class="pl-en">per_usart_ue</span>(<span class="pl-c1">per_usart_t</span>* )           <span class="pl-c"><span class="pl-c">//</span> returns the value of the Usart Enable bit.</span>
-    void per_usart_set_ue(<span class="pl-c1">per_usart_t</span>* , <span class="pl-k">bool</span>) <span class="pl-c"><span class="pl-c">//</span> modifies the value of Usart Enable bit.</span></pre></div>
+<pre>
+    bool per_usart_ue(per_usart_t* )           // returns the value of the Usart Enable bit.
+    void per_usart_set_ue(per_usart_t* , bool) // modifies the value of Usart Enable bit.
+</pre>
 <p>The per_usart_t pointers are provided in a function format</p>
-<div class="highlight highlight-source-c++"><pre>    <span class="pl-c1">per_usart_t</span>* <span class="pl-en">per_usart_1</span>(<span class="pl-k">void</span>)
-    per_usart_t* per_usart_2(<span class="pl-k">void</span>)
-	...  </pre></div>
+<pre>
+    per_usart_t* per_usart_1(void)
+    per_usart_t* per_usart_2(void)
+	...  
+</pre>
 <p>Enabling USART3 comes down to:</p>
-<div class="highlight highlight-source-c++"><pre>    <span class="pl-en">per_usart_set_ue</span>(per_usart_3(), true);  </pre></div>
+<pre>
+    per_usart_set_ue(per_usart_3(), true);  
+</pre>
 <p>This set UE example results in a minimal number of assembly instructions because
 both functions are inlined and bitband is used. Both functions also make it
 type-safe and they enable features such as zero-cost error checking.</p>
-<h2><a id="user-content-development-status-apr-2021" class="anchor" aria-hidden="true" href="#development-status-apr-2021"></a>DEVELOPMENT STATUS (apr 2021)</h2>
+<h2>DEVELOPMENT STATUS (apr 2021)</h2>
 <p>Supported peripherals</p>
 <ul>
 <li>100% ADC, DMA, SPI, USART, GPIO, TIM_AD, TIM_GP, DES, RCC, FLASH</li>
@@ -92,23 +107,25 @@ type-safe and they enable features such as zero-cost error checking.</p>
 <ul>
 <li>100% BITBAND, LOGGING</li>
 </ul>
-<h2><a id="user-content-structure" class="anchor" aria-hidden="true" href="#structure"></a>STRUCTURE</h2>
+<h2>STRUCTURE</h2>
 <p>The library consists the following layers:</p>
-<h3><a id="user-content-generic-type-definitions" class="anchor" aria-hidden="true" href="#generic-type-definitions"></a>generic type definitions</h3>
+<h3>generic type definitions</h3>
 <p>In per_bit_f4.h generic field types are provided. The types are available per access rule and per bit size.
 For example per_bit_rw1_t is a 1 bit size read and write peripheral field.</p>
-<h3><a id="user-content-generic-functions-for-each-generic-type" class="anchor" aria-hidden="true" href="#generic-functions-for-each-generic-type"></a>generic functions for each generic type</h3>
+<h3>generic functions for each generic type</h3>
 <p>In per_bit_f4.h generic functions are provided. Each function accesses one specific field type.
 For example per_bit_rw1_set(..., ...) sets one specific bit.</p>
-<h3><a id="user-content-peripheral-specific-structure" class="anchor" aria-hidden="true" href="#peripheral-specific-structure"></a>peripheral specific structure</h3>
+<h3>peripheral specific structure</h3>
 <p>Each peripheral has a specific structure defining all the internal fields with size, type and position. It is assembled from the generic types.
 per_usart_f4.h shows an example of this.</p>
-<div class="highlight highlight-source-c++"><pre>    <span class="pl-k">typedef</span> <span class="pl-k">struct</span>
+<pre>
+    typedef struct
     {
-        <span class="pl-c1">per_bit_rw1_t</span> Ue; <span class="pl-c"><span class="pl-c">//</span>/&lt; USART enable</span>
-        <span class="pl-c1">per_bit_rw2_t</span> Stop; <span class="pl-c"><span class="pl-c">//</span>/&lt; STOP bits</span>
-        <span class="pl-c1">per_bit_rw8_t</span> Psc; <span class="pl-c"><span class="pl-c">//</span>/&lt; Pre-scaler value</span>
-    } <span class="pl-c1">per_usart_per_t</span>;	</pre></div>
+        per_bit_rw1_t Ue; ///< USART enable
+        per_bit_rw2_t Stop; ///< STOP bits
+        per_bit_rw8_t Psc; ///< Pre-scaler value
+    } per_usart_per_t;	
+</pre>
 <p>Each single line defines six properties of the specific peripheral field for the compiler.</p>
 <ul>
 <li>The type <strong>per_bit_rw1_t</strong> provides both the bit size and the access rules.</li>
@@ -117,22 +134,24 @@ per_usart_f4.h shows an example of this.</p>
 </ul>
 <p>Compare this with alternatives that require calculations with magic numbers and global scoped names.
 These first three layers are very powerfull and they allow to define a complete new peripheral with minimal errors and in minimal time.</p>
-<h3><a id="user-content-peripheral-field-specific-functions" class="anchor" aria-hidden="true" href="#peripheral-field-specific-functions"></a>peripheral field specific functions</h3>
+<h3>peripheral field specific functions</h3>
 <p>Each peripheral field has specific functions to access this field.<br>
 If relevant an enum is provided to interpret the value of the field correctly.
 per_usart_f4.h shows examples of this.</p>
-<div class="highlight highlight-source-c++"><pre>    <span class="pl-c"><span class="pl-c">//</span>/ USART enable get</span>
-    <span class="pl-k">static</span> per_inline <span class="pl-k">bool</span> <span class="pl-en">per_usart_ue</span>(<span class="pl-k">const</span> <span class="pl-c1">per_usart_t</span>* <span class="pl-k">const</span> usart)
+<pre>
+    /// USART enable get
+    static per_inline bool per_usart_ue(const per_usart_t* const usart)
     {
-        <span class="pl-k">return</span> <span class="pl-c1">per_bit_rw1</span>(&amp;usart-&gt;<span class="pl-smi">Per</span>-&gt;<span class="pl-smi">Ue</span>);
+        return per_bit_rw1(&usart->Per->Ue);
     }
 
-    <span class="pl-c"><span class="pl-c">//</span>/ USART enable set</span>
-    <span class="pl-k">static</span> per_inline <span class="pl-k">void</span> <span class="pl-en">per_usart_set_ue</span>(<span class="pl-k">const</span> <span class="pl-c1">per_usart_t</span>* <span class="pl-k">const</span> usart, <span class="pl-k">bool</span> val)
+    /// USART enable set
+    static per_inline void per_usart_set_ue(const per_usart_t* const usart, bool val)
     {
-        <span class="pl-c1">per_bit_rw1_set</span>(&amp;usart-&gt;<span class="pl-smi">Per</span>-&gt;<span class="pl-smi">Ue</span>, val);
-    }</pre></div>
-<h3><a id="user-content-peripheral-variants" class="anchor" aria-hidden="true" href="#peripheral-variants"></a>peripheral variants</h3>
+        per_bit_rw1_set(&usart->Per->Ue, val);
+    }
+</pre>
+<h3>peripheral variants</h3>
 <p>Peripherals have variations that are handled by include files in the F4xxx/inc directory.
 Variants are for example the UART and USART. also the F407 has six UART/USARTS while the F439 has eight of these.
 These variants are handled with a descriptor structure for each specific peripheral.<br>
@@ -145,33 +164,35 @@ This descriptor structure contains</p>
 </ul>
 <p>The prevention of functions accessing non-suporting peripheral variants is done with a zero-cost check.
 If the variant is correct the compiler will optimise it out, if(0), if the variant is wrong, if(1) the linker will report this non existing function.</p>
-<div class="highlight highlight-source-c++"><pre>    <span class="pl-k">if</span> (usart-&gt;Uart)
+<pre>
+    if (usart->Uart)
     {
-        <span class="pl-c1">per_log_err_function_not_supported</span>();
-    }</pre></div>
+        per_log_err_function_not_supported();
+    }
+</pre>
 <p>An example is F439/inc/per_usart.h.</p>
-<h3><a id="user-content-peripheral-descriptor-functions" class="anchor" aria-hidden="true" href="#peripheral-descriptor-functions"></a>peripheral descriptor functions</h3>
+<h3>peripheral descriptor functions</h3>
 <p>Access to the peripheral descriptors is done via functions that return this descriptor.<br>
 This function interface is consistent for all peripherals and it is future proof, for simple GPIO it is implemented as a define, for complex peripherals it is implemented as a function.
 For example <strong>per_usart_1()</strong>.</p>
-<h2><a id="user-content-inline" class="anchor" aria-hidden="true" href="#inline"></a>inline</h2>
+<h2>inline</h2>
 <p>All the layers are provided in header files and inline functions. This allows the compiler to resolve all constants and optimise this all to a minimum size executable with fast execution times.
 The use of inline functions makes the API consistent and type safe.</p>
-<h2><a id="user-content-debug-logging" class="anchor" aria-hidden="true" href="#debug-logging"></a>debug logging</h2>
+<h2>debug logging</h2>
 <p>Runtime debug logging is provided in bsp_dep.c. This file contains a call-back function that is called from the per_... files in case of a runtime fault.
 A default log implementation captures this errors. It is up to the user to adapt and extend this file.</p>
-<h2><a id="user-content-dependencies" class="anchor" aria-hidden="true" href="#dependencies"></a>dependencies</h2>
+<h2>dependencies</h2>
 <p>There are only a few external dependencies. All dependencies are accessed and wrapped via the per_dep.* and bsp_dep.* files.<br>
 These files allow the user to adapt the library to other development enviroments.</p>
-<h2><a id="user-content-exceptions" class="anchor" aria-hidden="true" href="#exceptions"></a>exceptions</h2>
+<h2>exceptions</h2>
 <p>There are a few hardware peripheral registers that are better accessed by register instead of bitband.
 The specific functions for this register handle this implicitly. Examples of this are TIMx_SR and USARTx_DR</p>
-<h2><a id="user-content-compilation" class="anchor" aria-hidden="true" href="#compilation"></a>compilation</h2>
+<h2>compilation</h2>
 <p>The library can coexist with other HAL libraries. Just add the directories to the project.
 Note: the F439ZI is also good for other F4 types, it provides all possible peripherals.
 Add the include libraries: F4/inc, F439ZI/inc, Nucleo/inc
 If required, compile the files: per_bit.c, per_gpio.c, per_dep.c and bsp_dep.c</p>
-<h2><a id="user-content-the-end" class="anchor" aria-hidden="true" href="#the-end"></a>THE END</h2>
+<h2>THE END</h2>
 <p>If you have any tips, remarks, questions or suggestions please send an email.<br>
 Developing more efficient software can decrease energy consumption, decrease carbon footprint and help our planet :-)</p>
 
