@@ -34,14 +34,14 @@ extern "C" {
 #include "per_flash_f4.h"
 
 /// FLASH base address
-#define PER_FLASH (PER_ADDR_AHB1 + (uintptr_t)0x3C00)
+#define PER_FLASH ((per_flash_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_AHB1 + (uintptr_t)0x3C00))
 
 /// FLASH pointer to interface
 static per_inline const per_flash_t* per_flash(void)
 {
     static const per_flash_t flash =
     {
-        .Per = (per_flash_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_FLASH),
+        .Per = PER_FLASH,
         .Err = PER_LOG_FLASH,
         .LatencySize = PER_FLASH_LATENCY_SIZE_3,
         .Banks = 1,

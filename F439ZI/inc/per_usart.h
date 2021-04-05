@@ -35,35 +35,35 @@ extern "C" {
 #include "per_rcc.h"
 
 /// USART1 base address
-#define PER_USART_1 (PER_ADDR_APB2 + (uintptr_t)0x1000)
+#define PER_USART_1 ((per_usart_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_APB2 + (uintptr_t)0x1000))
 
 /// USART2 base address
-#define PER_USART_2 (PER_ADDR_APB1 + (uintptr_t)0x4400)
+#define PER_USART_2 ((per_usart_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_APB1 + (uintptr_t)0x4400))
 
 /// USART3 base address
-#define PER_USART_3 (PER_ADDR_APB1 + (uintptr_t)0x4800)
+#define PER_USART_3 ((per_usart_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_APB1 + (uintptr_t)0x4800))
 
 /// UART4 base address
-#define PER_UART_4  (PER_ADDR_APB1 + (uintptr_t)0x4C00)
+#define PER_UART_4  ((per_usart_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_APB1 + (uintptr_t)0x4C00))
 
 /// UART5 base address
-#define PER_UART_5  (PER_ADDR_APB1 + (uintptr_t)0x5000)
+#define PER_UART_5  ((per_usart_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_APB1 + (uintptr_t)0x5000))
 
 /// USART6 base address
-#define PER_USART_6 (PER_ADDR_APB2 + (uintptr_t)0x1400)
+#define PER_USART_6 ((per_usart_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_APB2 + (uintptr_t)0x1400))
 
 /// UART7 base address
-#define PER_UART_7  (PER_ADDR_APB1 + (uintptr_t)0x7800)
+#define PER_UART_7  ((per_usart_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_APB1 + (uintptr_t)0x7800))
 
 /// UART7 base address
-#define PER_UART_8  (PER_ADDR_APB1 + (uintptr_t)0x7C00)
+#define PER_UART_8  ((per_usart_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_APB1 + (uintptr_t)0x7C00))
 
 /// USART get pointer to usart 1
 static per_inline const per_usart_t* const per_usart_1(void)
 {
     static const per_usart_t usart =
     {
-        .Per = (per_usart_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_USART_1),
+        .Per = PER_USART_1,
         .Err = PER_LOG_USART_1,
         .Freq = &per_rcc_apb2_per_freq,
         .Uart = false,
@@ -76,7 +76,7 @@ static per_inline const per_usart_t* const per_usart_2(void)
 {
     static const per_usart_t usart =
     {
-        .Per = (per_usart_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_USART_2),
+        .Per = PER_USART_2,
         .Err = PER_LOG_USART_2,
         .Freq = &per_rcc_apb1_per_freq,
         .Uart = false,
@@ -89,7 +89,7 @@ static per_inline const per_usart_t* const per_usart_3(void)
 {
     static const per_usart_t usart =
     {
-        .Per = (per_usart_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_USART_3),
+        .Per = PER_USART_3,
         .Err = PER_LOG_USART_3,
         .Freq = &per_rcc_apb1_per_freq,
         .Uart = false,
@@ -102,7 +102,7 @@ static per_inline const per_usart_t* const per_uart_4(void)
 {
     static const per_usart_t usart =
     {
-        .Per = (per_usart_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_UART_4),
+        .Per = PER_UART_4,
         .Err = PER_LOG_UART_4,
         .Freq = &per_rcc_apb1_per_freq,
         .Uart = true,
@@ -115,7 +115,7 @@ static per_inline const per_usart_t* const per_uart_5(void)
 {
     static const per_usart_t usart =
     {
-        .Per = (per_usart_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_UART_5),
+        .Per = PER_UART_5,
         .Err = PER_LOG_UART_5,
         .Freq = &per_rcc_apb1_per_freq,
         .Uart = true,
@@ -128,7 +128,7 @@ static per_inline const per_usart_t* const per_usart_6(void)
 {
     static const per_usart_t usart =
     {
-        .Per = (per_usart_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_USART_6),
+        .Per = PER_USART_6,
         .Err = PER_LOG_USART_6,
         .Freq = &per_rcc_apb2_per_freq,
         .Uart = false,
@@ -141,7 +141,7 @@ static per_inline const per_usart_t* const per_uart_7(void)
 {
     static const per_usart_t usart =
     {
-        .Per = (per_usart_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_UART_7),
+        .Per = PER_UART_7,
         .Err = PER_LOG_UART_7,
         .Freq = &per_rcc_apb1_per_freq,
         .Uart = true,
@@ -154,7 +154,7 @@ static per_inline const per_usart_t* const per_uart_8(void)
 {
     static const per_usart_t usart =
     {
-        .Per = (per_usart_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_UART_8),
+        .Per = PER_UART_8,
         .Err = PER_LOG_UART_8,
         .Freq = &per_rcc_apb1_per_freq,
         .Uart = true,

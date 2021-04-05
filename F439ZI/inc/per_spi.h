@@ -35,29 +35,29 @@ extern "C"
 #include "per_spi_f4.h"
 
 /// SPI1 base address
-#define PER_SPI_1 (PER_ADDR_APB2 + (uintptr_t)0x3000)
+#define PER_SPI_1 ((per_spi_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_APB2 + (uintptr_t)0x3000))
 
 /// SPI2 base address
-#define PER_SPI_2 (PER_ADDR_APB1 + (uintptr_t)0x3800)
+#define PER_SPI_2 ((per_spi_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_APB1 + (uintptr_t)0x3800))
 
 /// SPI3 base address
-#define PER_SPI_3 (PER_ADDR_APB1 + (uintptr_t)0x3C00)
+#define PER_SPI_3 ((per_spi_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_APB1 + (uintptr_t)0x3C00))
 
 /// SPI4 base address
-#define PER_SPI_4 (PER_ADDR_APB2 + (uintptr_t)0x3400)
+#define PER_SPI_4 ((per_spi_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_APB2 + (uintptr_t)0x3400))
 
 /// SPI5 base address
-#define PER_SPI_5 (PER_ADDR_APB2 + (uintptr_t)0x5000)
+#define PER_SPI_5 ((per_spi_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_APB2 + (uintptr_t)0x5000))
 
 /// SPI6 base address
-#define PER_SPI_6 (PER_ADDR_APB2 + (uintptr_t)0x5400)
+#define PER_SPI_6 ((per_spi_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_APB2 + (uintptr_t)0x5400))
 
 /// SPI pointer to spi 1
 static per_inline const per_spi_t* const per_spi_1(void)
 {
     static const per_spi_t spi =
     {
-        .Per = (per_spi_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_SPI_1),
+        .Per = PER_SPI_1,
         .Err = PER_LOG_SPI_1,
     };
     return &spi;
@@ -68,7 +68,7 @@ static per_inline const per_spi_t* const per_spi_2(void)
 {
     static const per_spi_t spi =
     {
-        .Per = (per_spi_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_SPI_2),
+        .Per = PER_SPI_2,
         .Err = PER_LOG_SPI_2,
     };
     return &spi;
@@ -79,7 +79,7 @@ static per_inline const per_spi_t* const per_spi_3(void)
 {
     static const per_spi_t spi =
     {
-        .Per = (per_spi_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_SPI_3),
+        .Per = PER_SPI_3,
         .Err = PER_LOG_SPI_3,
     };
     return &spi;
@@ -90,7 +90,7 @@ static per_inline const per_spi_t* const per_spi_4(void)
 {
     static const per_spi_t spi =
     {
-        .Per = (per_spi_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_SPI_4),
+        .Per = PER_SPI_4,
         .Err = PER_LOG_SPI_4,
     };
     return &spi;
@@ -101,7 +101,7 @@ static per_inline const per_spi_t* const per_spi_5(void)
 {
     static const per_spi_t spi =
     {
-        .Per = (per_spi_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_SPI_5),
+        .Per = PER_SPI_5,
         .Err = PER_LOG_SPI_5,
     };
     return &spi;
@@ -112,7 +112,7 @@ static per_inline const per_spi_t* const per_spi_6(void)
 {
     static const per_spi_t spi =
     {
-        .Per = (per_spi_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_SPI_6),
+        .Per = PER_SPI_6,
         .Err = PER_LOG_SPI_6,
     };
     return &spi;

@@ -34,23 +34,23 @@ extern "C" {
 #include "per_adc_f4.h"
 
 /// ADC1 base address
-#define PER_ADC_1 (PER_ADDR_APB2 + (uintptr_t)0x2000)
+#define PER_ADC_1 ((per_adc_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_APB2 + (uintptr_t)0x2000))
 
 /// ADC2 base address
-#define PER_ADC_2 (PER_ADDR_APB2 + (uintptr_t)0x2100)
+#define PER_ADC_2 ((per_adc_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_APB2 + (uintptr_t)0x2100))
 
 /// ADC3 base address
-#define PER_ADC_3 (PER_ADDR_APB2 + (uintptr_t)0x2200)
+#define PER_ADC_3 ((per_adc_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_APB2 + (uintptr_t)0x2200))
 
 /// ADC_COMMON base address
-#define PER_ADC_COM (PER_ADDR_APB2 + (uintptr_t)0x2300)
+#define PER_ADC_COM ((per_adc_com_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_APB2 + (uintptr_t)0x2300))
 
 /// ADC pointer to adc 1
 static per_inline const per_adc_t* const per_adc_1(void)
 {
     static const per_adc_t adc =
     {
-        .Per = (per_adc_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADC_1),
+        .Per = PER_ADC_1,
         .Err = PER_LOG_ADC_1
     };
     return &adc;
@@ -61,7 +61,7 @@ static per_inline const per_adc_t* const per_adc_2(void)
 {
     static const per_adc_t adc =
     {
-        .Per = (per_adc_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADC_2),
+        .Per = PER_ADC_2,
         .Err = PER_LOG_ADC_2
     };
     return &adc;
@@ -72,7 +72,7 @@ static per_inline const per_adc_t* const per_adc_3(void)
 {
     static const per_adc_t adc =
     {
-        .Per = (per_adc_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADC_3),
+        .Per = PER_ADC_3,
         .Err = PER_LOG_ADC_3
     };
     return &adc;
@@ -83,7 +83,7 @@ static per_inline const per_adc_com_t* const per_adc_com(void)
 {
     static const per_adc_com_t adc =
     {
-        .Per = (per_adc_com_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADC_COM),
+        .Per = PER_ADC_COM,
         .Err = PER_LOG_ADC_COM
     };
     return &adc;

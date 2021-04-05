@@ -34,12 +34,20 @@ extern "C" {
 #include "per_pwr_f4.h"
 
 /// PWR base address
-#define PER_PWR (PER_ADDR_APB2 + (uintptr_t)0x3800)
+#define PER_PWR ((per_pwr_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_APB2 + (uintptr_t)0x3800))
 
 /// PWR pointer to pwr
-static per_inline per_pwr_t* per_pwr(void)
+static per_inline const per_pwr_t* const per_pwr(void)
 {
-    return (per_pwr_t*)PER_BIT_REG_TO_BIT_BAND(PER_PWR);
+    static const per_pwr_t pwr =
+    {
+        .Per = PER_PWR,
+        .Err = PER_LOG_PWR,
+        .Adcdc = true,
+        .Drive = true,
+        .Vos = true,
+    };
+    return &pwr;
 }
 
 #ifdef __cplusplus
