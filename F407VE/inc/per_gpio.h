@@ -33,32 +33,95 @@ extern "C" {
 
 #include "per_gpio_f4.h"
 
-/// GPIOA base address
-#define PER_GPIOA ((per_gpio_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_AHB1 + (uintptr_t)0x000))
+static per_inline per_gpio_in_t* const per_gpio_a_in(per_gpio_pin_e pin)
+{
+    return &PER_GPIOA->Id[pin];
+}
 
-/// GPIOB base address
-#define PER_GPIOB ((per_gpio_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_AHB1 + (uintptr_t)0x0400))
+static per_inline per_gpio_out_t* const per_gpio_a_out(per_gpio_pin_e pin)
+{
+    return &PER_GPIOA->Od[pin];
+}
 
-/// GPIOC base address
-#define PER_GPIOC ((per_gpio_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_AHB1 + (uintptr_t)0x0800))
+static per_inline per_gpio_in_t* const per_gpio_b_in(per_gpio_pin_e pin)
+{
+    return &PER_GPIOB->Id[pin];
+}
 
-/// GPIOD base address
-#define PER_GPIOD ((per_gpio_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_AHB1 + (uintptr_t)0x0C00))
+static per_inline per_gpio_out_t* const per_gpio_b_out(per_gpio_pin_e pin)
+{
+    return &PER_GPIOB->Od[pin];
+}
 
-/// GPIOE base address
-#define PER_GPIOE ((per_gpio_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_AHB1 + (uintptr_t)0x1000))
+static per_inline per_gpio_in_t* const per_gpio_c_in(per_gpio_pin_e pin)
+{
+    return &PER_GPIOC->Id[pin];
+}
 
-/// GPIOF base address
-#define PER_GPIOF ((per_gpio_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_AHB1 + (uintptr_t)0x1400))
+static per_inline per_gpio_out_t* const per_gpio_c_out(per_gpio_pin_e pin)
+{
+    return &PER_GPIOC->Od[pin];
+}
 
-/// GPIOG base address
-#define PER_GPIOG ((per_gpio_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_AHB1 + (uintptr_t)0x1800))
+static per_inline per_gpio_in_t* const per_gpio_d_in(per_gpio_pin_e pin)
+{
+    return &PER_GPIOD->Id[pin];
+}
 
-/// GPIOH base address
-#define PER_GPIOH ((per_gpio_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_AHB1 + (uintptr_t)0x1C00))
+static per_inline per_gpio_out_t* const per_gpio_d_out(per_gpio_pin_e pin)
+{
+    return &PER_GPIOD->Od[pin];
+}
 
-/// GPIOI base address
-#define PER_GPIOI ((per_gpio_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_AHB1 + (uintptr_t)0x2000))
+static per_inline per_gpio_in_t* const per_gpio_e_in(per_gpio_pin_e pin)
+{
+    return &PER_GPIOE->Id[pin];
+}
+
+static per_inline per_gpio_out_t* const per_gpio_e_out(per_gpio_pin_e pin)
+{
+    return &PER_GPIOE->Od[pin];
+}
+
+static per_inline per_gpio_in_t* const per_gpio_f_in(per_gpio_pin_e pin)
+{
+    return &PER_GPIOF->Id[pin];
+}
+
+static per_inline per_gpio_out_t* const per_gpio_f_out(per_gpio_pin_e pin)
+{
+    return &PER_GPIOF->Od[pin];
+}
+
+static per_inline per_gpio_in_t* const per_gpio_g_in(per_gpio_pin_e pin)
+{
+    return &PER_GPIOG->Id[pin];
+}
+
+static per_inline per_gpio_out_t* const per_gpio_g_out(per_gpio_pin_e pin)
+{
+    return &PER_GPIOG->Od[pin];
+}
+
+static per_inline per_gpio_in_t* const per_gpio_h_in(per_gpio_pin_e pin)
+{
+    return &PER_GPIOH->Id[pin];
+}
+
+static per_inline per_gpio_out_t* const per_gpio_h_out(per_gpio_pin_e pin)
+{
+    return &PER_GPIOH->Od[pin];
+}
+
+static per_inline per_gpio_in_t* const per_gpio_i_in(per_gpio_pin_e pin)
+{
+    return &PER_GPIOI->Id[pin];
+}
+
+static per_inline per_gpio_out_t* const per_gpio_i_out(per_gpio_pin_e pin)
+{
+    return &PER_GPIOI->Od[pin];
+}
 
 #ifdef __cplusplus
 }

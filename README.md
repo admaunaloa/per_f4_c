@@ -22,7 +22,7 @@ Three examples. The first two GPIO get and set, the third is an interrupt handle
 ```c++
     #include "per_gpio.h"
    
-    #define bsp_user_button_1() (&PER_GPIOC->Idr[PER_GPIO_PIN_13])
+    #define bsp_user_button_1() (per_gpio_c_in(PER_GPIO_PIN_13))
 
     // Get status of the button input
     bool button_state = per_gpio_in(bsp_user_button_1());
@@ -32,7 +32,7 @@ Three examples. The first two GPIO get and set, the third is an interrupt handle
 ```c++
     #include "per_gpio.h"
    
-    #define bsp_gpio_led_green() (&PER_GPIOB->Odr[PER_GPIO_PIN_0])
+    #define bsp_gpio_led_green() (per_gpio_b_out(PER_GPIO_PIN_0))
 
     // Enable the green LED
     per_gpio_set_out(bsp_gpio_led_green(), true);
