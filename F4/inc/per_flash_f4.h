@@ -73,6 +73,23 @@ typedef enum
     PER_FLASH_OPTKEY2 = 0x4C5D6E7F,
 } per_flash_optkey_e;
 
+/// FLASH Not write protect sector enumeration
+typedef enum
+{
+    PER_FLASH_NWRP_0 =  0b000000000001,
+    PER_FLASH_NWRP_1 =  0b000000000010,
+    PER_FLASH_NWRP_2 =  0b000000000100,
+    PER_FLASH_NWRP_3 =  0b000000001000,
+    PER_FLASH_NWRP_4 =  0b000000010000,
+    PER_FLASH_NWRP_5 =  0b000000100000,
+    PER_FLASH_NWRP_6 =  0b000001000000,
+    PER_FLASH_NWRP_7 =  0b000010000000,
+    PER_FLASH_NWRP_8 =  0b000100000000,
+    PER_FLASH_NWRP_9 =  0b001000000000,
+    PER_FLASH_NWRP_10 = 0b010000000000,
+    PER_FLASH_NWRP_11 = 0b100000000000,
+} per_flash_nwrp_e;
+
 typedef struct
 {
     // Flash access control register (FLASH_ACR)
@@ -606,15 +623,15 @@ static per_inline uint_fast16_t per_flash_rdp(const per_flash_t* const flash)
 }
 
 /// FLASH Not write protect
-static per_inline uint_fast16_t per_flash_nwrp(const per_flash_t* const flash)
+static per_inline per_flash_nwrp_e per_flash_nwrp(const per_flash_t* const flash)
 {
-    return per_bit_rw12(&flash->Per->Nwrp);
+    return (per_flash_nwrp_e)per_bit_rw12(&flash->Per->Nwrp);
 }
 
 /// FLASH Not write protect
-static per_inline bool per_flash_set_nwrp(const per_flash_t* const flash, uint_fast16_t val)
+static per_inline bool per_flash_set_nwrp(const per_flash_t* const flash, per_flash_nwrp_e val)
 {
-    return per_bit_rw12_set(&flash->Per->Nwrp, val);
+    return per_bit_rw12_set(&flash->Per->Nwrp, (uint_fast16_t)val);
 }
 
 /// FLASH Dual-bank on 1 Mbyte Flash memory devices
@@ -662,25 +679,25 @@ static per_inline void per_flash_set_sprmod(const per_flash_t* const flash, bool
 }
 
 /// FLASH Not write protect
-static per_inline uint_fast16_t per_flash_nwrp1(const per_flash_t* const flash)
+static per_inline per_flash_nwrp_e per_flash_nwrp1(const per_flash_t* const flash)
 {
     if (flash->Banks < 2)
     {
         per_dep_err_unsupported();
     }
 
-    return per_bit_rw12(&flash->Per->Nwrp1);
+    return (per_flash_nwrp_e)per_bit_rw12(&flash->Per->Nwrp1);
 }
 
 /// FLASH Not write protect
-static per_inline bool per_flash_set_nwrp1(const per_flash_t* const flash, uint_fast16_t val)
+static per_inline bool per_flash_set_nwrp1(const per_flash_t* const flash, per_flash_nwrp_e val)
 {
     if (flash->Banks < 2)
     {
         per_dep_err_unsupported();
     }
 
-    return per_bit_rw12_set(&flash->Per->Nwrp1, val);
+    return per_bit_rw12_set(&flash->Per->Nwrp1, (uint_fast16_t)val);
 }
 
 #ifdef __cplusplus

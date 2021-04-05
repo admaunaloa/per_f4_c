@@ -34,7 +34,7 @@ extern "C" {
 #include "per_rcc_f4.h"
 
 /// RCC base address
-#define PER_RCC (PER_ADDR_AHB1 + (uintptr_t)0x3800)
+#define PER_RCC ((per_rcc_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_AHB1 + (uintptr_t)0x3800))
 
 /// [Hz] Clock frequency
 #define per_rcc_freq() ((uint32_t)168000000)
@@ -44,7 +44,7 @@ static per_inline const per_rcc_t* const per_rcc(void)
 {
     static const per_rcc_t rcc =
     {
-        .Per = (per_rcc_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_RCC),
+        .Per = PER_RCC,
         .Err = PER_LOG_RCC,
         .Adc = PER_RCC_ADC_2,
         .Can = PER_RCC_CAN_2,

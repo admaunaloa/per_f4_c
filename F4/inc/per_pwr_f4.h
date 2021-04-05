@@ -33,6 +33,9 @@ extern "C" {
 
 #include "per_bit_f4.h"
 
+/// PWR VOS 1 bit mask
+#define PER_PWR_VOS_MASK (0b10)
+
 /// PWR PVD level selection enumeration
 typedef enum
 {
@@ -57,9 +60,9 @@ typedef enum
 /// PWR Under-drive ready enumeration
 typedef enum
 {
-    PER_PWR_URDY_DISABLED = 0b00, ///< Disabled
-    PER_PWR_URDY_ACTIVATED = 0b11, ///< Activated in Stop mode.
-} per_pwr_urdy_e;
+    PER_PWR_U_DISABLED = 0b00, ///< Disabled
+    PER_PWR_U_ACTIVATED = 0b11, ///< Activated in Stop mode.
+} per_pwr_u_e;
 
 typedef struct
 {
@@ -97,7 +100,364 @@ typedef struct
     per_bit_r1_t Odswrdy; ///< Over-drive mode switching ready
     per_bit_rw2_t Urdy; ///< Under-drive ready flag
     per_bit_n12_t PwrcsrBit20; ///< Reserved
-} __attribute__((packed)) per_pwr_t;
+} __attribute__((packed)) per_pwr_per_t;
+
+/// PWR descriptor
+typedef struct
+{
+    per_pwr_per_t* const Per; ///< Peripheral
+    const per_log_e Err;      ///< Peripheral error number
+    const bool Adcdc;         ///< DC for ADC1
+    const bool Drive;         ///< Over/Under
+    const bool Vos;           ///< Regulator voltage scaling 2 bits
+} per_pwr_t;
+
+/// PWR Low-power deepsleep
+static per_inline bool per_pwr_lpds(const per_pwr_t* const pwr)
+{
+    return per_bit_rw1(&pwr->Per->Lpds);
+}
+
+/// PWR Low-power deepsleep
+static per_inline void per_pwr_set_lpds(const per_pwr_t* const pwr, bool val)
+{
+    per_bit_rw1_set(&pwr->Per->Lpds, val);
+}
+
+/// PWR Power-down deepsleep
+static per_inline bool per_pwr_pdds(const per_pwr_t* const pwr)
+{
+    return per_bit_rw1(&pwr->Per->Pdds);
+}
+
+/// PWR Power-down deepsleep
+static per_inline void per_pwr_set_pdds(const per_pwr_t* const pwr, bool val)
+{
+    per_bit_rw1_set(&pwr->Per->Pdds, val);
+}
+
+/// PWR Clear wakeup flag
+static per_inline bool per_pwr_cwuf(const per_pwr_t* const pwr)
+{
+    return per_bit_rc1_w1(&pwr->Per->Cwuf);
+}
+
+/// PWR Clear wakeup flag
+static per_inline bool per_pwr_clr_cwuf(const per_pwr_t* const pwr)
+{
+    return per_bit_rc1_w1_rdclr(&pwr->Per->Cwuf);
+}
+
+/// PWR Clear standby flag
+static per_inline bool per_pwr_csbf(const per_pwr_t* const pwr)
+{
+    return per_bit_rc1_w1(&pwr->Per->Csbf);
+}
+
+/// PWR Clear standby flag
+static per_inline bool per_pwr_set_csbf(const per_pwr_t* const pwr)
+{
+    return per_bit_rc1_w1_rdclr(&pwr->Per->Csbf);
+}
+
+/// PWR Power voltage detector enable
+static per_inline bool per_pwr_pvde(const per_pwr_t* const pwr)
+{
+    return per_bit_rw1(&pwr->Per->Pvde);
+}
+
+/// PWR Power voltage detector enable
+static per_inline void per_pwr_set_pvde(const per_pwr_t* const pwr, bool val)
+{
+    per_bit_rw1_set(&pwr->Per->Pvde, val);
+}
+
+/// PWR PVD level selection
+static per_inline per_pwr_pls_e per_pwr_pls(const per_pwr_t* const pwr)
+{
+    return (per_pwr_pls_e)per_bit_rw3(&pwr->Per->Pls);
+}
+
+/// PWR PVD level selection
+static per_inline void per_pwr_set_pls(const per_pwr_t* const pwr, per_pwr_pls_e val)
+{
+    per_bit_rw3_set(&pwr->Per->Pls, (uint_fast16_t)val);
+}
+
+/// PWR Disable backup domain write protection
+static per_inline bool per_pwr_dbp(const per_pwr_t* const pwr)
+{
+    return per_bit_rw1(&pwr->Per->Dbp);
+}
+
+/// PWR Disable backup domain write protection
+static per_inline void per_pwr_set_dbp(const per_pwr_t* const pwr, bool val)
+{
+    per_bit_rw1_set(&pwr->Per->Dbp, val);
+}
+
+/// PWR Flash power-down in Stop mode
+static per_inline bool per_pwr_fpds(const per_pwr_t* const pwr)
+{
+    return per_bit_rw1(&pwr->Per->Fpds);
+}
+
+/// PWR Flash power-down in Stop mode
+static per_inline void per_pwr_set_fpds(const per_pwr_t* const pwr, bool val)
+{
+    per_bit_rw1_set(&pwr->Per->Fpds, val);
+}
+
+/// PWR Low-power regulator in deepsleep under-drive mode
+static per_inline bool per_pwr_lpuds(const per_pwr_t* const pwr)
+{
+    if (!pwr->Drive)
+    {
+        per_dep_err_unsupported();
+    }
+
+    return per_bit_rw1(&pwr->Per->Lpuds);
+}
+
+/// PWR Low-power regulator in deepsleep under-drive mode
+static per_inline void per_pwr_set_lpuds(const per_pwr_t* const pwr, bool val)
+{
+    if (!pwr->Drive)
+    {
+        per_dep_err_unsupported();
+    }
+
+    per_bit_rw1_set(&pwr->Per->Lpuds, val);
+}
+
+/// PWR Main regulator in deepsleep under-drive mode
+static per_inline bool per_pwr_mruds(const per_pwr_t* const pwr)
+{
+    if (!pwr->Drive)
+    {
+        per_dep_err_unsupported();
+    }
+
+    return per_bit_rw1(&pwr->Per->Mruds);
+}
+
+/// PWR Main regulator in deepsleep under-drive mode
+static per_inline void per_pwr_set_mruds(const per_pwr_t* const pwr, bool val)
+{
+    if (!pwr->Drive)
+    {
+        per_dep_err_unsupported();
+    }
+
+    per_bit_rw1_set(&pwr->Per->Mruds, val);
+}
+
+/// PWR Improve ADC accuracy
+static per_inline bool per_pwr_adcdc1(const per_pwr_t* const pwr)
+{
+    if (!pwr->Adcdc)
+    {
+        per_dep_err_unsupported();
+    }
+
+    return per_bit_rw1(&pwr->Per->ADCDC1);
+}
+
+/// PWR Improve ADC accuracy
+static per_inline void per_pwr_set_adcdc1(const per_pwr_t* const pwr, bool val)
+{
+    per_bit_rw1_set(&pwr->Per->ADCDC1, val);
+}
+
+/// PWR Regulator voltage scaling output selection
+static per_inline per_pwr_vos_e per_pwr_vos(const per_pwr_t* const pwr)
+{
+    uint_fast16_t val = per_bit_rw2(&pwr->Per->Vos);
+
+    if (!pwr->Vos)
+    {
+        val |= PER_PWR_VOS_MASK;
+    }
+
+    return (per_pwr_vos_e)val;
+}
+
+/// PWR Regulator voltage scaling output selection
+static per_inline void per_pwr_set_vos(const per_pwr_t* const pwr, per_pwr_vos_e val)
+{
+     uint_fast16_t vos = (uint_fast16_t)val;
+
+    if (!pwr->Vos)
+    {
+        vos &= ~PER_PWR_VOS_MASK;
+    }
+
+    per_bit_rw2_set(&pwr->Per->Vos, vos);
+}
+
+/// PWR Over-drive enable
+static per_inline bool per_pwr_oden(const per_pwr_t* const pwr)
+{
+    if (!pwr->Drive)
+    {
+        per_dep_err_unsupported();
+    }
+
+    return per_bit_rw1(&pwr->Per->Oden);
+}
+
+/// PWR Over-drive enable
+static per_inline void per_pwr_set_oden(const per_pwr_t* const pwr, bool val)
+{
+    if (!pwr->Drive)
+    {
+        per_dep_err_unsupported();
+    }
+
+    per_bit_rw1_set(&pwr->Per->Oden, val);
+}
+
+/// PWR Over-drive switching enabled
+static per_inline bool per_pwr_odswen(const per_pwr_t* const pwr)
+{
+    if (!pwr->Drive)
+    {
+        per_dep_err_unsupported();
+    }
+
+    return per_bit_rw1(&pwr->Per->Odswen);
+}
+
+/// PWR Over-drive switching enabled
+static per_inline void per_pwr_set_odswen(const per_pwr_t* const pwr, bool val)
+{
+    if (!pwr->Drive)
+    {
+        per_dep_err_unsupported();
+    }
+
+    per_bit_rw1_set(&pwr->Per->Odswen, val);
+}
+
+/// PWR Under-drive enable in stop mode
+static per_inline per_pwr_u_e per_pwr_uden(const per_pwr_t* const pwr)
+{
+    if (!pwr->Drive)
+    {
+        per_dep_err_unsupported();
+    }
+
+    return (per_pwr_u_e)per_bit_rw2(&pwr->Per->Uden);
+}
+
+/// PWR Under-drive enable in stop mode
+static per_inline void per_pwr_set_uden(const per_pwr_t* const pwr, per_pwr_u_e val)
+{
+    if (!pwr->Drive)
+    {
+        per_dep_err_unsupported();
+    }
+
+    per_bit_rw2_set(&pwr->Per->Uden, (uint_fast16_t)val);
+}
+
+/// PWR Wakeup flag
+static per_inline bool per_pwr_wuf(const per_pwr_t* const pwr)
+{
+    return per_bit_r1(&pwr->Per->Wuf);
+}
+
+/// PWR Standby flag
+static per_inline bool per_pwr_sbf(const per_pwr_t* const pwr)
+{
+    return per_bit_r1(&pwr->Per->Sbf);
+}
+
+/// PWR PVD output
+static per_inline bool per_pwr_pvdo(const per_pwr_t* const pwr)
+{
+    return per_bit_r1(&pwr->Per->Pvdo);
+}
+
+/// PWR Backup regulator ready
+static per_inline bool per_pwr_brr(const per_pwr_t* const pwr)
+{
+    return per_bit_r1(&pwr->Per->Brr);
+}
+
+/// PWR Enable WKUP pin
+static per_inline bool per_pwr_ewup(const per_pwr_t* const pwr)
+{
+    return per_bit_rw1(&pwr->Per->Ewup);
+}
+
+/// PWR Enable WKUP pin
+static per_inline void per_pwr_set_ewup(const per_pwr_t* const pwr, bool val)
+{
+    per_bit_rw1_set(&pwr->Per->Ewup, val);
+}
+
+/// PWR Backup regulator enable
+static per_inline bool per_pwr_bre(const per_pwr_t* const pwr)
+{
+    return per_bit_rw1(&pwr->Per->Bre);
+}
+
+/// PWR Backup regulator enable
+static per_inline void per_pwr_set_bre(const per_pwr_t* const pwr, bool val)
+{
+    per_bit_rw1_set(&pwr->Per->Bre, val);
+}
+
+/// PWR Regulator voltage scaling output selection ready bit
+static per_inline bool per_pwr_vosrdy(const per_pwr_t* const pwr)
+{
+    return per_bit_r1(&pwr->Per->Vosrdy);
+}
+
+/// PWR Over-drive mode ready
+static per_inline bool per_pwr_ordy(const per_pwr_t* const pwr)
+{
+    if (!pwr->Drive)
+    {
+        per_dep_err_unsupported();
+    }
+
+    return per_bit_r1(&pwr->Per->Ordy);
+}
+
+/// PWR Over-drive mode switching ready
+static per_inline bool per_pwr_odswrdy(const per_pwr_t* const pwr)
+{
+    if (!pwr->Drive)
+    {
+        per_dep_err_unsupported();
+    }
+
+    return per_bit_r1(&pwr->Per->Odswrdy);
+}
+
+/// PWR Under-drive ready flag
+static per_inline per_pwr_u_e per_pwr_urdy(const per_pwr_t* const pwr)
+{
+    if (!pwr->Drive)
+    {
+        per_dep_err_unsupported();
+    }
+
+    return (per_pwr_u_e)per_bit_rw2(&pwr->Per->Urdy);
+}
+
+/// PWR Under-drive ready flag
+static per_inline void per_pwr_clr_urdy(const per_pwr_t* const pwr)
+{
+    if (!pwr->Drive)
+    {
+        per_dep_err_unsupported();
+    }
+
+    per_bit_rw2_set(&pwr->Per->Urdy, (uint_fast16_t)PER_PWR_U_ACTIVATED);
+}
 
 #ifdef __cplusplus
 }
