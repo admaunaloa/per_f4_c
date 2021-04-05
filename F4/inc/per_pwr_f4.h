@@ -33,6 +33,9 @@ extern "C" {
 
 #include "per_bit_f4.h"
 
+/// PWR base address
+#define PER_PWR ((per_pwr_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_APB2 + (uintptr_t)0x3800))
+
 /// PWR VOS 1 bit mask
 #define PER_PWR_VOS_MASK (0b10)
 

@@ -34,12 +34,6 @@ extern "C" {
 #include "per_tim_ad_f4.h"
 #include "per_rcc.h"
 
-/// TIM1 base address
-#define PER_TIM_1 ((per_tim_ad_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_APB2 + (uintptr_t)0x0000))
-
-/// TIM8 base address
-#define PER_TIM_8 ((per_tim_ad_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_APB2 + (uintptr_t)0x0400))
-
 /// TIM_AD pointer to tim_ad 1
 static per_inline const per_tim_ad_t* const per_tim_ad_1(void)
 {

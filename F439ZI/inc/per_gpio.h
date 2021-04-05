@@ -33,39 +33,6 @@ extern "C" {
 
 #include "per_gpio_f4.h"
 
-/// GPIOA base address
-#define PER_GPIOA ((per_gpio_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_AHB1 + (uintptr_t)0x000))
-
-/// GPIOB base address
-#define PER_GPIOB ((per_gpio_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_AHB1 + (uintptr_t)0x0400))
-
-/// GPIOC base address
-#define PER_GPIOC ((per_gpio_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_AHB1 + (uintptr_t)0x0800))
-
-/// GPIOD base address
-#define PER_GPIOD ((per_gpio_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_AHB1 + (uintptr_t)0x0C00))
-
-/// GPIOE base address
-#define PER_GPIOE ((per_gpio_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_AHB1 + (uintptr_t)0x1000))
-
-/// GPIOF base address
-#define PER_GPIOF ((per_gpio_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_AHB1 + (uintptr_t)0x1400))
-
-/// GPIOG base address
-#define PER_GPIOG ((per_gpio_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_AHB1 + (uintptr_t)0x1800))
-
-/// GPIOH base address
-#define PER_GPIOH ((per_gpio_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_AHB1 + (uintptr_t)0x1C00))
-
-/// GPIOI base address
-#define PER_GPIOI ((per_gpio_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_AHB1 + (uintptr_t)0x2000))
-
-/// GPIOJ base address
-#define PER_GPIOJ ((per_gpio_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_AHB1 + (uintptr_t)0x2400))
-
-/// GPIOK base address
-#define PER_GPIOK ((per_gpio_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_AHB1 + (uintptr_t)0x2800))
-
 #ifdef __cplusplus
 }
 #endif

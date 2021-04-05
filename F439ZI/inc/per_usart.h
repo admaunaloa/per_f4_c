@@ -34,30 +34,6 @@ extern "C" {
 #include "per_usart_f4.h"
 #include "per_rcc.h"
 
-/// USART1 base address
-#define PER_USART_1 ((per_usart_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_APB2 + (uintptr_t)0x1000))
-
-/// USART2 base address
-#define PER_USART_2 ((per_usart_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_APB1 + (uintptr_t)0x4400))
-
-/// USART3 base address
-#define PER_USART_3 ((per_usart_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_APB1 + (uintptr_t)0x4800))
-
-/// UART4 base address
-#define PER_UART_4  ((per_usart_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_APB1 + (uintptr_t)0x4C00))
-
-/// UART5 base address
-#define PER_UART_5  ((per_usart_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_APB1 + (uintptr_t)0x5000))
-
-/// USART6 base address
-#define PER_USART_6 ((per_usart_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_APB2 + (uintptr_t)0x1400))
-
-/// UART7 base address
-#define PER_UART_7  ((per_usart_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_APB1 + (uintptr_t)0x7800))
-
-/// UART7 base address
-#define PER_UART_8  ((per_usart_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_APB1 + (uintptr_t)0x7C00))
-
 /// USART get pointer to usart 1
 static per_inline const per_usart_t* const per_usart_1(void)
 {

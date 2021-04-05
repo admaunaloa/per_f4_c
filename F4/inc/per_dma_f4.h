@@ -34,6 +34,18 @@ extern "C" {
 #include "per_bit_f4.h"
 #include "per_log_f4.h"
 
+/// DMA1 base address
+#define PER_DMA_1 (PER_ADDR_AHB1 + (uintptr_t)0x6000)
+
+/// DMA1 bit band base address
+#define PER_DMA_1_BB ((per_dma_t*)PER_BIT_REG_TO_BIT_BAND(PER_DMA_1))
+
+/// DMA2 base address
+#define PER_DMA_2 (PER_ADDR_AHB1 + (uintptr_t)0x6400)
+
+/// DMA2 bit band base address
+#define PER_DMA_2_BB ((per_dma_t*)PER_BIT_REG_TO_BIT_BAND(PER_DMA_2))
+
 /// Maximum number of streams
 #define PER_DMA_STREAM_MAX (8)
 

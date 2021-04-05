@@ -33,6 +33,9 @@ extern "C" {
 
 #include "per_bit_f4.h"
 
+/// SYSCFG base address
+#define PER_SYSCFG ((per_sys_cfg_t*)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_APB2 + (uintptr_t)0x3800))
+
 typedef struct
 {
     // SYSCFG memory re-map register (SYSCFG_MEMRMP)

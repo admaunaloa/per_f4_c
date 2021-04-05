@@ -67,6 +67,12 @@ extern "C" {
 #include "per_bit_f4.h"
 #include "per_log_f4.h"
 
+/// TIM1 base address
+#define PER_TIM_1 ((per_tim_ad_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_APB2 + (uintptr_t)0x0000))
+
+/// TIM8 base address
+#define PER_TIM_8 ((per_tim_ad_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_APB2 + (uintptr_t)0x0400))
+
 /// Clock division maximum
 #define PER_TIM_AD_CKD_MAX (4)
 

@@ -34,6 +34,9 @@ extern "C" {
 #include "per_bit_f4.h"
 #include "per_log_f4.h"
 
+/// FLASH base address
+#define PER_FLASH ((per_flash_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_AHB1 + (uintptr_t)0x3C00))
+
 /// Program size psize multiplier
 #define PER_FLASH_PSIZE_MULT (8)
 
