@@ -35,6 +35,24 @@ extern "C"
 #include "per_bit_f4.h"
 #include "per_log_f4.h"
 
+/// SPI1 base address
+#define PER_SPI_1 ((per_spi_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_APB2 + (uintptr_t)0x3000))
+
+/// SPI2 base address
+#define PER_SPI_2 ((per_spi_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_APB1 + (uintptr_t)0x3800))
+
+/// SPI3 base address
+#define PER_SPI_3 ((per_spi_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_APB1 + (uintptr_t)0x3C00))
+
+/// SPI4 base address
+#define PER_SPI_4 ((per_spi_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_APB2 + (uintptr_t)0x3400))
+
+/// SPI5 base address
+#define PER_SPI_5 ((per_spi_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_APB2 + (uintptr_t)0x5000))
+
+/// SPI6 base address
+#define PER_SPI_6 ((per_spi_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_APB2 + (uintptr_t)0x5400))
+
 /// Baudrate divider maximum value
 #define PER_SPI_BR_MAX (256)
 

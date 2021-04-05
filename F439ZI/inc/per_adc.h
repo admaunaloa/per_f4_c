@@ -33,18 +33,6 @@ extern "C" {
 
 #include "per_adc_f4.h"
 
-/// ADC1 base address
-#define PER_ADC_1 ((per_adc_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_APB2 + (uintptr_t)0x2000))
-
-/// ADC2 base address
-#define PER_ADC_2 ((per_adc_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_APB2 + (uintptr_t)0x2100))
-
-/// ADC3 base address
-#define PER_ADC_3 ((per_adc_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_APB2 + (uintptr_t)0x2200))
-
-/// ADC_COMMON base address
-#define PER_ADC_COM ((per_adc_com_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_APB2 + (uintptr_t)0x2300))
-
 /// ADC pointer to adc 1
 static per_inline const per_adc_t* const per_adc_1(void)
 {

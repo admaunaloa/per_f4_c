@@ -41,6 +41,9 @@ extern "C" {
 #include "per_bit_f4.h"
 #include "per_log_f4.h"
 
+/// RCC base address
+#define PER_RCC ((per_rcc_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_AHB1 + (uintptr_t)0x3800))
+
 /// RCC APBx to TIMERS fixed multiplier
 #define PER_RCC_APB_PER_TO_TIM_MUL ((uint32_t)2)
 

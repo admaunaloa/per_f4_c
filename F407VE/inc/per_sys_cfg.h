@@ -33,12 +33,9 @@ extern "C" {
 
 #include "per_sys_cfg_f4.h"
 
-/// SYSCFG base address
-#define PER_SYSCFG (PER_ADDR_APB2 + (uintptr_t)0x3800)
-
 static per_inline per_sys_cfg_t* per_sys_cfg(void)
 {
-    return (per_sys_cfg_t*)PER_BIT_REG_TO_BIT_BAND(PER_SYSCFG);
+    return PER_SYSCFG;
 }
 
 #ifdef __cplusplus

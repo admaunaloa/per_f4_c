@@ -69,6 +69,36 @@ extern "C" {
 #include "per_bit_f4.h"
 #include "per_log_f4.h"
 
+/// TIM2 base address
+#define PER_TIM_2 ((per_tim_gp_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_APB1 + (uintptr_t)0x0000))
+
+/// TIM3 base address
+#define PER_TIM_3 ((per_tim_gp_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_APB1 + (uintptr_t)0x0400))
+
+/// TIM4 base address
+#define PER_TIM_4 ((per_tim_gp_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_APB1 + (uintptr_t)0x0800))
+
+/// TIM5 base address
+#define PER_TIM_5 ((per_tim_gp_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_APB1 + (uintptr_t)0x0C00))
+
+/// TIM9 base address
+#define PER_TIM_9 ((per_tim_gp_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_APB2 + (uintptr_t)0x4000))
+
+/// TIM10 base address
+#define PER_TIM_10 ((per_tim_gp_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_APB2 + (uintptr_t)0x4400))
+
+/// TIM11 base address
+#define PER_TIM_11 ((per_tim_gp_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_APB2 + (uintptr_t)0x4800))
+
+/// TIM12 base address
+#define PER_TIM_12 ((per_tim_gp_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_APB1 + (uintptr_t)0x1800))
+
+/// TIM13 base address
+#define PER_TIM_13 ((per_tim_gp_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_APB1 + (uintptr_t)0x1C00))
+
+/// TIM14 base address
+#define PER_TIM_14 ((per_tim_gp_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_APB1 + (uintptr_t)0x2000))
+
 /// Clock division maximum
 #define PER_TIM_GP_CKD_MAX (4)
 
