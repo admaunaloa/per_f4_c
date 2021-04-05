@@ -34,16 +34,16 @@ extern "C" {
 #include "per_gpio.h"
 
 /// GPIOB
-#define bsp_gpio_led_green()        (&PER_GPIOB->Od[PER_GPIO_PIN_0])
-#define bsp_gpio_led_blue()         (&PER_GPIOB->Od[PER_GPIO_PIN_7])
-#define bsp_gpio_led_red()          (&PER_GPIOB->Od[PER_GPIO_PIN_14])
+#define bsp_gpio_led_green()        (per_gpio_b_out(PER_GPIO_PIN_0))
+#define bsp_gpio_led_blue()         (per_gpio_b_out(PER_GPIO_PIN_7))
+#define bsp_gpio_led_red()          (per_gpio_b_out(PER_GPIO_PIN_14))
 
 /// GPIOC
-#define bsp_user_button_1()         (&PER_GPIOC->Id[PER_GPIO_PIN_13])
+#define bsp_user_button_1()         (per_gpio_c_in(PER_GPIO_PIN_13))
 
 /// GPIOD
-#define bsp_gpio_usart3_tx()        (&PER_GPIOD->Od[PER_GPIO_PIN_8])
-#define bsp_gpio_usart3_rx()        (&PER_GPIOD->Id[PER_GPIO_PIN_9])
+#define bsp_gpio_usart3_tx()        (per_gpio_d_out(PER_GPIO_PIN_8))
+#define bsp_gpio_usart3_rx()        (per_gpio_d_in(PER_GPIO_PIN_9))
 
 void bsp_gpio_init(void);
 
