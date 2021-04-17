@@ -95,6 +95,9 @@ typedef enum
     PER_LOG_GPIO, ///< GPIO
     PER_LOG_HASH, ///< HASH
     PER_LOG_I2C, ///< I2C
+    PER_LOG_I2C_1, ///< I2C
+    PER_LOG_I2C_2, ///< I2C
+    PER_LOG_I2C_3, ///< I2C
     PER_LOG_IWDG, ///< IWDG
     PER_LOG_LTDC, ///< LTDC
     PER_LOG_OTG_FS, ///< OTG_FS
