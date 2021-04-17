@@ -93,8 +93,8 @@ type-safe and they enable features such as zero-cost error checking.
 
 ## DEVELOPMENT STATUS (apr 2021)
 Supported peripherals
-* 100% ADC, DMA, SPI, USART, GPIO, TIM_AD, TIM_GP, DES, RCC, FLASH 
-* 50%  PWR, SYS_CFG
+* 100% ADC, DMA, SPI, USART, GPIO, I2C, TIM_AD, TIM_GP, DES, RCC, FLASH, PWR
+* 50%  SYS_CFG
 * 20%  ETH
 
 Status generics
