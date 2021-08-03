@@ -15,6 +15,17 @@ This library gives existing bare-metal projects a performance boost, it unleashe
 ### Bitband
 This technique is excellently explained by: [Martin Hubacek](http://www.martinhubacek.cz/arm/advanced-arm-cortex-tips/bit-banding---fast-and-safe-bit-manipulation)
 
+## TESTS
+In these tests the per_ GPIO functions are compared to the standard GPIO functions.
+| Function | Duration | Size  |
+|          |[cycle]   |[byte] |
+|----------|----------|-------|
+| value = per_gpio_in(bsp_user_button_1())        | 15->7=53%   | 36->20=44% |
+| per_gpio_set_out(bsp_gpio_led_green(), true);   | 8->4=50%    | 16->12=25% |
+| per_gpio_set_out(bsp_gpio_led_green(), value);  | 11->8=27%   | 16->16=0%  |
+| if (per_tim_gp_rdclr_uif(per_tim_gp_3())) {...} | 20->16=20%  | 20->20=0%  |
+| per_tim_ad_set_cen(per_tim_ad_1(), true);       | 13->11=15%  | 16->8=50%  |
+
 ## USAGE
 Three examples. The first two GPIO get and set, the third is an interrupt handler.  
 
