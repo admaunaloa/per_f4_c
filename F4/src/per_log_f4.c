@@ -1,7 +1,7 @@
 /**
- * @file per_dep.c
+ * @file per_log_f4.c
  *
- * This file contains the peripheral portability functions
+ * This file contains the peripheral logging functions
  *
  * Copyright (c) 2021 admaunaloa admaunaloa@gmail.com
  *
@@ -24,12 +24,49 @@
  * SOFTWARE.
  */
 
-#include "per_dep.h"
+#include "per_log_f4.h"
 
-#include "bsp_dep.h"
+static per_log_event_t last; //!< Last event
+static volatile uint32_t count; //!< Number of errors
+static void (*callback)(uint_fast32_t per, uint_fast32_t ev, uint_fast32_t val);
 
-/// Logging peripheral error event with value
-void per_dep_log_err(uint_fast32_t per, uint_fast32_t ev, uint_fast32_t val)
+/// Logging peripheral error event with valuer
+void per_log_err(per_log_e per, uint_fast32_t ev, uint_fast32_t val)
 {
-    bsp_dep_log_err(per, ev, val); // Delegate it to the BSP layer. Abstract dependencies
+    last.peripheral = per;
+    last.event = ev;
+    last.value = val;
+    count++;
+
+    if (0 != callback)
+    {
+        callback(per, ev, val); // inform user
+    }
+}
+
+/// Logging user callback function set
+void per_log_set_callback(void (*fct)(uint_fast32_t per, uint_fast32_t ev, uint_fast32_t val))
+{
+    callback = fct;
+}
+
+/// Logging user callback function clear
+void per_log_clr_callback(void)
+{
+    callback = 0;
+}
+
+/// Get last logging event
+uint32_t per_log_get(per_log_event_t* ev)
+{
+    uint32_t cnt;
+
+    do
+    {
+        cnt = count;
+        per_mem_copy(ev, &last, sizeof(*ev));
+    }
+    while(cnt != count);
+
+    return cnt;
 }

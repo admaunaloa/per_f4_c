@@ -117,9 +117,9 @@ typedef enum
     PER_LOG_SPI_4, ///< SPI4
     PER_LOG_SPI_5, ///< SPI5
     PER_LOG_SPI_6, ///< SPI6
-    PER_LOG_SPI, ///< SPI
+    PER_LOG_SPI,   ///< SPI
     PER_LOG_SYS_CFG, ///< SYS_CFG
-    PER_LOG_TIM_1, ///< TIM1
+    PER_LOG_TIM_1,  ///< TIM1
     PER_LOG_TIM_10, ///< TIM10
     PER_LOG_TIM_11, ///< TIM11
     PER_LOG_TIM_12, ///< TIM12
@@ -133,7 +133,7 @@ typedef enum
     PER_LOG_TIM_7, ///< TIM7
     PER_LOG_TIM_8, ///< TIM8
     PER_LOG_TIM_9, ///< TIM9
-    PER_LOG_TIM, ///< TIM
+    PER_LOG_TIM,   ///< TIM
     PER_LOG_TIM_AD, ///< TIM advanced
     PER_LOG_TIM_GP, ///< TIM general purpose
     PER_LOG_UART_4, ///< UART4
@@ -144,16 +144,25 @@ typedef enum
     PER_LOG_USART_2, ///< USART2
     PER_LOG_USART_3, ///< USART3
     PER_LOG_USART_6, ///< USART6
-    PER_LOG_UART, ///< UART
+    PER_LOG_UART,  ///< UART
     PER_LOG_USART, ///< USART
-    PER_LOG_WWDG, ///< WWDG
+    PER_LOG_WWDG,  ///< WWDG
 } per_log_e;
 
-/// Logging peripheral error event with value
-static per_inline void per_log_err(per_log_e per, uint_fast32_t ev, uint_fast32_t val)
+typedef struct
 {
-    per_dep_log_err((uint_fast32_t)per, ev, val);
-}
+    per_log_e peripheral;  //!< Last error peripheral number
+    uint32_t event;  //!< Last error event number
+    uint32_t value;  //!< Last error value
+} per_log_event_t;
+
+void per_log_err(per_log_e per, uint_fast32_t ev, uint_fast32_t val);
+
+void per_log_set_callback(void (*fct)(uint_fast32_t per, uint_fast32_t ev, uint_fast32_t val));
+
+void per_log_clr_callback(void);
+
+uint32_t per_log_get(per_log_event_t* event);
 
 #ifdef __cplusplus
 }

@@ -34,6 +34,7 @@ extern "C" {
 // All the external dependencies of the library
 #include <stdbool.h>
 #include <stdint.h>
+#include <string.h>
 
 /// Provide the correct in-line definition for the project here
 #define per_inline inline
@@ -41,11 +42,11 @@ extern "C" {
 /// Provide the correct LOG2 function
 #define per_log2(x) __builtin_ctz(x)
 
-/// Logging peripheral error event with value
-void per_dep_log_err(uint_fast32_t per, uint_fast32_t ev, uint_fast32_t val);
-
 /// Mark unsupported functions and generate a compile/link time error
 __attribute((error("\nError: function does not exists on this peripheral"))) void per_dep_err_unsupported(void);
+
+/// Memory copy abstraction
+#define per_mem_copy(dest,src,n) memcpy(dest,src,n)
 
 #ifdef __cplusplus
 }

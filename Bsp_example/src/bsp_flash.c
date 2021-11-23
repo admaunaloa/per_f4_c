@@ -29,5 +29,10 @@
 /// Initialize FLASH
 void bsp_flash_init(void)
 {
-    per_flash_set_latency(per_flash(), 5);
+    const per_flash_t* flash = per_flash();
+
+    per_flash_set_latency(flash, 5);
+    per_flash_set_icen(flash, true);
+    per_flash_set_dcen(flash, true);
+    per_flash_set_prften(flash, true);
 }
