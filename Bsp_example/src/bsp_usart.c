@@ -27,6 +27,7 @@
 #include "bsp_usart.h"
 
 #include "per_rcc.h"
+
 #include "bsp_gpio.h"
 
 bsp_usart_data_t usart_3_inst; ///< USART3 instance
@@ -255,7 +256,7 @@ uint16_t usart_3_receive2(uint8_t* dest, uint16_t cap)
                 size1 = cap; // clip
             }
 
-            bsp_mem_copy(dest, usart_3_inst.BufEnd - usart_3_inst.Ndt, size1); // Copy first part
+            per_mem_copy(dest, usart_3_inst.BufEnd - usart_3_inst.Ndt, size1); // Copy first part
             usart_3_inst.Ndt -= size1;
 
             if (usart_3_inst.Ndt == 0) // Rest
@@ -275,7 +276,7 @@ uint16_t usart_3_receive2(uint8_t* dest, uint16_t cap)
                 size = cap; // clip
             }
 
-            bsp_mem_copy(dest, usart_3_inst.BufEnd - usart_3_inst.Ndt, size); // Copy all
+            per_mem_copy(dest, usart_3_inst.BufEnd - usart_3_inst.Ndt, size); // Copy all
             usart_3_inst.Ndt -= size;
         }
 
