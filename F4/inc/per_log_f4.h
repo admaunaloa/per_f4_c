@@ -158,7 +158,7 @@ typedef struct
 
 void per_log_err(per_log_e per, uint_fast32_t ev, uint_fast32_t val);
 
-void per_log_set_callback(void (*fct)(uint_fast32_t per, uint_fast32_t ev, uint_fast32_t val));
+void per_log_set_callback(void (*fct)(per_log_e per, uint_fast32_t ev, uint_fast32_t val));
 
 void per_log_clr_callback(void);
 

@@ -28,15 +28,21 @@
 
 static per_log_event_t last; //!< Last event
 static volatile uint32_t count; //!< Number of errors
-static void (*callback)(uint_fast32_t per, uint_fast32_t ev, uint_fast32_t val);
+static void (*callback)(per_log_e per, uint_fast32_t ev, uint_fast32_t val);
 
-/// Logging peripheral error event with valuer
+/// Logging peripheral error event with value, can be called from interrupt and user-space
 void per_log_err(per_log_e per, uint_fast32_t ev, uint_fast32_t val)
 {
-    last.peripheral = per;
-    last.event = ev;
-    last.value = val;
-    count++;
+    uint32_t cnt;
+
+    do
+    {
+        cnt = ++count;
+        last.peripheral = per;
+        last.event = ev;
+        last.value = val;
+    }
+    while(cnt != count);
 
     if (0 != callback)
     {
@@ -45,7 +51,7 @@ void per_log_err(per_log_e per, uint_fast32_t ev, uint_fast32_t val)
 }
 
 /// Logging user callback function set
-void per_log_set_callback(void (*fct)(uint_fast32_t per, uint_fast32_t ev, uint_fast32_t val))
+void per_log_set_callback(void (*fct)(per_log_e per, uint_fast32_t ev, uint_fast32_t val))
 {
     callback = fct;
 }
@@ -56,7 +62,7 @@ void per_log_clr_callback(void)
     callback = 0;
 }
 
-/// Get last logging event
+/// Get last logging event, is consistent even when interrupted.
 uint32_t per_log_get(per_log_event_t* ev)
 {
     uint32_t cnt;
