@@ -1,7 +1,7 @@
 /**
  * @file per_eth_f4.c
  *
- * This file contains the peripheral ETH
+ * This file contains the Ethernet peripheral interface (ETH)
  *
  * Copyright (c) 2021 admaunaloa admaunaloa@gmail.com
  *

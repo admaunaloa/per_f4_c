@@ -51,10 +51,14 @@ extern "C"
 /// ETH DMA base address
 #define PER_ETH_DMA ((per_eth_dma_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_AHB1 + (uintptr_t)0x9000))
 
+/// PPS frequency maximum value
+#define PER_ETH_PPSFREQ_MAX (32768)
+
 /// ETH error enumeration
 typedef enum
 {
     PER_ETH_ERR_OK = PER_LOG_ETH * PER_LOG_MULT, ///< No error
+    PER_ETH_PPSFREQ_ERR, ///< PPS frequency invalid
 } per_eth_error_e;
 
 /// ETH Interframe gap
@@ -91,11 +95,11 @@ typedef enum
 /// ETH Clock range
 typedef enum
 {
-    PER_ETH_CR_60_100   = 0b000, ///< 60-100 MHz HCLK/42
-    PER_ETH_CR_100_150  = 0b001, ///< 100-150 MHzHCLK/62
-    PER_ETH_CR_20_35    = 0b010, ///< 20-35 MHz HCLK/16
-    PER_ETH_CR_35_60    = 0b011, ///< 35-60 MHz HCLK/26
-    PER_ETH_CR_150_168  = 0b100, ///< 150-168 MHz HCLK/102
+    PER_ETH_CR_60_100  = 0b000, ///< 60-100 MHz HCLK/42
+    PER_ETH_CR_100_150 = 0b001, ///< 100-150 MHzHCLK/62
+    PER_ETH_CR_20_35   = 0b010, ///< 20-35 MHz HCLK/16
+    PER_ETH_CR_35_60   = 0b011, ///< 35-60 MHz HCLK/26
+    PER_ETH_CR_150_168 = 0b100, ///< 150-168 MHz HCLK/102
 } per_eth_cr_e;
 
 /// ETH PMT control and status register flags
@@ -117,49 +121,58 @@ typedef enum
 {
     PER_ETH_MSFRWCS_IDLE = 0b00, ///< Idle
     PER_ETH_MSFRWCS_READ  = 0b01, ///< Read active
-    PER_ETH_MSFRWCS_WRITE  = 0b10, ///< Write active
+    PER_ETH_MSFRWCS_WRITE = 0b10, ///< Write active
     PER_ETH_MSFRWCS_READ_WRITE = 0b11, ///< Read and write active
 } per_eth_msfrwcs_e;
 
 /// ETH Rx FIFO read controller status
 typedef enum
 {
-    PER_ETH_RFRCS_IDLE = 0b00, ///< IDLE state
-    PER_ETH_RFRCS_DATA  = 0b01, ///< Reading frame data
-    PER_ETH_RFRCS_STATUS  = 0b10, ///< Reading frame status (or time-stamp)
-    PER_ETH_RFRCS_FLUSH = 0b11, ///< Flushing the frame data and status
+    PER_ETH_RFRCS_IDLE   = 0b00, ///< IDLE state
+    PER_ETH_RFRCS_DATA   = 0b01, ///< Reading frame data
+    PER_ETH_RFRCS_STATUS = 0b10, ///< Reading frame status (or time-stamp)
+    PER_ETH_RFRCS_FLUSH  = 0b11, ///< Flushing the frame data and status
 } per_eth_rfrcs_e;
 
 /// ETH Rx FIFO fill level
 typedef enum
 {
-    PER_ETH_RFFL_EMPTY = 0b00, ///< Empty
+    PER_ETH_RFFL_EMPTY  = 0b00, ///< Empty
     PER_ETH_RFFL_BELOW  = 0b01, ///< Fill-level below flow-control de-activate threshold
     PER_ETH_RFFL_ABOVE  = 0b10, ///< Fill-level above flow-control activate threshold
-    PER_ETH_RFFL_FULL  = 0b11, ///< Full
+    PER_ETH_RFFL_FULL   = 0b11, ///< Full
 } per_eth_rffl_e;
 
 /// ETH MAC transmit frame controller status
 typedef enum
 {
-    PER_ETH_MTFCS_IDLE = 0b00, ///< Idle
-    PER_ETH_MTFCS_WAIT  = 0b01, ///< Waiting for Status of previous frame or IFG/backoff period to be over
-    PER_ETH_MTFCS_PAUSE  = 0b10, ///< Generating and transmitting a Pause control frame (in full duplex mode)
-    PER_ETH_MTFCS_TRANSFER  = 0b11, ///< Transferring input frame for transmission
+    PER_ETH_MTFCS_IDLE     = 0b00, ///< Idle
+    PER_ETH_MTFCS_WAIT     = 0b01, ///< Waiting for Status of previous frame or IFG/backoff period to be over
+    PER_ETH_MTFCS_PAUSE    = 0b10, ///< Generating and transmitting a Pause control frame (in full duplex mode)
+    PER_ETH_MTFCS_TRANSFER = 0b11, ///< Transferring input frame for transmission
 } per_eth_mtfcs_e;
 
 /// ETH Tx FIFO read status
 typedef enum
 {
-    PER_ETH_TFRS_IDLE = 0b00, ///< Idle state
+    PER_ETH_TFRS_IDLE  = 0b00, ///< Idle state
     PER_ETH_TFRS_READ  = 0b01, ///< Read state (transferring data to the MAC transmitter)
     PER_ETH_TFRS_WAIT  = 0b10, ///< Waiting for TxStatus from MAC transmitter
-    PER_ETH_TFRS_WRITE  = 0b11, ///< Writing the received TxStatus or flushing the TxFIFO
+    PER_ETH_TFRS_WRITE = 0b11, ///< Writing the received TxStatus or flushing the TxFIFO
 } per_eth_tfrs_e;
+
+/// ETH Time stamp clock node type
+typedef enum
+{
+    PER_ETH_TSCNT_ORDINARY = 0b00, ///< Ordinary clock
+    PER_ETH_TSCNT_BOUND = 0b01, ///< Boundary clock
+    PER_ETH_TSCNT_END   = 0b10, ///< End-to-end transparent clock
+    PER_ETH_TSCNT_PEER  = 0b11, ///< Peer-to-peer transparent clock
+} per_eth_tscnt_e;
 
 typedef struct
 {
-    // Ethernet MAC configuration register (ETH_MACCR)
+    // MAC configuration register (ETH_MACCR)
     per_bit_n2_t MaccrBit0; ///< Reserved
     per_bit_rw1_t Re; ///< Receiver enable
     per_bit_rw1_t Te; ///< Transmitter enable
@@ -183,7 +196,7 @@ typedef struct
     per_bit_rw1_t Cstf; ///< CRC stripping for Type frames
     per_bit_n6_t MaccrBit26; ///< Reserved
 
-    // Ethernet MAC frame filter register (ETH_MACFFR)
+    // MAC frame filter register (ETH_MACFFR)
     per_bit_rw1_t Pm; ///< Promiscuous mode
     per_bit_rw1_t Hu; ///< Hash unicast
     per_bit_rw1_t Hm; ///< Hash multicast
@@ -197,10 +210,10 @@ typedef struct
     per_bit_n20_t MacffrBit11; ///< Reserved
     per_bit_rw1_t Ra; ///< Receive all
 
-    // Ethernet MAC hash table high register (ETH_MACHTHR)
+    // MAC hash table high register (ETH_MACHTHR)
     per_bit_rw32_reg_t Hth; ///< Hash table high
 
-    // Ethernet MAC hash table low register (ETH_MACHTLR)
+    // MAC hash table low register (ETH_MACHTLR)
     per_bit_rw32_reg_t Htl; ///< Hash table low
 
     // Ethernet MAC MII address register (ETH_MACMIIAR)
@@ -219,10 +232,10 @@ typedef struct
         per_bit_rw16_reg_t Macmiiar; ///< Register access
     };
 
-    // Ethernet MAC MII data register (ETH_MACMIIDR)
+    // MAC MII data register (ETH_MACMIIDR)
     per_bit_rw16_reg_t Md; ///< MII data
 
-    // Ethernet MAC flow control register (ETH_MACFCR)
+    // MAC flow control register (ETH_MACFCR)
     per_bit_rs1_t Fcb; ///< Flow control busy/back pressure activate
     per_bit_rw1_t Tfce; ///< Transmit flow control enable
     per_bit_rw1_t Rfce; ///< Receive flow control enable
@@ -240,15 +253,15 @@ typedef struct
 
     per_bit_n32_t MacReg20[2]; ///< Reserved
 
-    // Ethernet MAC remote wakeup frame filter register (ETH_MACRWUFFR)
+    // MAC remote wakeup frame filter register (ETH_MACRWUFFR)
     per_bit_rw32_reg_t Rwuffr; ///< remote wakeup frame filter register
 
-    // Ethernet MAC PMT control and status register (ETH_MACPMTCSR)
+    // MAC PMT control and status register (ETH_MACPMTCSR)
     per_bit_rw32_reg_t Macpmtcsr; ///< Register access
 
     per_bit_n32_t MacReg30; ///< Reserved
 
-    // Ethernet MAC debug register (ETH_MACDBGR)
+    // MAC debug register (ETH_MACDBGR)
     per_bit_r1_t Mmrpea; ///< MAC MII receive protocol engine active
     per_bit_r2_t Msfrwcs; ///< MAC small FIFO read / write controllers status
     per_bit_n1_t MacdbgrBit3; ///< Reserved
@@ -267,7 +280,7 @@ typedef struct
     per_bit_r1_t Tff; ///< Tx FIFO full
     per_bit_n6_t MacdbgrBit26; ///< Reserved
 
-    // Ethernet MAC interrupt status register (ETH_MACSR)
+    // MAC interrupt status register (ETH_MACSR)
     per_bit_n3_t MaccsrBit0; ///< Reserved
     per_bit_r1_t Pmts; ///< PMT status
     per_bit_r1_t Mmcs; ///< MMC status
@@ -277,42 +290,42 @@ typedef struct
     per_bit_r1_t Tsts; ///< Time stamp trigger status
     per_bit_n22_t MaccsrBit10; ///< Reserved
 
-    // Ethernet MAC interrupt mask register (ETH_MACIMR)
+    // MAC interrupt mask register (ETH_MACIMR)
     per_bit_n3_t MacimrBit0; ///< Reserved
     per_bit_rw1_t Pmtim; ///< PMT interrupt mask
     per_bit_n5_t MacimrBit4; ///< Reserved
     per_bit_rw1_t Tstim; ///< Time stamp trigger interrupt mask
     per_bit_n22_t MacimrBit10; ///< Reserved
 
-    // Ethernet MAC address 0 high register (ETH_MACA0HR)
+    // MAC address 0 high register (ETH_MACA0HR)
     per_bit_rw16_t Maca0h; ///< MAC address0 high [47:32]
     per_bit_n15_t Maca0hrBit16; ///< Reserved
     per_bit_n1_t Mo; ///< Always 1
 
-    // Ethernet MAC address 0 low register (ETH_MACA0LR)
+    // MAC address 0 low register (ETH_MACA0LR)
     per_bit_rw32_reg_t Maca0l; ///< MAC address0 low [31:0]
 
-    // Ethernet MAC address 1 high register (ETH_MACA1HR)
+    // MAC address 1 high register (ETH_MACA1HR)
     per_bit_rw16_t Maca1h; ///< MAC address1 high [47:32]
     per_bit_n8_t Maca1hrBit16; ///< Reserved
     per_bit_rw6_t Mbc1; ///< Mask byte control
     per_bit_rw1_t Sa1; ///< Source address
     per_bit_rw1_t Ae1; ///< Address enable
 
-    // Ethernet MAC address 1 low register (ETH_MACA1LR)
+    // MAC address 1 low register (ETH_MACA1LR)
     per_bit_rw32_reg_t Maca1l; ///< MAC address1 low [31:0]
 
-    // Ethernet MAC address 2 high register (ETH_MACA2HR)
+    // MAC address 2 high register (ETH_MACA2HR)
     per_bit_rw16_t Maca2h; ///< MAC address2 high [47:32]
     per_bit_n8_t Maca2hrBit16; ///< Reserved
     per_bit_rw6_t Mbc2; ///< Mask byte control
     per_bit_rw1_t Sa2; ///< Source address
     per_bit_rw1_t Ae2; ///< Address enable
 
-    // Ethernet MAC address 2 low register (ETH_MACA2LR)
+    // MAC address 2 low register (ETH_MACA2LR)
     per_bit_rw32_reg_t Maca2l; ///< MAC address2 low [31:0]
 
-    // Ethernet MAC address 3 high register (ETH_MACA3HR)
+    // MAC address 3 high register (ETH_MACA3HR)
     per_bit_rw16_t Maca3h; ///< MAC address3 high [47:32]
     per_bit_n8_t Maca3hrBit16; ///< Reserved
     per_bit_rw6_t Mbc3; ///< Mask byte control
@@ -325,7 +338,7 @@ typedef struct
 
 typedef struct
 {
-    // Ethernet MMC control register (ETH_MMCCR)
+    // MMC control register (ETH_MMCCR)
     per_bit_rw1_t Cr; ///< Counter reset
     per_bit_rw1_t Csr; ///< Counter stop rollover
     per_bit_rw1_t Ror; ///< Reset on read
@@ -334,7 +347,7 @@ typedef struct
     per_bit_rw1_t Mcfhp; ///< MMC counter Full-Half preset
     per_bit_n26_t MmccrBit6; ///< Reserved
 
-    // Ethernet MMC receive interrupt register (ETH_MMCRIR)
+    // MMC receive interrupt register (ETH_MMCRIR)
     per_bit_n5_t MmcrirBit0; ///< Reserved
     per_bit_r1_t Rfces; ///< Received frames CRC error status
     per_bit_r1_t Rfaes; ///< Received frames alignment error status
@@ -342,7 +355,7 @@ typedef struct
     per_bit_r1_t Rgufs; ///< Received Good Unicast Frames Status
     per_bit_n14_t MmcrirBit18; ///< Reserved
 
-    // Ethernet MMC transmit interrupt register (ETH_MMCTIR)
+    // MMC transmit interrupt register (ETH_MMCTIR)
     per_bit_n14_t MmctirBit0; ///< Reserved
     per_bit_r1_t Tgfscs; ///< Transmitted good frames single collision status
     per_bit_r1_t Tgmscs; ///< Transmitted good frames more single collision status
@@ -350,7 +363,7 @@ typedef struct
     per_bit_r1_t Tgfs; ///< Transmitted good frames status
     per_bit_n10_t MmctirBit22; ///< Reserved
 
-    // Ethernet MMC receive interrupt mask register (ETH_MMCRIMR)
+    // MMC receive interrupt mask register (ETH_MMCRIMR)
     per_bit_n5_t MmcimrBit0; ///< Reserved
     per_bit_rw1_t Rfcem; ///< Received frame CRC error mask
     per_bit_rw1_t Rfaem; ///< Received frames alignment error mask
@@ -358,7 +371,7 @@ typedef struct
     per_bit_rw1_t Rgufm; ///< Received good unicast frames mask
     per_bit_n14_t MmcimrBit18; ///< Reserved
 
-    // Ethernet MMC transmit interrupt mask register (ETH_MMCTIMR)
+    // MMC transmit interrupt mask register (ETH_MMCTIMR)
     per_bit_n14_t MmctimrBit0; ///< Reserved
     per_bit_rw1_t Tgfscm; ///< Transmitted good frames single collision mask
     per_bit_rw1_t Tgfmscm; ///< Transmitted good frames more single collision mask
@@ -368,23 +381,23 @@ typedef struct
 
     per_bit_n32_t MmcReg14[14]; ///< Reserved
 
-    // Ethernet MMC transmitted good frames after a single collision counter register (ETH_MMCTGFSCCR)
+    // MMC transmitted good frames after a single collision counter register (ETH_MMCTGFSCCR)
     per_bit_r32_reg_t Tgfscc; ///< Transmitted good frames single collision counter
 
-    // Ethernet MMC transmitted good frames after more than a single collision counter register (ETH_MMCTGFMSCCR)
+    // MMC transmitted good frames after more than a single collision counter register (ETH_MMCTGFMSCCR)
     per_bit_r32_reg_t Tgfmscc; ///< Transmitted good frames more single collision counter
 
     per_bit_n32_t MmcReg54[5]; ///< Reserved
 
-    // Ethernet MMC transmitted good frames counter register (ETH_MMCTGFCR)
+    // MMC transmitted good frames counter register (ETH_MMCTGFCR)
     per_bit_r32_reg_t Tgfc; ///< Transmitted good frames counter
 
     per_bit_n32_t MmcReg6c[10]; ///< Reserved
 
-    // Ethernet MMC received frames with CRC error counter register (ETH_MMCRFCECR)
+    // MMC received frames with CRC error counter register (ETH_MMCRFCECR)
     per_bit_r32_reg_t Rfcec; ///< Received frames CRC error counter
 
-    // Ethernet MMC received frames with alignment error counter register (ETH_MMCRFAECR)
+    // MMC received frames with alignment error counter register (ETH_MMCRFAECR)
     per_bit_r32_reg_t Rfaec; ///< Received frames alignment error counter
 
     per_bit_n32_t MmcReg9c[10]; ///< Reserved
@@ -395,6 +408,61 @@ typedef struct
 
 typedef struct
 {
+    // PTP time stamp control register (ETH_PTPTSCR)
+    per_bit_rw1_t Tse; ///< Time stamp enable
+    per_bit_rw1_t Tsfcu; ///< Time stamp fine or coarse update
+    per_bit_rw1_t Tssti; ///< Time stamp system time initialize
+    per_bit_rw1_t Tsstu; ///< Time stamp system time update
+    per_bit_rw1_t Tsite; ///< Time stamp interrupt trigger enable
+    per_bit_rw1_t Ttsaru; ///< Time stamp addend register update
+    per_bit_n2_t PtptscrBit6; ///< Reserved
+    per_bit_rw1_t Tssarfe; ///< Time stamp snapshot for all received frames enable
+    per_bit_rw1_t Tsssr; ///< Time stamp subsecond rollover: digital or binary rollover control
+    per_bit_rw1_t Tsptppsv2e; ///< Time stamp PTP packet snooping for version2 format enable
+    per_bit_rw1_t Tssptpoefe; ///< Time stamp snapshot for PTP over ethernet frames enable
+    per_bit_rw1_t Tssipv6fe; ///< Time stamp snapshot for IPv6 frames enable
+    per_bit_rw1_t Tssipv4fe; ///< Time stamp snapshot for IPv4 frames enable
+    per_bit_rw1_t Tsseme; ///< Time stamp snapshot for event message enable
+    per_bit_rw1_t Tssmrme; ///< Time stamp snapshot for message relevant to master enable
+    per_bit_rw2_t Tscnt; ///< Time stamp clock node type
+    per_bit_rw1_t Tspffmae; ///< Time stamp PTP frame filtering MAC address enable
+    per_bit_n13_t PtptscrBit19; ///< Reserved
+
+    // PTP subsecond increment register (ETH_PTPSSIR)
+    per_bit_rw8_reg_t Stssi; ///< System time subsecond increment
+
+    // PTP time stamp high register (ETH_PTPTSHR)
+    per_bit_r32_reg_t Sts; ///< System time second
+
+    // PTP time stamp low register (ETH_PTPTSLR)
+    per_bit_r32_reg_t Stss; ///< System time subseconds. Note used as signed int32
+
+    // PTP time stamp high update register (ETH_PTPTSHUR)
+    per_bit_rw32_reg_t Tsus; ///< Time stamp update second
+
+    // PTP time stamp low update register (ETH_PTPTSLUR)
+    per_bit_rw32_reg_t Tsuss; ///< Time stamp update subseconds. Note used as signed int32
+
+    // PTP time stamp addend register (ETH_PTPTSAR)
+    per_bit_rw32_reg_t Tsa; ///< Time stamp addend
+
+    // PTP target time high register (ETH_PTPTTHR)
+    per_bit_rw32_reg_t Ttsh; ///< Target time stamp high
+
+    // PTP target time low register (ETH_PTPTTLR)
+    per_bit_rw32_reg_t Ttsl; ///< Target time stamp low
+
+    per_bit_n32_t PtpReg24; ///< Reserved
+
+    // PTP time stamp status register (ETH_PTPTSSR)
+    per_bit_r1_t Tsso; ///< Time stamp second overflow
+    per_bit_r1_t Tsttr; ///< Time stamp target time reached
+    per_bit_n30_t PtptssrBit2; ///< Reserved
+
+    // PTP PPS control register (ETH_PTPPPSCR)
+    per_bit_rw4_t Ppsfreq; ///< PPS frequency selection
+    per_bit_n28_t PtpppscrBit4; ///< Reserved
+
 } __attribute__((packed)) per_eth_ptp_t;
 
 typedef struct
@@ -1602,6 +1670,313 @@ static per_inline uint_fast32_t per_eth_rfaec(const per_eth_t* const eth)
 static per_inline uint_fast32_t per_eth_rgufc(const per_eth_t* const eth)
 {
    return per_bit_r32_reg(&eth->PerMmc->Rgufc);
+}
+
+/// Time stamp enable
+static per_inline bool per_eth_ptp_tse(const per_eth_t* const eth)
+{
+    return per_bit_rw1(&eth->PerPtp->Tse);
+}
+
+/// Time stamp enable
+static per_inline void per_eth_ptp_set_tse(const per_eth_t* const eth, bool val)
+{
+    per_bit_rw1_set(&eth->PerPtp->Tse, val);
+}
+
+/// Time stamp fine or coarse update
+static per_inline bool per_eth_ptp_tsfcu(const per_eth_t* const eth)
+{
+    return per_bit_rw1(&eth->PerPtp->Tsfcu);
+}
+
+/// Time stamp fine or coarse update
+static per_inline void per_eth_ptp_set_tsfcu(const per_eth_t* const eth, bool val)
+{
+    per_bit_rw1_set(&eth->PerPtp->Tsfcu, val);
+}
+
+/// Time stamp system time initialize
+static per_inline bool per_eth_ptp_tssti(const per_eth_t* const eth)
+{
+    return per_bit_rw1(&eth->PerPtp->Tssti);
+}
+
+/// Time stamp system time initialize
+static per_inline void per_eth_ptp_set_tssti(const per_eth_t* const eth, bool val)
+{
+    per_bit_rw1_set(&eth->PerPtp->Tssti, val);
+}
+
+/// Time stamp system time update
+static per_inline bool per_eth_ptp_tsstu(const per_eth_t* const eth)
+{
+   return per_bit_rw1(&eth->PerPtp->Tsstu);
+}
+
+/// Time stamp system time update
+static per_inline void per_eth_ptp_set_tsstu(const per_eth_t* const eth, bool val)
+{
+   per_bit_rw1_set(&eth->PerPtp->Tsstu, val);
+}
+
+/// Time stamp interrupt trigger enable
+static per_inline bool per_eth_ptp_tsite(const per_eth_t* const eth)
+{
+   return per_bit_rw1(&eth->PerPtp->Tsite);
+}
+
+/// Time stamp interrupt trigger enable
+static per_inline void per_eth_ptp_set_tsite(const per_eth_t* const eth, bool val)
+{
+   per_bit_rw1_set(&eth->PerPtp->Tsite, val);
+}
+
+/// Time stamp addend register update
+static per_inline bool per_eth_ptp_ttsaru(const per_eth_t* const eth)
+{
+   return per_bit_rw1(&eth->PerPtp->Ttsaru);
+}
+
+/// Time stamp addend register update
+static per_inline void per_eth_ptp_set_ttsaru(const per_eth_t* const eth, bool val)
+{
+   per_bit_rw1_set(&eth->PerPtp->Ttsaru, val);
+}
+
+/// Time stamp snapshot for all received frames enable
+static per_inline bool per_eth_ptp_tssarfe(const per_eth_t* const eth)
+{
+   return per_bit_rw1(&eth->PerPtp->Tssarfe);
+}
+
+/// Time stamp snapshot for all received frames enable
+static per_inline void per_eth_ptp_set_tssarfe(const per_eth_t* const eth, bool val)
+{
+   per_bit_rw1_set(&eth->PerPtp->Tssarfe, val);
+}
+
+/// Time stamp subsecond rollover: digital or binary rollover control
+static per_inline bool per_eth_ptp_tsssr(const per_eth_t* const eth)
+{
+   return per_bit_rw1(&eth->PerPtp->Tsssr);
+}
+
+/// Time stamp subsecond rollover: digital or binary rollover control
+static per_inline void per_eth_ptp_set_tsssr(const per_eth_t* const eth, bool val)
+{
+   per_bit_rw1_set(&eth->PerPtp->Tsssr, val);
+}
+
+/// Time stamp PTP packet snooping for version2 format enable
+static per_inline bool per_eth_ptp_tsptppsv2e(const per_eth_t* const eth)
+{
+   return per_bit_rw1(&eth->PerPtp->Tsptppsv2e);
+}
+
+/// Time stamp PTP packet snooping for version2 format enable
+static per_inline void per_eth_ptp_set_tsptppsv2e(const per_eth_t* const eth, bool val)
+{
+   per_bit_rw1_set(&eth->PerPtp->Tsptppsv2e, val);
+}
+
+/// Time stamp snapshot for PTP over ethernet frames enable
+static per_inline bool per_eth_ptp_tssptpoefe(const per_eth_t* const eth)
+{
+   return per_bit_rw1(&eth->PerPtp->Tssptpoefe);
+}
+
+/// Time stamp snapshot for PTP over ethernet frames enable
+static per_inline void per_eth_ptp_set_tssptpoefe(const per_eth_t* const eth, bool val)
+{
+   per_bit_rw1_set(&eth->PerPtp->Tssptpoefe, val);
+}
+
+/// Time stamp snapshot for IPv6 frames enable
+static per_inline bool per_eth_ptp_tssipv6fe(const per_eth_t* const eth)
+{
+   return per_bit_rw1(&eth->PerPtp->Tssipv6fe);
+}
+
+/// Time stamp snapshot for IPv6 frames enable
+static per_inline void per_eth_ptp_set_tssipv6fe(const per_eth_t* const eth, bool val)
+{
+   per_bit_rw1_set(&eth->PerPtp->Tssipv6fe, val);
+}
+
+/// Time stamp snapshot for IPv4 frames enable
+static per_inline bool per_eth_ptp_tssipv4fe(const per_eth_t* const eth)
+{
+   return per_bit_rw1(&eth->PerPtp->Tssipv4fe);
+}
+
+/// Time stamp snapshot for IPv4 frames enable
+static per_inline void per_eth_ptp_set_tssipv4fe(const per_eth_t* const eth, bool val)
+{
+   per_bit_rw1_set(&eth->PerPtp->Tssipv4fe, val);
+}
+
+/// Time stamp snapshot for event message enable
+static per_inline bool per_eth_ptp_tsseme(const per_eth_t* const eth)
+{
+   return per_bit_rw1(&eth->PerPtp->Tsseme);
+}
+
+/// Time stamp snapshot for event message enable
+static per_inline void per_eth_ptp_set_tsseme(const per_eth_t* const eth, bool val)
+{
+   per_bit_rw1_set(&eth->PerPtp->Tsseme, val);
+}
+
+/// Time stamp snapshot for message relevant to master enable
+static per_inline bool per_eth_ptp_tssmrme(const per_eth_t* const eth)
+{
+   return per_bit_rw1(&eth->PerPtp->Tssmrme);
+}
+
+/// Time stamp snapshot for message relevant to master enable
+static per_inline void per_eth_ptp_set_tssmrme(const per_eth_t* const eth, bool val)
+{
+   per_bit_rw1_set(&eth->PerPtp->Tssmrme, val);
+}
+
+/// Time stamp clock node type
+static per_inline per_eth_tscnt_e per_eth_ptp_tscnt(const per_eth_t* const eth)
+{
+    return (per_eth_tscnt_e)per_bit_rw2(&eth->PerPtp->Tscnt);
+}
+
+/// Time stamp clock node type
+static per_inline void per_eth_ptp_set_tscnt(const per_eth_t* const eth, per_eth_tscnt_e val)
+{
+    per_bit_rw2_set(&eth->PerPtp->Tscnt, (uint_fast16_t)val);
+}
+
+/// Time stamp PTP frame filtering MAC address enable
+static per_inline bool per_eth_ptp_tspffmae(const per_eth_t* const eth)
+{
+    return per_bit_rw1(&eth->PerPtp->Tspffmae);
+}
+
+/// Time stamp PTP frame filtering MAC address enable
+static per_inline void per_eth_ptp_set_tspffmae(const per_eth_t* const eth, bool val)
+{
+    per_bit_rw1_set(&eth->PerPtp->Tspffmae, val);
+}
+
+/// System time subsecond increment
+static per_inline uint8_t per_eth_ptp_stssi(const per_eth_t* const eth)
+{
+    return per_bit_rw8_reg(&eth->PerPtp->Stssi);
+}
+
+/// System time subsecond increment
+static per_inline void per_eth_ptp_set_stssi(const per_eth_t* const eth, uint8_t val)
+{
+    per_bit_rw8_reg_set(&eth->PerPtp->Stssi, val);
+}
+
+/// System time second
+static per_inline uint32_t per_eth_ptp_sts(const per_eth_t* const eth)
+{
+    return per_bit_r32_reg(&eth->PerPtp->Sts);
+}
+
+/// System time subseconds
+static per_inline int32_t per_eth_ptp_stss(const per_eth_t* const eth)
+{
+    return (int32_t)per_bit_r32_reg(&eth->PerPtp->Stss);
+}
+
+///Time stamp update second
+static per_inline uint32_t per_eth_ptp_tsus(const per_eth_t* const eth)
+{
+    return per_bit_rw32_reg(&eth->PerPtp->Tsus);
+}
+
+///Time stamp update second
+static per_inline void per_eth_ptp_set_tsus(const per_eth_t* const eth, uint32_t val)
+{
+    per_bit_rw32_reg_set(&eth->PerPtp->Tsus, val);
+}
+
+/// Time stamp update subseconds
+static per_inline int32_t per_eth_ptp_tsuss(const per_eth_t* const eth)
+{
+    return (int32_t)per_bit_rw32_reg(&eth->PerPtp->Tsuss);
+}
+
+/// Time stamp update subseconds
+static per_inline void per_eth_ptp_set_tsuss(const per_eth_t* const eth, int32_t val)
+{
+    per_bit_rw32_reg_set(&eth->PerPtp->Tsuss, (uint32_t)val);
+}
+
+/// Time stamp addend
+static per_inline uint32_t per_eth_ptp_tsa(const per_eth_t* const eth)
+{
+    return per_bit_rw32_reg(&eth->PerPtp->Tsa);
+}
+
+/// Time stamp addend
+static per_inline void per_eth_ptp_set_tsa(const per_eth_t* const eth, uint32_t val)
+{
+    per_bit_rw32_reg_set(&eth->PerPtp->Tsa, val);
+}
+
+/// Target time stamp high
+static per_inline uint32_t per_eth_ptp_ttsh(const per_eth_t* const eth)
+{
+    return per_bit_rw32_reg(&eth->PerPtp->Ttsh);
+}
+
+/// Target time stamp high
+static per_inline void per_eth_ptp_set_ttsh(const per_eth_t* const eth, uint32_t val)
+{
+    per_bit_rw32_reg_set(&eth->PerPtp->Ttsh, val);
+}
+
+/// Target time stamp low
+static per_inline uint32_t per_eth_ptp_ttsl(const per_eth_t* const eth)
+{
+    return per_bit_rw32_reg(&eth->PerPtp->Ttsl);
+}
+
+/// Target time stamp low
+static per_inline void per_eth_ptp_set_ttsl(const per_eth_t* const eth, uint32_t val)
+{
+    per_bit_rw32_reg_set(&eth->PerPtp->Ttsl, val);
+}
+
+/// Time stamp second overflow
+static per_inline bool per_eth_ptp_tsso(const per_eth_t* const eth)
+{
+    return per_bit_r1(&eth->PerPtp->Tsso);
+}
+
+/// Time stamp target time reached
+static per_inline bool per_eth_ptp_tsttr(const per_eth_t* const eth)
+{
+    return per_bit_r1(&eth->PerPtp->Tsttr);
+}
+
+/// PPS frequency selection
+static per_inline uint_fast16_t per_eth_ptp_ppsfreq(const per_eth_t* const eth)
+{
+    return per_bit_inv_log2(per_bit_rw4(&eth->PerPtp->Ppsfreq));
+}
+
+/// PPS frequency selection
+static per_inline bool per_eth_ptp_set_ppsfreq(const per_eth_t* const eth, uint_fast16_t val)
+{
+    if ((val > PER_ETH_PPSFREQ_MAX) ||
+        !per_bit_is_log2(val))
+    {
+        per_log_err(eth->Err, PER_ETH_PPSFREQ_ERR, val);
+        return false;
+    }
+
+    return per_bit_rw4_set(&eth->PerPtp->Ppsfreq, per_bit_log2(val));
 }
 
 #ifdef __cplusplus
