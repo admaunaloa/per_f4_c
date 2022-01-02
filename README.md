@@ -17,14 +17,14 @@ This technique is excellently explained by: [Martin Hubacek](http://www.martinhu
 
 ## TESTS
 In these tests the per_ GPIO functions are compared to the standard GPIO functions.
-| Function | Duration | Size |
-|:---:|:---:|:---:|
-|  | [cycles] | [bytes] |
-| value = per_gpio_in(bsp_user_button_1()) | 15->7=53% | 36->20=44% |
-| per_gpio_set_out(bsp_gpio_led_green(), true); | 8->4=50% | 16->12=25% |
-| per_gpio_set_out(bsp_gpio_led_green(), value); | 11->8=27% | 16->16=0% |
-| if (per_tim_gp_rdclr_uif(per_tim_gp_3())) {...} | 20->16=20% | 20->20=0% |
-| per_tim_ad_set_cen(per_tim_ad_1(), true); | 13->11=15% | 16->8=50% |
+| Function | Duration | Size | Description |
+|:---:|:---:|:---:|:---:|
+|  | [cycles] | [bytes] | |
+| value = per_gpio_in(bsp_user_button_1()) | 15->7=53% | 36->20=44% | Get a GPIO input |
+| per_gpio_set_out(bsp_gpio_led_green(), true); | 8->4=50% | 16->12=25% | Set a GPIO output to fixed value |
+| per_gpio_set_out(bsp_gpio_led_green(), value); | 11->8=27% | 16->16=0% | Set a GPIO output to variable value|
+| if (per_tim_gp_rdclr_uif(per_tim_gp_3())) {...} | 20->16=20% | 20->20=0% | Read and clear interrupt flags |
+| per_tim_ad_set_cen(per_tim_ad_1(), true); | 13->11=15% | 16->8=50% | Enable advanced timer 1 |
 
 ## USAGE
 Three examples. The first two GPIO get and set, the third is an interrupt handler.  
