@@ -17,14 +17,14 @@ This technique is excellently explained by: [Martin Hubacek](http://www.martinhu
 
 ## TESTS
 In these tests the per_ GPIO functions are compared to the standard GPIO functions.
-| Function | Duration | Size  |
-|          |[cycle]   |[byte] |
-|----------|----------|-------|
-| value = per_gpio_in(bsp_user_button_1())        | 15->7=53%   | 36->20=44% |
-| per_gpio_set_out(bsp_gpio_led_green(), true);   | 8->4=50%    | 16->12=25% |
-| per_gpio_set_out(bsp_gpio_led_green(), value);  | 11->8=27%   | 16->16=0%  |
-| if (per_tim_gp_rdclr_uif(per_tim_gp_3())) {...} | 20->16=20%  | 20->20=0%  |
-| per_tim_ad_set_cen(per_tim_ad_1(), true);       | 13->11=15%  | 16->8=50%  |
+| Function | Duration | Size |
+|:---:|:---:|:---:|
+|  | [cycles] | [bytes] |
+| value = per_gpio_in(bsp_user_button_1()) | 15->7=53% | 36->20=44% |
+| per_gpio_set_out(bsp_gpio_led_green(), true); | 8->4=50% | 16->12=25% |
+| per_gpio_set_out(bsp_gpio_led_green(), value); | 11->8=27% | 16->16=0% |
+| if (per_tim_gp_rdclr_uif(per_tim_gp_3())) {...} | 20->16=20% | 20->20=0% |
+| per_tim_ad_set_cen(per_tim_ad_1(), true); | 13->11=15% | 16->8=50% |
 
 ## USAGE
 Three examples. The first two GPIO get and set, the third is an interrupt handler.  
@@ -102,11 +102,10 @@ This set UE example results in a minimal number of assembly instructions because
 both functions are inlined and bitband is used. Both functions also make it
 type-safe and they enable features such as zero-cost error checking.
 
-## DEVELOPMENT STATUS (apr 2021)
+## DEVELOPMENT STATUS (jan 2022)
 Supported peripherals
 * 100% ADC, DMA, SPI, USART, GPIO, I2C, TIM_AD, TIM_GP, DES, RCC, FLASH, PWR
-* 50%  SYS_CFG
-* 20%  ETH
+* 50%  SYS_CFG, ETH
 
 Status generics
 * 100% BITBAND, LOGGING
