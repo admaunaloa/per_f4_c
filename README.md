@@ -1,5 +1,5 @@
 ## ALOHA!
-This project is a hardware abstraction (HAL) library for F4 micro-controller peripherals written in C.  
+This project is a hardware abstraction (HAL) library for STM32 F4 micro-controller peripherals written in C.  
   
 The advantages of this libary are:
 * Faster execution
