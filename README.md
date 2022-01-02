@@ -5,8 +5,8 @@ The advantages of this libary are:
 * Faster execution
 * Smaller size
 * Interrupt and thread safe register manipulation
-* Type safe consistent API interface
-* It can co-exist with other HAL libraries
+* Type safe and consistent API interface (the compiler is your friend)
+* It co-exists with other HAL libraries
 
 Typical GPIO peripheral functions have up to 50% shorter execution time combined with a up to 40% smaller footprint.  
 Bitband technology is used extensively and implicit.  
@@ -185,27 +185,26 @@ This function interface is consistent for all peripherals and it is future proof
 For example **per_usart_1()**.
 
 ## inline
-All the layers are provided in header files and inline functions. This allows the compiler to resolve all constants and optimise this all to a minimum size executable with fast execution times.
+All the layers are provided in header files and inline functions. This allows the compiler to resolve all constants and optimise everything to a minimum size executable with fast execution times.
 The use of inline functions makes the API consistent and type safe.  
 
 ## debug logging
-Runtime debug logging is provided in bsp_dep.c. This file contains a call-back function that is called from the per_... files in case of a runtime fault.
-A default log implementation captures this errors. It is up to the user to adapt and extend this file. 
+The library has very efficient runtime debug logging. The user can extend this by subscribing a user logging callback function via a call to per_log_set_callback(...).
 
 ## dependencies
-There are only a few external dependencies. All dependencies are accessed and wrapped via the per_dep.* and bsp_dep.* files.  
-These files allow the user to adapt the library to other development enviroments.
+There are only minimal external dependencies and all of them are accessed and wrapped via the per_dep.h and bsp_dep.h files.  
+This abstraction allows for future adaption to other development enviroments.
 
 ## exceptions
-There are a few hardware peripheral registers that are better accessed by register instead of bitband.
-The specific functions for this register handle this implicitly. Examples of this are TIMx_SR and USARTx_DR
+For the F4 specialists among us, there are a few hardware peripheral registers that are not safely accessible by bitband.
+The specific functions for these registers take care of this implicitly. Examples of this are TIMx_SR and USARTx_DR
 
 ## compilation
 The library can coexist with other HAL libraries. Just add the directories to the project.
 Note: the F439ZI is also good for other F4 types, it provides all possible peripherals.
 Add the include libraries: F4/inc, F439ZI/inc, Nucleo/inc
-If required, compile the files: per_bit.c, per_gpio.c, per_dep.c and bsp_dep.c  
+If required, compile the files: per_log_f4.c per_bit_f4.c, per_gpio_f4.c, per_eth_f4.c and bsp_dep.c  
 
 ## THE END
 If you have any tips, remarks, questions or suggestions please send an email.  
-Developing more efficient software can decrease energy consumption, decrease carbon footprint and help our planet :-)  
+Developing more efficient software can decrease energy consumption, decrease carbon footprint and help the planet :-)  
