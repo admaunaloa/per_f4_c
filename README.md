@@ -28,7 +28,8 @@ In these tests the per_ GPIO functions are compared to the standard GPIO functio
 
 ## USAGE
 The best example is located in the file Blinky_Nucleo_F439.zip. This simple example shows hardware abstraction (Bsp), hardware initialization, GPIO usage and co-existance with the standard HAL driver.
-Below are three code snippet examples. The first two GPIO get and set, the third is an interrupt handler.  
+
+Below are three small code snippet examples. The first two GPIO get and set, the third is an interrupt handler.  
 
 ### GPIO GET
 ```c++
