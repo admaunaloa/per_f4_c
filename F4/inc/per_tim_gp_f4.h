@@ -3,7 +3,7 @@
  *
  * This file contains the peripheral timer general purpose 4 channel (TIM_GP)
  *
- * Copyright (c) 2021 admaunaloa admaunaloa@gmail.com
+ * Copyright (c) 2023 admaunaloa admaunaloa@gmail.com
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -342,7 +342,7 @@ typedef struct
             per_bit_rw4_t Icf; ///< Input capture filter
         };
     };
-} __attribute__((packed)) per_tim_gp_ccm_t;
+} per_tim_gp_ccm_t;
 
 typedef struct
 {
@@ -521,7 +521,7 @@ typedef struct
     per_bit_n2_t Dcrbit8;   ///< Reserved
     per_bit_rw2_t Itr1_rmp; ///< TIM2 Internal trigger 1 remap
     per_bit_n20_t Dcrbit12; ///< Reserved
-} __attribute__((packed)) per_tim_gp_per_t;
+} per_tim_gp_per_t;
 
 /// TIM_GP descriptor
 typedef struct

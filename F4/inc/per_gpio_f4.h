@@ -3,7 +3,7 @@
  *
  * This file contains the peripheral GPIO
  *
- * Copyright (c) 2021 admaunaloa admaunaloa@gmail.com
+ * Copyright (c) 2023 admaunaloa admaunaloa@gmail.com
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -255,7 +255,7 @@ typedef struct
 
     // AFRL AFRH alternate function low/high register
     per_bit_rw4_t Afr[PER_GPIO_MAX]; ///< Alternate function selection
-} __attribute__((packed)) per_gpio_t;
+} per_gpio_t;
 
 /// GPIO set mode input, output or alternate
 static per_inline bool per_gpio_set_mode(per_gpio_t* gpio, per_gpio_pin_e pin, per_gpio_mode_e mode)

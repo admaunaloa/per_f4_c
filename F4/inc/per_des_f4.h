@@ -3,7 +3,7 @@
  *
  * This file contains the Device Electronic Signature (DES)
  *
- * Copyright (c) 2021 admaunaloa admaunaloa@gmail.com
+ * Copyright (c) 2023 admaunaloa admaunaloa@gmail.com
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -45,7 +45,7 @@ typedef struct
     uint32_t Uid0; ///< UID bit 0-31
     uint32_t Uid32; ///< UID bit 32-63
     uint32_t Uid64; ///< UID bit 64-95
-} __attribute__((packed)) per_des_uid_t;
+} per_des_uid_t;
 
 /// Device unique device identifier UID
 static per_inline const per_des_uid_t* per_des_uid(void)

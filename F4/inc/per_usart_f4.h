@@ -4,7 +4,7 @@
  * This file contains the peripheral Universal Synchronous Asynchronous Receiver Transmitter (USART)
  * For the F4 series
  *
- * Copyright (c) 2021 admaunaloa admaunaloa@gmail.com
+ * Copyright (c) 2023 admaunaloa admaunaloa@gmail.com
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -254,7 +254,7 @@ typedef struct
     per_bit_rw8_t Psc; ///< Pre-scaler value
     per_bit_rw8_t Gt; ///< Guard time value
     per_bit_n16_t GtprBit16; ///< Reserved
-} __attribute__((packed)) per_usart_per_t;
+} per_usart_per_t;
 
 /// USART descriptor
 typedef struct
