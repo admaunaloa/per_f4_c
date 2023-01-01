@@ -3,7 +3,7 @@
  *
  * This file contains the peripheral timer advanced (TIM_AD)
  *
- * Copyright (c) 2021 admaunaloa admaunaloa@gmail.com
+ * Copyright (c) 2023 admaunaloa admaunaloa@gmail.com
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -283,7 +283,7 @@ typedef struct
             per_bit_rw4_t Icf; ///< Input capture filter
         };
     };
-} __attribute__((packed)) per_tim_ad_ccm_t;
+} per_tim_ad_ccm_t;
 
 typedef struct
 {
@@ -454,7 +454,7 @@ typedef struct
 
     // DMA address for full transfer (TIMx_DMAR)
     per_bit_rw32_reg_t Dmab; ///< DMA register for burst accesses
-} __attribute__((packed)) per_tim_ad_per_t;
+} per_tim_ad_per_t;
 
 /// TIM_AD descriptor
 typedef struct

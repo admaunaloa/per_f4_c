@@ -3,7 +3,7 @@
  *
  * This file contains the Inter-integrated circuit interface (I2C)
  *
- * Copyright (c) 2021 admaunaloa admaunaloa@gmail.com
+ * Copyright (c) 2023 admaunaloa admaunaloa@gmail.com
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -190,7 +190,7 @@ typedef struct
     per_bit_rw4_t Dnf; ///< Digital noise filter
     per_bit_rw1_t Anoff; ///< Analog noise filter OFF
     per_bit_n27_t FltrBit5; ///< Reserved
-} __attribute__((packed)) per_i2c_per_t;
+} per_i2c_per_t;
 
 /// I2C descriptor
 typedef struct

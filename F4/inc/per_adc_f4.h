@@ -3,7 +3,7 @@
  *
  * This file contains the analog digital converter (ADC)
  *
- * Copyright (c) 2021 admaunaloa admaunaloa@gmail.com
+ * Copyright (c) 2023 admaunaloa admaunaloa@gmail.com
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -231,13 +231,13 @@ typedef struct
 {
     per_bit_rw12_t Off; ///< Offset
     per_bit_n20_t Bit12; ///< Reserved
-} __attribute__((packed)) per_adc_jofr_t;
+} per_adc_jofr_t;
 
 /// ADC Data register structure
 typedef struct
 {
     per_bit_r16_reg_t Data ; ///< Data register
-} __attribute__((packed)) per_adc_dr_t;
+} per_adc_dr_t;
 
 /// ADC channel structure
 typedef struct
@@ -329,7 +329,7 @@ typedef struct
 
     // regular data register (ADC_DR)
     per_adc_dr_t D; ///< Regular data
-} __attribute__((packed)) per_adc_per_t;
+} per_adc_per_t;
 
 /// ADC Common status register structure
 typedef struct
@@ -341,7 +341,7 @@ typedef struct
     per_bit_r1_t Strt; ///< Regular channel Start flag
     per_bit_r1_t Ovr; ///< Overrun flag
     per_bit_n2_t CsrBit6; ///< Reserved
-} __attribute__((packed)) per_adc_csr_t;
+} per_adc_csr_t;
 
 /// ADC descriptor
 typedef struct
@@ -372,7 +372,7 @@ typedef struct
     // common regular data register for dual and triple modes (ADC_CDR)
     per_bit_r16_t Data1; ///< 1st Data item of a pair of regular conversions
     per_bit_r16_t Data2; ///< 2 Data item of a pair of regular conversions
-} __attribute__((packed)) per_adc_com_per_t;
+} per_adc_com_per_t;
 
 /// ADC common descriptor
 typedef struct

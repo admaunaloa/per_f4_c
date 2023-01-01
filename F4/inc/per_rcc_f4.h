@@ -3,7 +3,7 @@
  *
  * This file contains the peripheral Reset and Clock Control (RCC)
  *
- * Copyright (c) 2021 admaunaloa admaunaloa@gmail.com
+ * Copyright (c) 2023 admaunaloa admaunaloa@gmail.com
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -750,7 +750,7 @@ typedef struct
     per_bit_rw2_t Sai1bsrc; ///< SAI1-B clock source selection
     per_bit_rw1_t Timpre; ///< Timers clocks prescalers selection
     per_bit_n7_t DckcfgrBit25; ///< Reserved
-} __attribute__((packed)) per_rcc_per_t;
+} per_rcc_per_t;
 
 /// RCC descriptor
 typedef struct

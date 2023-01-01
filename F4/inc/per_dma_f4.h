@@ -3,7 +3,7 @@
  *
  * This file contains the peripheral Direct Memory Access (DMA)
  *
- * Copyright (c) 2021 admaunaloa admaunaloa@gmail.com
+ * Copyright (c) 2023 admaunaloa admaunaloa@gmail.com
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -163,7 +163,7 @@ typedef struct
     per_bit_r1_t Teif; ///< Stream x transfer error interrupt flag
     per_bit_r1_t Htif; ///< Stream x half transfer interrupt flag
     per_bit_r1_t Tcif; ///< Stream transfer complete interrupt flag
-} __attribute__((packed)) per_dma_isr_t;
+} per_dma_isr_t;
 
 /// DMA interrupt flag clear register
 typedef struct
@@ -174,7 +174,7 @@ typedef struct
     per_bit_w1_t Cteif; ///< Stream x transfer error interrupt flag
     per_bit_w1_t Chtif; ///< Stream x half transfer interrupt flag
     per_bit_w1_t Ctcif; ///< Stream transfer complete interrupt flag
-} __attribute__((packed)) per_dma_ifcr_t;
+} per_dma_ifcr_t;
 
 /// DMA configuration registers
 typedef struct
@@ -221,7 +221,7 @@ typedef struct
     per_bit_n1_t SxfcrBit6; ///< Reserved
     per_bit_rw1_t Feie; ///< FIFO error interrupt enable
     per_bit_n24_t SxfcrBit8; ///< Reserved
-} __attribute__((packed)) per_dma_conf_t;
+} per_dma_conf_t;
 
 /// DMA Stream 0...7 configuration
 typedef struct
@@ -259,7 +259,7 @@ typedef struct
     per_bit_n4_t HifcrBit28; ///< Reserved
 
     per_dma_conf_t Stream[PER_DMA_STREAM_MAX];
-} __attribute__((packed)) per_dma_t;
+} per_dma_t;
 
 /// DMA Stream descriptor
 typedef struct
@@ -268,7 +268,7 @@ typedef struct
     per_dma_isr_t* const Isr; ///< Interrupt status structure pointer
     per_dma_ifcr_t* const Ifcr; ///< Interrupt flag clear structure pointer
     const per_log_e Err; ///< Error peripheral number
-} __attribute__((packed)) per_dma_stream_t;
+} per_dma_stream_t;
 
 /// DMA Stream-channel selection options
 typedef struct

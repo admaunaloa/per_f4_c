@@ -3,7 +3,7 @@
  *
  * This file contains the Ethernet peripheral interface (ETH)
  *
- * Copyright (c) 2021 admaunaloa admaunaloa@gmail.com
+ * Copyright (c) 2023 admaunaloa admaunaloa@gmail.com
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -52,13 +52,29 @@ extern "C"
 #define PER_ETH_DMA ((per_eth_dma_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_AHB1 + (uintptr_t)0x9000))
 
 /// PPS frequency maximum value
-#define PER_ETH_PPSFREQ_MAX (32768)
+#define PER_ETH_PTP_PPSFREQ_MAX (32768)
+
+/// DMA Rx DMA PBL
+#define PER_ETH_DMA_RDP_MAX (32)
+
+/// DMA Rx Tx priority ratio
+#define PER_ETH_DMA_PM_MAX (4)
+
+/// DMA Rx Tx priority ratio
+#define PER_ETH_DMA_PBL_MAX (32)
+
+/// DMA Descriptor skip length
+#define PER_ETH_DMA_DSL_MAX PER_BIT_MAX(5)
 
 /// ETH error enumeration
 typedef enum
 {
     PER_ETH_ERR_OK = PER_LOG_ETH * PER_LOG_MULT, ///< No error
-    PER_ETH_PPSFREQ_ERR, ///< PPS frequency invalid
+    PER_ETH_PTP_PPSFREQ_ERR, ///< PPS frequency invalid
+    PER_ETH_DMA_RDP_ERR, ///< Rx DMA PBL
+    PER_ETH_DMA_PM_ERR, ///< DMA Rx Tx priority ratio invalid
+    PER_ETH_DMA_PBL_ERR, ///< DMA Programmable burst length invalid
+    PER_ETH_DMA_DSL_ERR, ///< DMA Descriptor skip length invalid
 } per_eth_error_e;
 
 /// ETH Interframe gap
@@ -334,7 +350,7 @@ typedef struct
 
     // Ethernet MAC address 3 low register (ETH_MACA3LR)
     per_bit_rw32_reg_t Maca3l; ///< MAC address3 low [31:0]
-} __attribute__((packed)) per_eth_mac_t;
+} per_eth_mac_t;
 
 typedef struct
 {
@@ -404,7 +420,7 @@ typedef struct
 
     // MMC received good unicast frames counter register (ETH_MMCRGUFCR)
     per_bit_r32_reg_t Rgufc; ///< Received good unicast frames counter
-} __attribute__((packed)) per_eth_mmc_t;
+} per_eth_mmc_t;
 
 typedef struct
 {
@@ -463,11 +479,29 @@ typedef struct
     per_bit_rw4_t Ppsfreq; ///< PPS frequency selection
     per_bit_n28_t PtpppscrBit4; ///< Reserved
 
-} __attribute__((packed)) per_eth_ptp_t;
+} per_eth_ptp_t;
 
 typedef struct
 {
-} __attribute__((packed)) per_eth_dma_t;
+    // Ethernet DMA bus mode register (ETH_DMABMR)
+    per_bit_n5_t DmabmrBit27; ///< Reserved
+    per_bit_rw1_t Mb; ///< Mixed burst
+    per_bit_rw1_t Aab; ///< Address-aligned beats
+    per_bit_rw1_t Fpm; ///< 4xPBL mode
+    per_bit_rw1_t Usp; ///< Use separate PBL
+    per_bit_rw6_t Rdp; ///< Rx DMA PBL
+    per_bit_rw1_t Fb; ///< Fixed burst
+    per_bit_rw2_t Pm; ///< Rx Tx priority ratio
+    per_bit_rw6_t Pbl; ///< Programmable burst length
+    per_bit_rw1_t Edfe; ///< Enhanced descriptor format enable
+    per_bit_rw5_t Dsl; ///< Descriptor skip length
+    per_bit_rw1_t Da; ///< DMA Arbitration
+    per_bit_rs1_t Sr; ///< Software reset
+
+
+
+
+} per_eth_dma_t;
 
 /// ETH descriptor
 typedef struct
@@ -1969,15 +2003,216 @@ static per_inline uint_fast16_t per_eth_ptp_ppsfreq(const per_eth_t* const eth)
 /// PPS frequency selection
 static per_inline bool per_eth_ptp_set_ppsfreq(const per_eth_t* const eth, uint_fast16_t val)
 {
-    if ((val > PER_ETH_PPSFREQ_MAX) ||
+    if ((val > PER_ETH_PTP_PPSFREQ_MAX) ||
         !per_bit_is_log2(val))
     {
-        per_log_err(eth->Err, PER_ETH_PPSFREQ_ERR, val);
+        per_log_err(eth->Err, PER_ETH_PTP_PPSFREQ_ERR, val);
         return false;
     }
 
     return per_bit_rw4_set(&eth->PerPtp->Ppsfreq, per_bit_log2(val));
 }
+
+/// Mixed burst
+static per_inline bool per_eth_dma_mb(const per_eth_t* const eth)
+{
+    return per_bit_rw1(&eth->PerDma->Mb);
+}
+
+/// Mixed burst
+static per_inline void per_eth_dma_set_mb(const per_eth_t* const eth, bool val)
+{
+    per_bit_rw1_set(&eth->PerDma->Mb, val);
+}
+
+/// Address-aligned beats
+static per_inline bool per_eth_dma_aab(const per_eth_t* const eth)
+{
+    return per_bit_rw1(&eth->PerDma->Aab);
+}
+
+/// Address-aligned beats
+static per_inline void per_eth_dma_set_aab(const per_eth_t* const eth, bool val)
+{
+    per_bit_rw1_set(&eth->PerDma->Aab, val);
+}
+
+/// 4xPBL mode
+static per_inline bool per_eth_dma_fpm(const per_eth_t* const eth)
+{
+    return per_bit_rw1(&eth->PerDma->Fpm);
+}
+
+/// 4xPBL mode
+static per_inline void per_eth_dma_set_fpm(const per_eth_t* const eth, bool val)
+{
+    per_bit_rw1_set(&eth->PerDma->Fpm, val);
+}
+
+/// Use separate PBL
+static per_inline bool per_eth_dma_usp(const per_eth_t* const eth)
+{
+    return per_bit_rw1(&eth->PerDma->Usp);
+}
+
+/// Use separate PBL
+static per_inline void per_eth_dma_set_usp(const per_eth_t* const eth, bool val)
+{
+    per_bit_rw1_set(&eth->PerDma->Usp, val);
+}
+
+/// Rx DMA PBL
+static per_inline uint_fast16_t per_eth_dma_rdp(const per_eth_t* const eth)
+{
+    return per_bit_rw6(&eth->PerDma->Rdp);
+}
+
+/// Rx DMA PBL
+static per_inline bool per_eth_dma_set_rdp(const per_eth_t* const eth, uint16_t val)
+{
+    if ((val > PER_ETH_DMA_RDP_MAX) ||
+        !per_bit_is_log2(val))
+    {
+        per_log_err(eth->Err, PER_ETH_DMA_RDP_ERR, val);
+        return false;
+    }
+
+    return per_bit_rw6_set(&eth->PerDma->Rdp, val);
+}
+
+/// Fixed burst
+static per_inline bool per_eth_dma_fb(const per_eth_t* const eth)
+{
+    return per_bit_rw1(&eth->PerDma->Fb);
+}
+
+/// Fixed burst
+static per_inline void per_eth_dma_set_fb(const per_eth_t* const eth, bool val)
+{
+    per_bit_rw1_set(&eth->PerDma->Fb, val);
+}
+
+/// Rx Tx priority ratio
+static per_inline uint_fast16_t per_eth_dma_pm(const per_eth_t* const eth)
+{
+    return per_bit_rw2(&eth->PerDma->Pm) + 1;
+}
+
+/// Rx Tx priority ratio
+static per_inline bool  per_eth_dma_set_pm(const per_eth_t* const eth, uint16_t val)
+{
+    if ((val > PER_ETH_DMA_PM_MAX) ||
+        (val == 0))
+    {
+        per_log_err(eth->Err, PER_ETH_DMA_PM_ERR, val);
+        return false;
+    }
+
+    return per_bit_rw2_set(&eth->PerDma->Pm, val - 1);
+}
+
+/// Programmable burst length
+static per_inline uint_fast16_t per_eth_dma_pbl(const per_eth_t* const eth)
+{
+    return per_bit_rw6(&eth->PerDma->Pbl);
+}
+
+/// Programmable burst length
+static per_inline bool per_eth_dma_set_pbl(const per_eth_t* const eth, uint16_t val)
+{
+    if ((val > PER_ETH_DMA_PBL_MAX) ||
+        !per_bit_is_log2(val))
+    {
+        per_log_err(eth->Err, PER_ETH_DMA_PBL_ERR, val);
+        return false;
+    }
+
+    return per_bit_rw6_set(&eth->PerDma->Pbl, val);
+}
+
+/// Enhanced descriptor format enable
+static per_inline bool per_eth_dma_edfe(const per_eth_t* const eth)
+{
+    return per_bit_rw1(&eth->PerDma->Edfe);
+}
+
+/// Enhanced descriptor format enable
+static per_inline void per_eth_dma_set_edfe(const per_eth_t* const eth, bool val)
+{
+    per_bit_rw1_set(&eth->PerDma->Edfe, val);
+}
+
+/// Descriptor skip length
+static per_inline uint_fast16_t per_eth_dma_dsl(const per_eth_t* const eth)
+{
+    return per_bit_rw5(&eth->PerDma->Dsl);
+}
+
+/// Descriptor skip length
+static per_inline bool per_eth_dma_set_dsl(const per_eth_t* const eth, uint16_t val)
+{
+    if (val > PER_ETH_DMA_DSL_MAX)
+    {
+        per_log_err(eth->Err, PER_ETH_DMA_DSL_ERR, val);
+        return false;
+    }
+
+    return per_bit_rw5_set(&eth->PerDma->Dsl, val);
+}
+
+/// DMA Arbitration
+static per_inline bool per_eth_dma_da(const per_eth_t* const eth)
+{
+    return per_bit_rw1(&eth->PerDma->Da);
+}
+
+/// DMA Arbitration
+static per_inline void per_eth_dma_set_da(const per_eth_t* const eth, bool val)
+{
+    per_bit_rw1_set(&eth->PerDma->Da, val);
+}
+
+/// Software reset
+static per_inline bool per_eth_dma_sr(const per_eth_t* const eth)
+{
+    return per_bit_rs1(&eth->PerDma->Sr);
+}
+
+/// Software reset
+static per_inline void per_eth_dma_set_sr(const per_eth_t* const eth)
+{
+    per_bit_rs1_set(&eth->PerDma->Sr);
+}
+
+
+
+
+// /// 
+// static per_inline bool per_eth_dma_(const per_eth_t* const eth)
+// {
+//     return per_bit_rw1(&eth->PerDma->);
+// }
+
+// /// 
+// static per_inline void per_eth_dma_set_(const per_eth_t* const eth, bool val)
+// {
+//     per_bit_rw1_set(&eth->PerDma->, val);
+// }
+
+
+// /// 
+// static per_inline uint_fast16_t per_eth_dma_(const per_eth_t* const eth)
+// {
+//     return per_bit_rw(&eth->PerDma->);
+// }
+
+// /// 
+// static per_inline bool per_eth_dma_set_(const per_eth_t* const eth, uint16_t val)
+// {
+//     return per_bit_rw_set(&eth->PerDma->, val);
+// }
+
+
 
 #ifdef __cplusplus
 }

@@ -3,7 +3,7 @@
  *
  * This file contains the power controller (PWR)
  *
- * Copyright (c) 2021 admaunaloa admaunaloa@gmail.com
+ * Copyright (c) 2023 admaunaloa admaunaloa@gmail.com
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -103,7 +103,7 @@ typedef struct
     per_bit_r1_t Odswrdy; ///< Over-drive mode switching ready
     per_bit_rw2_t Urdy; ///< Under-drive ready flag
     per_bit_n12_t PwrcsrBit20; ///< Reserved
-} __attribute__((packed)) per_pwr_per_t;
+} per_pwr_per_t;
 
 /// PWR descriptor
 typedef struct
