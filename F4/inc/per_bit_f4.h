@@ -180,7 +180,7 @@ typedef struct
     per_bit_bitband_t Rc; ///< One read clear bit
 } per_bit_rc1_w1_t;
 
-/// FLASH One read and clear bit get
+/// One read and clear bit get
 static per_inline bool per_bit_rc1_w1(const per_bit_rc1_w1_t* self)
 {
     return self->Rc.Bit8 != PER_BIT_0;
