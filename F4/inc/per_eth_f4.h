@@ -24,7 +24,8 @@
  * SOFTWARE.
  *
  * Convenience functions:
- * per_eth_macmiiar_write()     writes the MII register in one command
+ * per_eth_mac_miiar_write()     writes the MII register in one command
+ * per_eth_dma_irq()            clears active interrupts and returns bitmask of the cleared ones
  *
  */
 
@@ -327,7 +328,7 @@ typedef struct
             per_bit_rw5_t Pa; ///< PHY address
             per_bit_rw16_t MiiarBit16; ///< Reserved
         };
-        per_bit_rw16_reg_t Macmiiar; ///< Register access
+        per_bit_rw16_reg_t Miiar; ///< Register access
     };
 
     // MAC MII data register (ETH_MACMIIDR)
@@ -645,6 +646,33 @@ typedef struct
     per_bit_rw1_t Dtcefd; ///< Dropping of TCP/IP checksum error frames disable
     per_bit_n5_t OmrBit27; ///< Reserved
 
+    // DMA interrupt enable register (ETH_DMAIER)
+    union
+    {
+        struct
+        {
+            per_bit_rw1_t Tie; ///< Transmit interrupt enable
+            per_bit_rw1_t Tpsie; ///< Transmit process stopped interrupt enable
+            per_bit_rw1_t Tbuie; ///< Transmit buffer unavailable interrupt enable
+            per_bit_rw1_t Tjtie; ///< Transmit jabber timeout interrupt enable
+            per_bit_rw1_t Roie; ///< Overflow interrupt enable
+            per_bit_rw1_t Tuie; ///< Underflow interrupt enable
+            per_bit_rw1_t Rie; ///< Receive interrupt enable
+            per_bit_rw1_t Rbuie; ///< Receive buffer unavailable interrupt enable
+            per_bit_rw1_t Rpsie; ///< Receive process stopped interrupt enable
+            per_bit_rw1_t Rwtie; ///< Receive watchdog timeout interrupt enable
+            per_bit_rw1_t Etie; ///< Early transmit interrupt enable
+            per_bit_n2_t DierBit11; ///< Reserved
+            per_bit_rw1_t Fbeie; ///< Fatal bus error interrupt enable
+            per_bit_rw1_t Erie; ///< Early receive interrupt enable
+            per_bit_rw1_t Aise; ///< Abnormal interrupt summary enable
+            per_bit_rw1_t Nise; ///< Normal interrupt summary enable
+            per_bit_n15_t DierBit17; ///< Reserved
+        };
+        per_bit_rw32_reg_t Dier; ///< DMA interrupt enable register (ETH_DMAIER)
+    };
+
+    // DMA missed frame and buffer overflow counter register (ETH_DMAMFBOCR)
 
 } per_eth_dma_t;
 
@@ -1067,28 +1095,28 @@ static per_inline void per_eth_mac_set_pa(const per_eth_t* const eth, uint_fast1
 }
 
 /// ETH MII address register
-static per_inline uint_fast16_t per_eth_mac_macmiiar(const per_eth_t* const eth)
+static per_inline uint_fast16_t per_eth_mac_miiar(const per_eth_t* const eth)
 {
-    return per_bit_rw16_reg(&eth->PerMac->Macmiiar);
+    return per_bit_rw16_reg(&eth->PerMac->Miiar);
 }
 
 /// ETH MII address register
-static per_inline void per_eth_mac_set_macmiiar(const per_eth_t* const eth, uint16_t val)
+static per_inline void per_eth_mac_set_miiar(const per_eth_t* const eth, uint16_t val)
 {
-    per_bit_rw16_reg_set(&eth->PerMac->Macmiiar, val);
+    per_bit_rw16_reg_set(&eth->PerMac->Miiar, val);
 }
 
 /// ETH MII write address register
-static per_inline void per_eth_mac_macmiiar_write(const per_eth_t* const eth, uint_fast16_t reg, uint_fast16_t addr)
+static per_inline void per_eth_mac_miiar_write(const per_eth_t* const eth, uint_fast16_t reg, uint_fast16_t addr)
 {
     per_eth_mac_t* const per = eth->PerMac;
     uint16_t val = per_bit_rw5_mask(&per->Mr) & (reg << per_bit_rw5_shift(&per->Mr));
 
     val |= per_bit_rw5_mask(&per->Pa) & (addr << per_bit_rw5_shift(&per->Pa));
     val |= per_bit_rw1_mask(&per->Mw); // set write bit
-    val |= per_bit_rw16_reg(&eth->PerMac->Macmiiar) & per_bit_rw3_mask(&per->Cr); // Save the clock range
+    val |= per_bit_rw16_reg(&eth->PerMac->Miiar) & per_bit_rw3_mask(&per->Cr); // Save the clock range
 
-    per_bit_rw16_reg_set(&per->Macmiiar, val);
+    per_bit_rw16_reg_set(&per->Miiar, val);
 }
 
 /// ETH MII data register
@@ -2692,13 +2720,13 @@ static per_inline void per_eth_dma_set_ftf(const per_eth_t* const eth, bool val)
 /// Transmit store and forward
 static per_inline bool per_eth_dma_tsf(const per_eth_t* const eth)
 {
-    return per_bit_rw1(&eth->PerDma->Tsf);
+    return per_bit_rs1(&eth->PerDma->Tsf);
 }
 
 /// Transmit store and forward
-static per_inline void per_eth_dma_set_tsf(const per_eth_t* const eth, bool val)
+static per_inline void per_eth_dma_set_tsf(const per_eth_t* const eth)
 {
-    per_bit_rw1_set(&eth->PerDma->Tsf, val);
+    per_bit_rs1_set(&eth->PerDma->Tsf);
 }
 
 /// Disable flushing of received frames
@@ -2737,6 +2765,197 @@ static per_inline void per_eth_dma_set_dtcefd(const per_eth_t* const eth, bool v
     per_bit_rw1_set(&eth->PerDma->Dtcefd, val);
 }
 
+/// DMA interrupt enable register (ETH_DMAIER)
+static per_inline uint_fast32_t per_eth_dma_dier(const per_eth_t* const eth)
+{
+    return per_bit_rw32_reg(&eth->PerDma->Dier);
+}
+
+/// DMA interrupt enable register (ETH_DMAIER)
+static per_inline void per_eth_dma_set_dier(const per_eth_t* const eth, uint32_t val)
+{
+    per_bit_rw32_reg_set(&eth->PerDma->Dier, val);
+}
+
+/// Transmit interrupt enable
+static per_inline bool per_eth_dma_tie(const per_eth_t* const eth)
+{
+    return per_bit_rw1(&eth->PerDma->Tie);
+}
+
+/// Transmit interrupt enable
+static per_inline void per_eth_dma_set_tie(const per_eth_t* const eth, bool val)
+{
+    per_bit_rw1_set(&eth->PerDma->Tie, val);
+}
+
+/// Transmit process stopped interrupt enable
+static per_inline bool per_eth_dma_tpsie(const per_eth_t* const eth)
+{
+    return per_bit_rw1(&eth->PerDma->Tpsie);
+}
+
+/// Transmit process stopped interrupt enable
+static per_inline void per_eth_dma_set_tpsie(const per_eth_t* const eth, bool val)
+{
+    per_bit_rw1_set(&eth->PerDma->Tpsie, val);
+}
+
+/// Transmit buffer unavailable interrupt enable
+static per_inline bool per_eth_dma_tbuie(const per_eth_t* const eth)
+{
+    return per_bit_rw1(&eth->PerDma->Tbuie);
+}
+
+/// Transmit buffer unavailable interrupt enable
+static per_inline void per_eth_dma_set_tbuie(const per_eth_t* const eth, bool val)
+{
+    per_bit_rw1_set(&eth->PerDma->Tbuie, val);
+}
+
+/// Transmit jabber timeout interrupt enable
+static per_inline bool per_eth_dma_tjtie(const per_eth_t* const eth)
+{
+    return per_bit_rw1(&eth->PerDma->Tjtie);
+}
+
+/// Transmit jabber timeout interrupt enable
+static per_inline void per_eth_dma_set_tjtie(const per_eth_t* const eth, bool val)
+{
+    per_bit_rw1_set(&eth->PerDma->Tjtie, val);
+}
+
+/// Overflow interrupt enable
+static per_inline bool per_eth_dma_roie(const per_eth_t* const eth)
+{
+    return per_bit_rw1(&eth->PerDma->Roie);
+}
+
+/// Overflow interrupt enable
+static per_inline void per_eth_dma_set_roie(const per_eth_t* const eth, bool val)
+{
+    per_bit_rw1_set(&eth->PerDma->Roie, val);
+}
+
+/// Underflow interrupt enable
+static per_inline bool per_eth_dma_tuie(const per_eth_t* const eth)
+{
+    return per_bit_rw1(&eth->PerDma->Tuie);
+}
+
+/// Underflow interrupt enable
+static per_inline void per_eth_dma_set_tuie(const per_eth_t* const eth, bool val)
+{
+    per_bit_rw1_set(&eth->PerDma->Tuie, val);
+}
+
+/// Receive interrupt enable
+static per_inline bool per_eth_dma_rie(const per_eth_t* const eth)
+{
+    return per_bit_rw1(&eth->PerDma->Rie);
+}
+
+/// Receive interrupt enable
+static per_inline void per_eth_dma_set_rie(const per_eth_t* const eth, bool val)
+{
+    per_bit_rw1_set(&eth->PerDma->Rie, val);
+}
+
+/// Receive buffer unavailable interrupt enable
+static per_inline bool per_eth_dma_rbuie(const per_eth_t* const eth)
+{
+    return per_bit_rw1(&eth->PerDma->Rbuie);
+}
+
+/// Receive buffer unavailable interrupt enable
+static per_inline void per_eth_dma_set_rbuie(const per_eth_t* const eth, bool val)
+{
+    per_bit_rw1_set(&eth->PerDma->Rbuie, val);
+}
+
+/// Receive process stopped interrupt enable
+static per_inline bool per_eth_dma_rpsie(const per_eth_t* const eth)
+{
+    return per_bit_rw1(&eth->PerDma->Rpsie);
+}
+
+/// Receive process stopped interrupt enable
+static per_inline void per_eth_dma_set_rpsie(const per_eth_t* const eth, bool val)
+{
+    per_bit_rw1_set(&eth->PerDma->Rpsie, val);
+}
+
+/// Receive watchdog timeout interrupt enable
+static per_inline bool per_eth_dma_rwtie(const per_eth_t* const eth)
+{
+    return per_bit_rw1(&eth->PerDma->Rwtie);
+}
+
+/// Receive watchdog timeout interrupt enable
+static per_inline void per_eth_dma_set_rwtie(const per_eth_t* const eth, bool val)
+{
+    per_bit_rw1_set(&eth->PerDma->Rwtie, val);
+}
+
+/// Early transmit interrupt enable
+static per_inline bool per_eth_dma_etie(const per_eth_t* const eth)
+{
+    return per_bit_rw1(&eth->PerDma->Etie);
+}
+
+/// Early transmit interrupt enable
+static per_inline void per_eth_dma_set_etie(const per_eth_t* const eth, bool val)
+{
+    per_bit_rw1_set(&eth->PerDma->Etie, val);
+}
+
+/// Fatal bus error interrupt enable
+static per_inline bool per_eth_dma_fbeie(const per_eth_t* const eth)
+{
+    return per_bit_rw1(&eth->PerDma->Fbeie);
+}
+
+/// Fatal bus error interrupt enable
+static per_inline void per_eth_dma_set_fbeie(const per_eth_t* const eth, bool val)
+{
+    per_bit_rw1_set(&eth->PerDma->Fbeie, val);
+}
+
+/// Early receive interrupt enable
+static per_inline bool per_eth_dma_erie(const per_eth_t* const eth)
+{
+    return per_bit_rw1(&eth->PerDma->Erie);
+}
+
+/// Early receive interrupt enable
+static per_inline void per_eth_dma_set_erie(const per_eth_t* const eth, bool val)
+{
+    per_bit_rw1_set(&eth->PerDma->Erie, val);
+}
+
+/// Abnormal interrupt summary enable
+static per_inline bool per_eth_dma_aise(const per_eth_t* const eth)
+{
+    return per_bit_rw1(&eth->PerDma->Aise);
+}
+
+/// Abnormal interrupt summary enable
+static per_inline void per_eth_dma_set_aise(const per_eth_t* const eth, bool val)
+{
+    per_bit_rw1_set(&eth->PerDma->Aise, val);
+}
+
+/// Normal interrupt summary enable
+static per_inline bool per_eth_dma_nise(const per_eth_t* const eth)
+{
+    return per_bit_rw1(&eth->PerDma->Nise);
+}
+
+/// Normal interrupt summary enable
+static per_inline void per_eth_dma_set_nise(const per_eth_t* const eth, bool val)
+{
+    per_bit_rw1_set(&eth->PerDma->Nise, val);
+}
 
 
 
