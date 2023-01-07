@@ -67,8 +67,8 @@ Below are three small code snippet examples. The first two GPIO get and set, the
 ```
 
 ### TRY IT OUT
-1. Copy the libraries F4, F439ZI and Bsp_example in an existing project, F439ZI supports most other types too,
-1. Add the directories F4/inc F439ZI/inc and Bsp_example  to the include directories of the project/makefile.
+1. Copy the libraries F4, F439XX and Bsp_example in an existing project.
+1. Add the directories F4/inc F439XX/inc and Bsp_example  to the include directories of the project/makefile.
 1. Copy the lines of the GPIO get example above to an existing source file.
 1. Modify PER_GPIOC and PER_GPIO_PIN_13 to a valid GPIO input.
 1. Compile
@@ -203,8 +203,8 @@ The specific functions for these registers take care of this implicitly. Example
 
 ## compilation
 The library can coexist with other HAL libraries. Just add the directories to the project.
-Note: the F439ZI is also good for other F4 types, it provides all possible peripherals.
-Add the include libraries: F4/inc, F439ZI/inc, Nucleo/inc
+Note: the F439XX is good for all F4 types, it provides all possible peripherals.
+Add the include libraries: F4/inc, F439XX/inc, Nucleo/inc
 If required, compile the files: per_log_f4.c per_bit_f4.c, per_gpio_f4.c, per_eth_f4.c and bsp_dep.c  
 
 ## THE END

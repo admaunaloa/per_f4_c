@@ -66,6 +66,9 @@ extern "C"
 /// DMA Descriptor skip length
 #define PER_ETH_DMA_DSL_MAX PER_BIT_MAX(5)
 
+/// DMA Transmit threshold control Most significant bit
+#define DMA_TTS_MSB (0b0100)
+
 /// ETH error enumeration
 typedef enum
 {
@@ -186,31 +189,110 @@ typedef enum
     PER_ETH_TSCNT_PEER  = 0b11, ///< Peer-to-peer transparent clock
 } per_eth_tscnt_e;
 
+/// ETH DMA Status register flags
+typedef enum
+{
+    PER_ETH_DMA_SR_TS   = 0x000001, ///< Transmit status
+    PER_ETH_DMA_SR_TPSS = 0x000002, ///< Transmit process stopped status
+    PER_ETH_DMA_SR_TBUS = 0x000004, ///< Transmit buffer unavailable status
+    PER_ETH_DMA_SR_TJTS = 0x000008, ///< Transmit jabber timeout status
+    PER_ETH_DMA_SR_ROS  = 0x000010, ///< Receive overflow status
+    PER_ETH_DMA_SR_TUS  = 0x000020, ///< Transmit underflow status
+    PER_ETH_DMA_SR_RS   = 0x000040, ///< Receive status
+    PER_ETH_DMA_SR_RBUS = 0x000080, ///< Receive buffer unavailable status
+    PER_ETH_DMA_SR_RPSS = 0x000100, ///< Receive process stopped status
+    PER_ETH_DMA_SR_RWTS = 0x000200, ///< Receive watchdog timeout status
+    PER_ETH_DMA_SR_ETS  = 0x000400, ///< Early transmit status
+    PER_ETH_DMA_SR_FBES = 0x002000, ///< Fatal bus error status
+    PER_ETH_DMA_SR_ERS  = 0x004000, ///< Early receive status
+    PER_ETH_DMA_SR_AIS  = 0x008000, ///< Abnormal interrupt summary
+    PER_ETH_DMA_SR_NIS  = 0x010000, ///< Normal interrupt summary
+    PER_ETH_DMA_SR_MASK = PER_ETH_DMA_SR_TS | ///< All interrupt flag
+                          PER_ETH_DMA_SR_TPSS |
+                          PER_ETH_DMA_SR_TBUS |
+                          PER_ETH_DMA_SR_TJTS |
+                          PER_ETH_DMA_SR_ROS |
+                          PER_ETH_DMA_SR_TUS |
+                          PER_ETH_DMA_SR_RS |
+                          PER_ETH_DMA_SR_RBUS |
+                          PER_ETH_DMA_SR_RPSS |
+                          PER_ETH_DMA_SR_RWTS |
+                          PER_ETH_DMA_SR_ETS |
+                          PER_ETH_DMA_SR_FBES |
+                          PER_ETH_DMA_SR_ERS |
+                          PER_ETH_DMA_SR_AIS |
+                          PER_ETH_DMA_SR_NIS,
+} per_eth_dma_sr_e;
+
+/// ETH DMA Transmit process state
+typedef enum
+{
+    PER_ETH_DMA_TPS_STOPPED = 0b000, ///< Stopped; Reset or Stop Transmit Command issued
+    PER_ETH_DMA_TPS_FETCHING = 0b001, ///< Running; Fetching transmit transfer descriptor
+    PER_ETH_DMA_TPS_WAITING = 0b010, ///< Running; Waiting for status
+    PER_ETH_DMA_TPS_READING = 0b011, ///< Running; Reading Data from host memory
+    PER_ETH_DMA_TPS_SUSPENDED = 0b110, ///< Suspended
+    PER_ETH_DMA_TPS_CLOSING = 0b111, ///< Running; Closing transmit descriptor
+} per_eth_dma_tps_e;
+
+/// ETH DMA Receive process state
+typedef enum
+{
+    PER_ETH_DMA_RPS_STOPPED = 0b000, ///< Stopped: Reset or Stop Receive Command issued
+    PER_ETH_DMA_RPS_FETCHING = 0b001, ///< Running: Fetching receive transfer descriptor
+    PER_ETH_DMA_RPS_WAITING = 0b011, ///< Running: Waiting for receive packet
+    PER_ETH_DMA_RPS_SUSPENDED = 0b100, ///< Suspended: Receive descriptor unavailable
+    PER_ETH_DMA_RPS_CLOSING = 0b101, ///< Running: Closing receive descriptor
+    PER_ETH_DMA_RPS_TRANSFERRING = 0b111, ///< Running: Transferring the receive packet data
+} per_eth_dma_rps_e;
+
+/// ETH DMA Transmit threshold control
+typedef enum
+{
+    PER_ETH_DMA_TTC_64  = 0b000, ///< 64
+    PER_ETH_DMA_TTC_128 = 0b001, ///< 128
+    PER_ETH_DMA_TTC_192 = 0b010, ///< 192
+    PER_ETH_DMA_TTC_256 = 0b011, ///< 256
+    PER_ETH_DMA_TTC_40  = 0b100, ///< 40
+    PER_ETH_DMA_TTC_32  = 0b101, ///< 32
+    PER_ETH_DMA_TTC_24  = 0b110, ///< 24
+    PER_ETH_DMA_TTC_16  = 0b111, ///< 16
+} per_eth_dma_ttc_e;
+
+/// ETH DMA Receive threshold control
+typedef enum
+{
+    PER_ETH_DMA_RTC_64  = 0b00, ///< 64
+    PER_ETH_DMA_RTC_32  = 0b01, ///< 32
+    PER_ETH_DMA_RTC_96  = 0b10, ///< 96
+    PER_ETH_DMA_RTC_128 = 0b11, ///< 128
+} per_eth_dma_rtc_e;
+
 typedef struct
 {
     // MAC configuration register (ETH_MACCR)
-    per_bit_n2_t MaccrBit0; ///< Reserved
+    per_bit_n2_t CrBit0; ///< Reserved
     per_bit_rw1_t Re; ///< Receiver enable
     per_bit_rw1_t Te; ///< Transmitter enable
     per_bit_rw1_t Dc; ///< Deferral check
     per_bit_rw2_t Bl; ///< Back-off limit
     per_bit_rw1_t Acps; ///< Automatic pad/CRC stripping
-    per_bit_n1_t MaccrBit8; ///< Reserved
+    per_bit_n1_t CrBit8; ///< Reserved
     per_bit_rw1_t Rd; ///< Retry disable
     per_bit_rw1_t Ipco; ///< IPv4 checksum offload
     per_bit_rw1_t Dm; ///< Duplex mode
     per_bit_rw1_t Lm; ///< Loopback mode
     per_bit_rw1_t Rod; ///< Receive own disable
     per_bit_rw1_t Fes; ///< Fast Ethernet speed
-    per_bit_n1_t MaccrBit15; ///< Reserved
+    per_bit_n1_t CrBit15; ///< Reserved
     per_bit_rw1_t Csd; ///< Carrier sense disable
     per_bit_rw3_t Ifg; ///< Interframe gap
-    per_bit_n2_t MaccrBit20; ///< Reserved
+    per_bit_n2_t CrBit20; ///< Reserved
     per_bit_rw1_t Jd; ///< Jabber disable
     per_bit_rw1_t Wd; ///< Watchdog disable
-    per_bit_n1_t MaccrBit24; ///< Reserved
+    per_bit_n1_t CrBit24; ///< Reserved
     per_bit_rw1_t Cstf; ///< CRC stripping for Type frames
-    per_bit_n6_t MaccrBit26; ///< Reserved
+    per_bit_n6_t CrBit26; ///< Reserved
 
     // MAC frame filter register (ETH_MACFFR)
     per_bit_rw1_t Pm; ///< Promiscuous mode
@@ -223,7 +305,7 @@ typedef struct
     per_bit_rw1_t Saif; ///< Source address inverse filtering
     per_bit_rw1_t Saf; ///< Source address filter
     per_bit_rw1_t Hpf; ///< Hash or perfect filter
-    per_bit_n20_t MacffrBit11; ///< Reserved
+    per_bit_n20_t FfrBit11; ///< Reserved
     per_bit_rw1_t Ra; ///< Receive all
 
     // MAC hash table high register (ETH_MACHTHR)
@@ -232,7 +314,7 @@ typedef struct
     // MAC hash table low register (ETH_MACHTLR)
     per_bit_rw32_reg_t Htl; ///< Hash table low
 
-    // Ethernet MAC MII address register (ETH_MACMIIAR)
+    // MAC MII address register (ETH_MACMIIAR)
     union
     {
         struct
@@ -240,10 +322,10 @@ typedef struct
             per_bit_rs1_t Mb; ///< MII busy
             per_bit_rw1_t Mw; ///< MII write
             per_bit_rw3_t Cr; ///< Clock range
-            per_bit_n1_t MacmiiarBit5; ///< Reserved
+            per_bit_n1_t MiiarBit5; ///< Reserved
             per_bit_rw5_t Mr; ///< MII register
             per_bit_rw5_t Pa; ///< PHY address
-            per_bit_rw16_t MacmiiarBit16; ///< Reserved
+            per_bit_rw16_t MiiarBit16; ///< Reserved
         };
         per_bit_rw16_reg_t Macmiiar; ///< Register access
     };
@@ -257,15 +339,15 @@ typedef struct
     per_bit_rw1_t Rfce; ///< Receive flow control enable
     per_bit_rw1_t Upfd; ///< Unicast pause frame detect
     per_bit_rw2_t Plt; ///< Pause low threshold
-    per_bit_n1_t MacfcrBit6; ///< Reserved
+    per_bit_n1_t FcrBit6; ///< Reserved
     per_bit_rw1_t Zqpd; ///< Zero-quanta pause disable
-    per_bit_n8_t MacfcrBit8; ///< Reserved
+    per_bit_n8_t FcrBit8; ///< Reserved
     per_bit_rw16_t Pt; ///< Pause time
 
-    // Ethernet MAC VLAN tag register (ETH_MACVLANTR)
+    // MAC VLAN tag register (ETH_MACVLANTR)
     per_bit_rw16_t Vlanti; ///< VLAN tag identifier (for receive frames)
     per_bit_rw1_t Vlantc; ///< 12-bit VLAN tag comparison
-    per_bit_n15_t MacvlantrBit17; ///< Reserved
+    per_bit_n15_t VlantrBit17; ///< Reserved
 
     per_bit_n32_t MacReg20[2]; ///< Reserved
 
@@ -280,42 +362,42 @@ typedef struct
     // MAC debug register (ETH_MACDBGR)
     per_bit_r1_t Mmrpea; ///< MAC MII receive protocol engine active
     per_bit_r2_t Msfrwcs; ///< MAC small FIFO read / write controllers status
-    per_bit_n1_t MacdbgrBit3; ///< Reserved
+    per_bit_n1_t DbgrBit3; ///< Reserved
     per_bit_r1_t Rfwra; ///< Rx FIFO write controller active
     per_bit_r2_t Rfrcs; ///< Rx FIFO read controller status
-    per_bit_n1_t MacdbgrBit7; ///< Reserved
+    per_bit_n1_t DbgrBit7; ///< Reserved
     per_bit_r2_t Rffl; ///< Rx FIFO fill level
-    per_bit_n6_t MacdbgrBit10; ///< Reserved
+    per_bit_n6_t DbgrBit10; ///< Reserved
     per_bit_r1_t Mmtea; ///< MAC MII transmit engine active
     per_bit_r2_t Mtfcs; ///< MAC transmit frame controller status
     per_bit_r1_t Mtp; ///< MAC transmitter in pause
     per_bit_r2_t Tfrs; ///< Tx FIFO read status
     per_bit_r1_t Tfwa; ///< Tx FIFO write active
-    per_bit_n1_t MacdbgrBit23; ///< Reserved
+    per_bit_n1_t DbgrBit23; ///< Reserved
     per_bit_r1_t Tfne; ///< Tx FIFO not empty
     per_bit_r1_t Tff; ///< Tx FIFO full
-    per_bit_n6_t MacdbgrBit26; ///< Reserved
+    per_bit_n6_t DbgrBit26; ///< Reserved
 
     // MAC interrupt status register (ETH_MACSR)
-    per_bit_n3_t MaccsrBit0; ///< Reserved
+    per_bit_n3_t CsrBit0; ///< Reserved
     per_bit_r1_t Pmts; ///< PMT status
     per_bit_r1_t Mmcs; ///< MMC status
     per_bit_r1_t Mmcrs; ///< MMC receive status
     per_bit_r1_t Mmcts; ///< MMC transmit status
-    per_bit_n2_t MaccsrBit7; ///< Reserved
+    per_bit_n2_t CsrBit7; ///< Reserved
     per_bit_r1_t Tsts; ///< Time stamp trigger status
-    per_bit_n22_t MaccsrBit10; ///< Reserved
+    per_bit_n22_t CsrBit10; ///< Reserved
 
     // MAC interrupt mask register (ETH_MACIMR)
-    per_bit_n3_t MacimrBit0; ///< Reserved
+    per_bit_n3_t ImrBit0; ///< Reserved
     per_bit_rw1_t Pmtim; ///< PMT interrupt mask
-    per_bit_n5_t MacimrBit4; ///< Reserved
+    per_bit_n5_t ImrBit4; ///< Reserved
     per_bit_rw1_t Tstim; ///< Time stamp trigger interrupt mask
-    per_bit_n22_t MacimrBit10; ///< Reserved
+    per_bit_n22_t ImrBit10; ///< Reserved
 
     // MAC address 0 high register (ETH_MACA0HR)
     per_bit_rw16_t Maca0h; ///< MAC address0 high [47:32]
-    per_bit_n15_t Maca0hrBit16; ///< Reserved
+    per_bit_n15_t A0hrBit16; ///< Reserved
     per_bit_n1_t Mo; ///< Always 1
 
     // MAC address 0 low register (ETH_MACA0LR)
@@ -323,7 +405,7 @@ typedef struct
 
     // MAC address 1 high register (ETH_MACA1HR)
     per_bit_rw16_t Maca1h; ///< MAC address1 high [47:32]
-    per_bit_n8_t Maca1hrBit16; ///< Reserved
+    per_bit_n8_t A1hrBit16; ///< Reserved
     per_bit_rw6_t Mbc1; ///< Mask byte control
     per_bit_rw1_t Sa1; ///< Source address
     per_bit_rw1_t Ae1; ///< Address enable
@@ -333,7 +415,7 @@ typedef struct
 
     // MAC address 2 high register (ETH_MACA2HR)
     per_bit_rw16_t Maca2h; ///< MAC address2 high [47:32]
-    per_bit_n8_t Maca2hrBit16; ///< Reserved
+    per_bit_n8_t A2hrBit16; ///< Reserved
     per_bit_rw6_t Mbc2; ///< Mask byte control
     per_bit_rw1_t Sa2; ///< Source address
     per_bit_rw1_t Ae2; ///< Address enable
@@ -343,12 +425,12 @@ typedef struct
 
     // MAC address 3 high register (ETH_MACA3HR)
     per_bit_rw16_t Maca3h; ///< MAC address3 high [47:32]
-    per_bit_n8_t Maca3hrBit16; ///< Reserved
+    per_bit_n8_t A3hrBit16; ///< Reserved
     per_bit_rw6_t Mbc3; ///< Mask byte control
     per_bit_rw1_t Sa3; ///< Source address
     per_bit_rw1_t Ae3; ///< Address enable
 
-    // Ethernet MAC address 3 low register (ETH_MACA3LR)
+    // MAC address 3 low register (ETH_MACA3LR)
     per_bit_rw32_reg_t Maca3l; ///< MAC address3 low [31:0]
 } per_eth_mac_t;
 
@@ -361,39 +443,39 @@ typedef struct
     per_bit_rw1_t Mcf; ///< MMC counter freeze
     per_bit_rw1_t Mcp; ///< MMC counter preset
     per_bit_rw1_t Mcfhp; ///< MMC counter Full-Half preset
-    per_bit_n26_t MmccrBit6; ///< Reserved
+    per_bit_n26_t CrBit6; ///< Reserved
 
     // MMC receive interrupt register (ETH_MMCRIR)
-    per_bit_n5_t MmcrirBit0; ///< Reserved
+    per_bit_n5_t RirBit0; ///< Reserved
     per_bit_r1_t Rfces; ///< Received frames CRC error status
     per_bit_r1_t Rfaes; ///< Received frames alignment error status
-    per_bit_n10_t MmcrirBit7; ///< Reserved
+    per_bit_n10_t RirBit7; ///< Reserved
     per_bit_r1_t Rgufs; ///< Received Good Unicast Frames Status
-    per_bit_n14_t MmcrirBit18; ///< Reserved
+    per_bit_n14_t RirBit18; ///< Reserved
 
     // MMC transmit interrupt register (ETH_MMCTIR)
-    per_bit_n14_t MmctirBit0; ///< Reserved
+    per_bit_n14_t TirBit0; ///< Reserved
     per_bit_r1_t Tgfscs; ///< Transmitted good frames single collision status
     per_bit_r1_t Tgmscs; ///< Transmitted good frames more single collision status
-    per_bit_n5_t MmctirBit16; ///< Reserved
+    per_bit_n5_t TirBit16; ///< Reserved
     per_bit_r1_t Tgfs; ///< Transmitted good frames status
-    per_bit_n10_t MmctirBit22; ///< Reserved
+    per_bit_n10_t TirBit22; ///< Reserved
 
     // MMC receive interrupt mask register (ETH_MMCRIMR)
-    per_bit_n5_t MmcimrBit0; ///< Reserved
+    per_bit_n5_t ImrBit0; ///< Reserved
     per_bit_rw1_t Rfcem; ///< Received frame CRC error mask
     per_bit_rw1_t Rfaem; ///< Received frames alignment error mask
-    per_bit_n10_t MmcimrBit7; ///< Reserved
+    per_bit_n10_t ImrBit7; ///< Reserved
     per_bit_rw1_t Rgufm; ///< Received good unicast frames mask
-    per_bit_n14_t MmcimrBit18; ///< Reserved
+    per_bit_n14_t ImrBit18; ///< Reserved
 
     // MMC transmit interrupt mask register (ETH_MMCTIMR)
-    per_bit_n14_t MmctimrBit0; ///< Reserved
+    per_bit_n14_t TimrBit0; ///< Reserved
     per_bit_rw1_t Tgfscm; ///< Transmitted good frames single collision mask
     per_bit_rw1_t Tgfmscm; ///< Transmitted good frames more single collision mask
-    per_bit_n5_t MmctimrBit16; ///< Reserved
+    per_bit_n5_t TimrBit16; ///< Reserved
     per_bit_rw1_t Tgfm; ///< Transmitted good frames mask
-    per_bit_n10_t MmctimrBit22; ///< Reserved
+    per_bit_n10_t TimrBit22; ///< Reserved
 
     per_bit_n32_t MmcReg14[14]; ///< Reserved
 
@@ -431,7 +513,7 @@ typedef struct
     per_bit_rw1_t Tsstu; ///< Time stamp system time update
     per_bit_rw1_t Tsite; ///< Time stamp interrupt trigger enable
     per_bit_rw1_t Ttsaru; ///< Time stamp addend register update
-    per_bit_n2_t PtptscrBit6; ///< Reserved
+    per_bit_n2_t TscrBit6; ///< Reserved
     per_bit_rw1_t Tssarfe; ///< Time stamp snapshot for all received frames enable
     per_bit_rw1_t Tsssr; ///< Time stamp subsecond rollover: digital or binary rollover control
     per_bit_rw1_t Tsptppsv2e; ///< Time stamp PTP packet snooping for version2 format enable
@@ -442,7 +524,7 @@ typedef struct
     per_bit_rw1_t Tssmrme; ///< Time stamp snapshot for message relevant to master enable
     per_bit_rw2_t Tscnt; ///< Time stamp clock node type
     per_bit_rw1_t Tspffmae; ///< Time stamp PTP frame filtering MAC address enable
-    per_bit_n13_t PtptscrBit19; ///< Reserved
+    per_bit_n13_t TscrBit19; ///< Reserved
 
     // PTP subsecond increment register (ETH_PTPSSIR)
     per_bit_rw8_reg_t Stssi; ///< System time subsecond increment
@@ -473,32 +555,95 @@ typedef struct
     // PTP time stamp status register (ETH_PTPTSSR)
     per_bit_r1_t Tsso; ///< Time stamp second overflow
     per_bit_r1_t Tsttr; ///< Time stamp target time reached
-    per_bit_n30_t PtptssrBit2; ///< Reserved
+    per_bit_n30_t TsrBit2; ///< Reserved
 
     // PTP PPS control register (ETH_PTPPPSCR)
     per_bit_rw4_t Ppsfreq; ///< PPS frequency selection
-    per_bit_n28_t PtpppscrBit4; ///< Reserved
+    per_bit_n28_t PpscrBit4; ///< Reserved
 
 } per_eth_ptp_t;
 
 typedef struct
 {
-    // Ethernet DMA bus mode register (ETH_DMABMR)
-    per_bit_n5_t DmabmrBit27; ///< Reserved
-    per_bit_rw1_t Mb; ///< Mixed burst
-    per_bit_rw1_t Aab; ///< Address-aligned beats
-    per_bit_rw1_t Fpm; ///< 4xPBL mode
-    per_bit_rw1_t Usp; ///< Use separate PBL
-    per_bit_rw6_t Rdp; ///< Rx DMA PBL
-    per_bit_rw1_t Fb; ///< Fixed burst
-    per_bit_rw2_t Pm; ///< Rx Tx priority ratio
-    per_bit_rw6_t Pbl; ///< Programmable burst length
-    per_bit_rw1_t Edfe; ///< Enhanced descriptor format enable
-    per_bit_rw5_t Dsl; ///< Descriptor skip length
+    // DMA bus mode register (ETH_DMABMR)
+    per_bit_rs1_t Sftr; ///< (Sr) Software reset. Note duplicate abbreviation
     per_bit_rw1_t Da; ///< DMA Arbitration
-    per_bit_rs1_t Sr; ///< Software reset
+    per_bit_rw5_t Dsl; ///< Descriptor skip length
+    per_bit_rw1_t Edfe; ///< Enhanced descriptor format enable
+    per_bit_rw6_t Pbl; ///< Programmable burst length
+    per_bit_rw2_t Pm; ///< Rx Tx priority ratio
+    per_bit_rw1_t Fb; ///< Fixed burst
+    per_bit_rw6_t Rdp; ///< Rx DMA PBL
+    per_bit_rw1_t Usp; ///< Use separate PBL
+    per_bit_rw1_t Fpm; ///< 4xPBL mode
+    per_bit_rw1_t Aab; ///< Address-aligned beats
+    per_bit_rw1_t Mb; ///< Mixed burst
+    per_bit_n5_t BmrBit27; ///< Reserved
 
+    // DMA transmit poll demand register (ETH_DMATPDR)
+    per_bit_w32_reg_t Tpd; ///< Transmit poll demand
 
+    // DMA receive poll demand register (ETH_DMARPDR)
+    per_bit_w32_reg_t Rpd; ///< Receive poll demand
+
+    // DMA receive descriptor list address register (ETH_DMARDLAR)
+    per_bit_rw32_reg_t Srl; ///< Start of receive list
+
+    // DMA transmit descriptor list address register (ETH_DMATDLAR)
+    per_bit_rw32_reg_t Stl; ///< Start of transmit list
+
+    // DMA status register (ETH_DMASR)
+    union
+    {
+        struct
+        {
+            per_bit_rc1_w1_t Ts; ///< Transmit status
+            per_bit_rc1_w1_t Tpss; ///< Transmit process stopped status
+            per_bit_rc1_w1_t Tbus; ///< Transmit buffer unavailable status
+            per_bit_rc1_w1_t Tjts; ///< Transmit jabber timeout status
+            per_bit_rc1_w1_t Ros; ///< Receive overflow status
+            per_bit_rc1_w1_t Tus; ///< Transmit underflow status
+            per_bit_rc1_w1_t Rs; ///< Receive status
+            per_bit_rc1_w1_t Rbus; ///< Receive buffer unavailable status
+            per_bit_rc1_w1_t Rpss; ///< Receive process stopped status
+            per_bit_rc1_w1_t Rwts; ///< Receive watchdog timeout status
+            per_bit_rc1_w1_t Ets; ///< Early transmit status
+            per_bit_n2_t SrBit11; ///< Reserved
+            per_bit_rc1_w1_t Fbes; ///< Fatal bus error status
+            per_bit_rc1_w1_t Ers; ///< Early receive status
+            per_bit_rc1_w1_t Ais; ///< Abnormal interrupt summary
+            per_bit_rc1_w1_t Nis; ///< Normal interrupt summary
+            per_bit_r3_t Rps; ///< Receive process state
+            per_bit_r3_t Tps; ///< Transmit process state
+            per_bit_r3_t Ebs; ///< Error bits status
+            per_bit_n1_t SrBit26; ///< Reserved
+            per_bit_r1_t Mmcs; ///< MMC status
+            per_bit_r1_t Pmts; ///< PMT status
+            per_bit_r1_t Tsts; ///< Time stamp trigger status
+            per_bit_n2_t SrBit30; ///< Reserved
+        };
+        per_bit_rw32_reg_t Sr; ///< DMA status register (ETH_DMASR)
+    };
+
+    // DMA operation mode register (ETH_DMAOMR)
+    per_bit_n1_t OmrBit0; ///< Reserved
+    per_bit_rw1_t Ssr; ///< (Sr) Start/stop receive. Note duplicate abbreviation
+    per_bit_rw1_t Osf; ///< Operate on second frame
+    per_bit_rw2_t Rtc; ///< Receive threshold control
+    per_bit_n1_t OmrBit5; ///< Reserved
+    per_bit_rw1_t Fugf; ///< Forward undersized good frames
+    per_bit_rw1_t Fef; ///< Forward error frames
+    per_bit_n5_t OmrBit8; ///< Reserved
+    per_bit_rw1_t St; ///< Start/stop transmission
+    per_bit_rw3_t Ttc; ///< Transmit threshold control
+    per_bit_n3_t OmrBit17; ///< Reserved
+    per_bit_rw1_t Ftf; ///< Flush transmit FIFO
+    per_bit_rs1_t Tsf; ///< Transmit store and forward
+    per_bit_n2_t OmrBit22; ///< Reserved
+    per_bit_rw1_t Dfrf; ///< Disable flushing of received frames
+    per_bit_rw1_t Rsf; ///< Receive store and forward
+    per_bit_rw1_t Dtcefd; ///< Dropping of TCP/IP checksum error frames disable
+    per_bit_n5_t OmrBit27; ///< Reserved
 
 
 } per_eth_dma_t;
@@ -844,7 +989,7 @@ static per_inline uint_fast32_t per_eth_mac_hth(const per_eth_t* const eth)
 }
 
 /// ETH Hash table high
-static per_inline void per_eth_mac_set_hth(const per_eth_t* const eth, uint_fast32_t val)
+static per_inline void per_eth_mac_set_hth(const per_eth_t* const eth, uint32_t val)
 {
     per_bit_rw32_reg_set(&eth->PerMac->Hth, val);
 }
@@ -856,7 +1001,7 @@ static per_inline uint_fast32_t per_eth_mac_htl(const per_eth_t* const eth)
 }
 
 /// ETH Hash table low
-static per_inline void per_eth_mac_set_htl(const per_eth_t* const eth, uint_fast32_t val)
+static per_inline void per_eth_mac_set_htl(const per_eth_t* const eth, uint32_t val)
 {
     per_bit_rw32_reg_set(&eth->PerMac->Htl, val);
 }
@@ -2013,102 +2158,58 @@ static per_inline bool per_eth_ptp_set_ppsfreq(const per_eth_t* const eth, uint_
     return per_bit_rw4_set(&eth->PerPtp->Ppsfreq, per_bit_log2(val));
 }
 
-/// Mixed burst
-static per_inline bool per_eth_dma_mb(const per_eth_t* const eth)
+/// Software reset
+static per_inline bool per_eth_dma_sr1(const per_eth_t* const eth)
 {
-    return per_bit_rw1(&eth->PerDma->Mb);
+    return per_bit_rs1(&eth->PerDma->Sftr);
 }
 
-/// Mixed burst
-static per_inline void per_eth_dma_set_mb(const per_eth_t* const eth, bool val)
+/// Software reset
+static per_inline void per_eth_dma_set_sr1(const per_eth_t* const eth)
 {
-    per_bit_rw1_set(&eth->PerDma->Mb, val);
+    per_bit_rs1_set(&eth->PerDma->Sftr);
 }
 
-/// Address-aligned beats
-static per_inline bool per_eth_dma_aab(const per_eth_t* const eth)
+/// DMA Arbitration
+static per_inline bool per_eth_dma_da(const per_eth_t* const eth)
 {
-    return per_bit_rw1(&eth->PerDma->Aab);
+    return per_bit_rw1(&eth->PerDma->Da);
 }
 
-/// Address-aligned beats
-static per_inline void per_eth_dma_set_aab(const per_eth_t* const eth, bool val)
+/// DMA Arbitration
+static per_inline void per_eth_dma_set_da(const per_eth_t* const eth, bool val)
 {
-    per_bit_rw1_set(&eth->PerDma->Aab, val);
+    per_bit_rw1_set(&eth->PerDma->Da, val);
 }
 
-/// 4xPBL mode
-static per_inline bool per_eth_dma_fpm(const per_eth_t* const eth)
+/// Descriptor skip length
+static per_inline uint_fast16_t per_eth_dma_dsl(const per_eth_t* const eth)
 {
-    return per_bit_rw1(&eth->PerDma->Fpm);
+    return per_bit_rw5(&eth->PerDma->Dsl);
 }
 
-/// 4xPBL mode
-static per_inline void per_eth_dma_set_fpm(const per_eth_t* const eth, bool val)
+/// Descriptor skip length
+static per_inline bool per_eth_dma_set_dsl(const per_eth_t* const eth, uint16_t val)
 {
-    per_bit_rw1_set(&eth->PerDma->Fpm, val);
-}
-
-/// Use separate PBL
-static per_inline bool per_eth_dma_usp(const per_eth_t* const eth)
-{
-    return per_bit_rw1(&eth->PerDma->Usp);
-}
-
-/// Use separate PBL
-static per_inline void per_eth_dma_set_usp(const per_eth_t* const eth, bool val)
-{
-    per_bit_rw1_set(&eth->PerDma->Usp, val);
-}
-
-/// Rx DMA PBL
-static per_inline uint_fast16_t per_eth_dma_rdp(const per_eth_t* const eth)
-{
-    return per_bit_rw6(&eth->PerDma->Rdp);
-}
-
-/// Rx DMA PBL
-static per_inline bool per_eth_dma_set_rdp(const per_eth_t* const eth, uint16_t val)
-{
-    if ((val > PER_ETH_DMA_RDP_MAX) ||
-        !per_bit_is_log2(val))
+    if (val > PER_ETH_DMA_DSL_MAX)
     {
-        per_log_err(eth->Err, PER_ETH_DMA_RDP_ERR, val);
+        per_log_err(eth->Err, PER_ETH_DMA_DSL_ERR, val);
         return false;
     }
 
-    return per_bit_rw6_set(&eth->PerDma->Rdp, val);
+    return per_bit_rw5_set(&eth->PerDma->Dsl, val);
 }
 
-/// Fixed burst
-static per_inline bool per_eth_dma_fb(const per_eth_t* const eth)
+/// Enhanced descriptor format enable
+static per_inline bool per_eth_dma_edfe(const per_eth_t* const eth)
 {
-    return per_bit_rw1(&eth->PerDma->Fb);
+    return per_bit_rw1(&eth->PerDma->Edfe);
 }
 
-/// Fixed burst
-static per_inline void per_eth_dma_set_fb(const per_eth_t* const eth, bool val)
+/// Enhanced descriptor format enable
+static per_inline void per_eth_dma_set_edfe(const per_eth_t* const eth, bool val)
 {
-    per_bit_rw1_set(&eth->PerDma->Fb, val);
-}
-
-/// Rx Tx priority ratio
-static per_inline uint_fast16_t per_eth_dma_pm(const per_eth_t* const eth)
-{
-    return per_bit_rw2(&eth->PerDma->Pm) + 1;
-}
-
-/// Rx Tx priority ratio
-static per_inline bool  per_eth_dma_set_pm(const per_eth_t* const eth, uint16_t val)
-{
-    if ((val > PER_ETH_DMA_PM_MAX) ||
-        (val == 0))
-    {
-        per_log_err(eth->Err, PER_ETH_DMA_PM_ERR, val);
-        return false;
-    }
-
-    return per_bit_rw2_set(&eth->PerDma->Pm, val - 1);
+    per_bit_rw1_set(&eth->PerDma->Edfe, val);
 }
 
 /// Programmable burst length
@@ -2130,62 +2231,528 @@ static per_inline bool per_eth_dma_set_pbl(const per_eth_t* const eth, uint16_t 
     return per_bit_rw6_set(&eth->PerDma->Pbl, val);
 }
 
-/// Enhanced descriptor format enable
-static per_inline bool per_eth_dma_edfe(const per_eth_t* const eth)
+/// Rx Tx priority ratio
+static per_inline uint_fast16_t per_eth_dma_pm(const per_eth_t* const eth)
 {
-    return per_bit_rw1(&eth->PerDma->Edfe);
+    return per_bit_rw2(&eth->PerDma->Pm) + 1;
 }
 
-/// Enhanced descriptor format enable
-static per_inline void per_eth_dma_set_edfe(const per_eth_t* const eth, bool val)
+/// Rx Tx priority ratio
+static per_inline bool  per_eth_dma_set_pm(const per_eth_t* const eth, uint16_t val)
 {
-    per_bit_rw1_set(&eth->PerDma->Edfe, val);
-}
-
-/// Descriptor skip length
-static per_inline uint_fast16_t per_eth_dma_dsl(const per_eth_t* const eth)
-{
-    return per_bit_rw5(&eth->PerDma->Dsl);
-}
-
-/// Descriptor skip length
-static per_inline bool per_eth_dma_set_dsl(const per_eth_t* const eth, uint16_t val)
-{
-    if (val > PER_ETH_DMA_DSL_MAX)
+    if ((val > PER_ETH_DMA_PM_MAX) ||
+        (val == 0))
     {
-        per_log_err(eth->Err, PER_ETH_DMA_DSL_ERR, val);
+        per_log_err(eth->Err, PER_ETH_DMA_PM_ERR, val);
         return false;
     }
 
-    return per_bit_rw5_set(&eth->PerDma->Dsl, val);
+    return per_bit_rw2_set(&eth->PerDma->Pm, val - 1);
 }
 
-/// DMA Arbitration
-static per_inline bool per_eth_dma_da(const per_eth_t* const eth)
+/// Fixed burst
+static per_inline bool per_eth_dma_fb(const per_eth_t* const eth)
 {
-    return per_bit_rw1(&eth->PerDma->Da);
+    return per_bit_rw1(&eth->PerDma->Fb);
 }
 
-/// DMA Arbitration
-static per_inline void per_eth_dma_set_da(const per_eth_t* const eth, bool val)
+/// Fixed burst
+static per_inline void per_eth_dma_set_fb(const per_eth_t* const eth, bool val)
 {
-    per_bit_rw1_set(&eth->PerDma->Da, val);
+    per_bit_rw1_set(&eth->PerDma->Fb, val);
 }
 
-/// Software reset
-static per_inline bool per_eth_dma_sr(const per_eth_t* const eth)
+/// Rx DMA PBL
+static per_inline uint_fast16_t per_eth_dma_rdp(const per_eth_t* const eth)
 {
-    return per_bit_rs1(&eth->PerDma->Sr);
+    return per_bit_rw6(&eth->PerDma->Rdp);
 }
 
-/// Software reset
-static per_inline void per_eth_dma_set_sr(const per_eth_t* const eth)
+/// Rx DMA PBL
+static per_inline bool per_eth_dma_set_rdp(const per_eth_t* const eth, uint16_t val)
 {
-    per_bit_rs1_set(&eth->PerDma->Sr);
+    if ((val > PER_ETH_DMA_RDP_MAX) ||
+        !per_bit_is_log2(val))
+    {
+        per_log_err(eth->Err, PER_ETH_DMA_RDP_ERR, val);
+        return false;
+    }
+
+    return per_bit_rw6_set(&eth->PerDma->Rdp, val);
+}
+
+/// Use separate PBL
+static per_inline bool per_eth_dma_usp(const per_eth_t* const eth)
+{
+    return per_bit_rw1(&eth->PerDma->Usp);
+}
+
+/// Use separate PBL
+static per_inline void per_eth_dma_set_usp(const per_eth_t* const eth, bool val)
+{
+    per_bit_rw1_set(&eth->PerDma->Usp, val);
+}
+
+/// 4xPBL mode
+static per_inline bool per_eth_dma_fpm(const per_eth_t* const eth)
+{
+    return per_bit_rw1(&eth->PerDma->Fpm);
+}
+
+/// 4xPBL mode
+static per_inline void per_eth_dma_set_fpm(const per_eth_t* const eth, bool val)
+{
+    per_bit_rw1_set(&eth->PerDma->Fpm, val);
+}
+
+/// Address-aligned beats
+static per_inline bool per_eth_dma_aab(const per_eth_t* const eth)
+{
+    return per_bit_rw1(&eth->PerDma->Aab);
+}
+
+/// Address-aligned beats
+static per_inline void per_eth_dma_set_aab(const per_eth_t* const eth, bool val)
+{
+    per_bit_rw1_set(&eth->PerDma->Aab, val);
+}
+
+/// Mixed burst
+static per_inline bool per_eth_dma_mb(const per_eth_t* const eth)
+{
+    return per_bit_rw1(&eth->PerDma->Mb);
+}
+
+/// Mixed burst
+static per_inline void per_eth_dma_set_mb(const per_eth_t* const eth, bool val)
+{
+    per_bit_rw1_set(&eth->PerDma->Mb, val);
+}
+
+/// Transmit poll demand
+static per_inline void per_eth_dma_set_tpd(const per_eth_t* const eth)
+{
+    per_bit_w32_reg_set(&eth->PerDma->Tpd, 1);
+}
+
+/// Receive poll demand
+static per_inline void per_eth_dma_set_rpd(const per_eth_t* const eth)
+{
+    per_bit_w32_reg_set(&eth->PerDma->Rpd, 1);
+}
+
+/// Start of receive list
+static per_inline uint_fast32_t per_eth_dma_srl(const per_eth_t* const eth)
+{
+    return per_bit_rw32_reg(&eth->PerDma->Srl);
+}
+
+/// Start of receive list
+static per_inline void per_eth_dma_set_srl(const per_eth_t* const eth, uint32_t val)
+{
+    per_bit_rw32_reg_set(&eth->PerDma->Srl, val);
+}
+
+/// Start of transmit list
+static per_inline uint_fast32_t per_eth_dma_stl(const per_eth_t* const eth)
+{
+    return per_bit_rw32_reg(&eth->PerDma->Stl);
+}
+
+/// Start of transmit list
+static per_inline void per_eth_dma_set_stl(const per_eth_t* const eth, uint32_t val)
+{
+    per_bit_rw32_reg_set(&eth->PerDma->Stl, val);
+}
+
+/// Status register (ETH_DMASR)
+static per_inline uint_fast32_t per_eth_dma_sr(const per_eth_t* const eth)
+{
+    return per_bit_rw32_reg(&eth->PerDma->Sr);
+}
+
+/// Status register (ETH_DMASR)
+static per_inline void per_eth_dma_set_sr(const per_eth_t* const eth, uint32_t val)
+{
+    per_bit_rw32_reg_set(&eth->PerDma->Sr, val);
+}
+
+/// Transmit status
+static per_inline bool per_eth_dma_ts(const per_eth_t* const eth)
+{
+    return per_bit_rc1_w1(&eth->PerDma->Ts);
+}
+
+/// Transmit status
+static per_inline bool per_eth_dma_clr_ts(const per_eth_t* const eth)
+{
+    return per_bit_rc1_w1_rdclr(&eth->PerDma->Ts);
+}
+
+/// Transmit process stopped status
+static per_inline bool per_eth_dma_tpss(const per_eth_t* const eth)
+{
+    return per_bit_rc1_w1(&eth->PerDma->Tpss);
+}
+
+/// Transmit process stopped status
+static per_inline bool per_eth_dma_clr_tpss(const per_eth_t* const eth)
+{
+    return per_bit_rc1_w1_rdclr(&eth->PerDma->Tpss);
+}
+
+/// Transmit buffer unavailable status
+static per_inline bool per_eth_dma_tbus(const per_eth_t* const eth)
+{
+    return per_bit_rc1_w1(&eth->PerDma->Tbus);
+}
+
+/// Transmit buffer unavailable status
+static per_inline bool per_eth_dma_clr_tbus(const per_eth_t* const eth)
+{
+    return per_bit_rc1_w1_rdclr(&eth->PerDma->Tbus);
+}
+
+/// Transmit jabber timeout status
+static per_inline bool per_eth_dma_tjts(const per_eth_t* const eth)
+{
+    return per_bit_rc1_w1(&eth->PerDma->Tjts);
+}
+
+/// Transmit jabber timeout status
+static per_inline bool per_eth_dma_clr_tjts(const per_eth_t* const eth)
+{
+    return per_bit_rc1_w1_rdclr(&eth->PerDma->Tjts);
+}
+
+/// Receive overflow status
+static per_inline bool per_eth_dma_ros(const per_eth_t* const eth)
+{
+    return per_bit_rc1_w1(&eth->PerDma->Ros);
+}
+
+/// Receive overflow status
+static per_inline bool per_eth_dma_clr_ros(const per_eth_t* const eth)
+{
+    return per_bit_rc1_w1_rdclr(&eth->PerDma->Ros);
+}
+
+/// Transmit underflow status
+static per_inline bool per_eth_dma_tus(const per_eth_t* const eth)
+{
+    return per_bit_rc1_w1(&eth->PerDma->Tus);
+}
+
+/// Transmit underflow status
+static per_inline bool per_eth_dma_clr_tus(const per_eth_t* const eth)
+{
+    return per_bit_rc1_w1_rdclr(&eth->PerDma->Tus);
+}
+
+/// Receive status
+static per_inline bool per_eth_dma_rs(const per_eth_t* const eth)
+{
+    return per_bit_rc1_w1(&eth->PerDma->Rs);
+}
+
+/// Receive status
+static per_inline bool per_eth_dma_clr_rs(const per_eth_t* const eth)
+{
+    return per_bit_rc1_w1_rdclr(&eth->PerDma->Rs);
+}
+
+/// Receive buffer unavailable status
+static per_inline bool per_eth_dma_rbus(const per_eth_t* const eth)
+{
+    return per_bit_rc1_w1(&eth->PerDma->Rbus);
+}
+
+/// Receive buffer unavailable status
+static per_inline bool per_eth_dma_clr_rbus(const per_eth_t* const eth)
+{
+    return per_bit_rc1_w1_rdclr(&eth->PerDma->Rbus);
+}
+
+/// Receive process stopped status
+static per_inline bool per_eth_dma_rpss(const per_eth_t* const eth)
+{
+    return per_bit_rc1_w1(&eth->PerDma->Rpss);
+}
+
+/// Receive process stopped status
+static per_inline bool per_eth_dma_clr_rpss(const per_eth_t* const eth)
+{
+    return per_bit_rc1_w1_rdclr(&eth->PerDma->Rpss);
+}
+
+/// Receive watchdog timeout status
+static per_inline bool per_eth_dma_rwts(const per_eth_t* const eth)
+{
+    return per_bit_rc1_w1(&eth->PerDma->Rwts);
+}
+
+/// Receive watchdog timeout status
+static per_inline bool per_eth_dma_clr_rwts(const per_eth_t* const eth)
+{
+    return per_bit_rc1_w1_rdclr(&eth->PerDma->Rwts);
+}
+
+/// Early transmit status
+static per_inline bool per_eth_dma_ets(const per_eth_t* const eth)
+{
+    return per_bit_rc1_w1(&eth->PerDma->Ets);
+}
+
+/// Early transmit status
+static per_inline bool per_eth_dma_clr_ets(const per_eth_t* const eth)
+{
+    return per_bit_rc1_w1_rdclr(&eth->PerDma->Ets);
+}
+
+/// Fatal bus error status
+static per_inline bool per_eth_dma_fbes(const per_eth_t* const eth)
+{
+    return per_bit_rc1_w1(&eth->PerDma->Fbes);
+}
+
+/// Fatal bus error status
+static per_inline bool per_eth_dma_clr_fbes(const per_eth_t* const eth)
+{
+    return per_bit_rc1_w1_rdclr(&eth->PerDma->Fbes);
+}
+
+/// Early receive status
+static per_inline bool per_eth_dma_ers(const per_eth_t* const eth)
+{
+    return per_bit_rc1_w1(&eth->PerDma->Ers);
+}
+
+/// Early receive status
+static per_inline bool per_eth_dma_clr_ers(const per_eth_t* const eth)
+{
+    return per_bit_rc1_w1_rdclr(&eth->PerDma->Ers);
+}
+
+/// Abnormal interrupt summary
+static per_inline bool per_eth_dma_ais(const per_eth_t* const eth)
+{
+    return per_bit_rc1_w1(&eth->PerDma->Ais);
+}
+
+/// Abnormal interrupt summary
+static per_inline bool per_eth_dma_clr_ais(const per_eth_t* const eth)
+{
+    return per_bit_rc1_w1_rdclr(&eth->PerDma->Ais);
+}
+
+/// Normal interrupt summary
+static per_inline bool per_eth_dma_nis(const per_eth_t* const eth)
+{
+    return per_bit_rc1_w1(&eth->PerDma->Nis);
+}
+
+/// Normal interrupt summary
+static per_inline bool per_eth_dma_clr_nis(const per_eth_t* const eth)
+{
+    return per_bit_rc1_w1_rdclr(&eth->PerDma->Nis);
+}
+
+/// Receive process state
+static per_inline per_eth_dma_rps_e per_eth_dma_rps(const per_eth_t* const eth)
+{
+    return (per_eth_dma_rps_e)per_bit_r3(&eth->PerDma->Rps);
+}
+
+/// Transmit process state
+static per_inline per_eth_dma_tps_e per_eth_dma_tps(const per_eth_t* const eth)
+{
+    return (per_eth_dma_tps_e)per_bit_r3(&eth->PerDma->Tps);
+}
+
+/// Error bits status
+static per_inline uint_fast16_t per_eth_dma_ebs(const per_eth_t* const eth)
+{
+    return per_bit_r3(&eth->PerDma->Ebs);
+}
+
+/// MMC status
+static per_inline bool per_eth_dma_mmcs(const per_eth_t* const eth)
+{
+    return per_bit_r1(&eth->PerDma->Mmcs);
+}
+
+/// PMT status
+static per_inline bool per_eth_dma_pmts(const per_eth_t* const eth)
+{
+    return per_bit_r1(&eth->PerDma->Pmts);
+}
+
+/// Time stamp trigger status
+static per_inline bool per_eth_dma_tsts(const per_eth_t* const eth)
+{
+    return per_bit_r1(&eth->PerDma->Tsts);
+}
+
+/// (Sr) Start/stop receive. Note duplicate abbreviation
+static per_inline bool per_eth_dma_ssr(const per_eth_t* const eth)
+{
+    return per_bit_rw1(&eth->PerDma->Ssr);
+}
+
+/// (Sr) Start/stop receive. Note duplicate abbreviation
+static per_inline void per_eth_dma_set_ssr(const per_eth_t* const eth, bool val)
+{
+    per_bit_rw1_set(&eth->PerDma->Ssr, val);
+}
+
+/// Operate on second frame
+static per_inline bool per_eth_dma_osf(const per_eth_t* const eth)
+{
+    return per_bit_rw1(&eth->PerDma->Osf);
+}
+
+/// Operate on second frame
+static per_inline void per_eth_dma_set_osf(const per_eth_t* const eth, bool val)
+{
+    per_bit_rw1_set(&eth->PerDma->Osf, val);
+}
+
+/// Receive threshold control
+static per_inline per_eth_dma_rtc_e per_eth_dma_rtc(const per_eth_t* const eth)
+{
+    return (per_eth_dma_rtc_e)per_bit_rw2(&eth->PerDma->Rtc);
+}
+
+/// Receive threshold control
+static per_inline bool per_eth_dma_set_rtc(const per_eth_t* const eth, per_eth_dma_rtc_e val)
+{
+    return per_bit_rw2_set(&eth->PerDma->Rtc, (uint16_t)val);
+}
+
+/// Forward undersized good frames
+static per_inline bool per_eth_dma_fugf(const per_eth_t* const eth)
+{
+    return per_bit_rw1(&eth->PerDma->Fugf);
+}
+
+/// Forward undersized good frames
+static per_inline void per_eth_dma_set_fugf(const per_eth_t* const eth, bool val)
+{
+    per_bit_rw1_set(&eth->PerDma->Fugf, val);
+}
+
+/// Forward error frames
+static per_inline bool per_eth_dma_fef(const per_eth_t* const eth)
+{
+    return per_bit_rw1(&eth->PerDma->Fef);
+}
+
+/// Forward error frames
+static per_inline void per_eth_dma_set_fef(const per_eth_t* const eth, bool val)
+{
+    per_bit_rw1_set(&eth->PerDma->Fef, val);
+}
+
+/// Start/stop transmission
+static per_inline bool per_eth_dma_st(const per_eth_t* const eth)
+{
+    return per_bit_rw1(&eth->PerDma->St);
+}
+
+/// Start/stop transmission
+static per_inline void per_eth_dma_set_st(const per_eth_t* const eth, bool val)
+{
+    per_bit_rw1_set(&eth->PerDma->St, val);
+}
+
+/// Transmit threshold control
+static per_inline per_eth_dma_ttc_e per_eth_dma_ttc(const per_eth_t* const eth)
+{
+    return (per_eth_dma_ttc_e)per_bit_rw3(&eth->PerDma->Ttc);
+}
+
+/// Transmit threshold control
+static per_inline bool per_eth_dma_set_ttc(const per_eth_t* const eth, per_eth_dma_ttc_e val)
+{
+    return per_bit_rw3_set(&eth->PerDma->Ttc, (uint16_t)val);
+}
+
+/// Flush transmit FIFO
+static per_inline bool per_eth_dma_ftf(const per_eth_t* const eth)
+{
+    return per_bit_rw1(&eth->PerDma->Ftf);
+}
+
+/// Flush transmit FIFO
+static per_inline void per_eth_dma_set_ftf(const per_eth_t* const eth, bool val)
+{
+    per_bit_rw1_set(&eth->PerDma->Ftf, val);
+}
+
+/// Transmit store and forward
+static per_inline bool per_eth_dma_tsf(const per_eth_t* const eth)
+{
+    return per_bit_rw1(&eth->PerDma->Tsf);
+}
+
+/// Transmit store and forward
+static per_inline void per_eth_dma_set_tsf(const per_eth_t* const eth, bool val)
+{
+    per_bit_rw1_set(&eth->PerDma->Tsf, val);
+}
+
+/// Disable flushing of received frames
+static per_inline bool per_eth_dma_dfrf(const per_eth_t* const eth)
+{
+    return per_bit_rw1(&eth->PerDma->Dfrf);
+}
+
+/// Disable flushing of received frames
+static per_inline void per_eth_dma_set_dfrf(const per_eth_t* const eth, bool val)
+{
+    per_bit_rw1_set(&eth->PerDma->Dfrf, val);
+}
+
+/// Receive store and forward
+static per_inline bool per_eth_dma_rsf(const per_eth_t* const eth)
+{
+    return per_bit_rw1(&eth->PerDma->Rsf);
+}
+
+/// Receive store and forward
+static per_inline void per_eth_dma_set_rsf(const per_eth_t* const eth, bool val)
+{
+    per_bit_rw1_set(&eth->PerDma->Rsf, val);
+}
+
+/// Dropping of TCP/IP checksum error frames disable
+static per_inline bool per_eth_dma_dtcefd(const per_eth_t* const eth)
+{
+    return per_bit_rw1(&eth->PerDma->Dtcefd);
+}
+
+/// Dropping of TCP/IP checksum error frames disable
+static per_inline void per_eth_dma_set_dtcefd(const per_eth_t* const eth, bool val)
+{
+    per_bit_rw1_set(&eth->PerDma->Dtcefd, val);
 }
 
 
 
+
+
+
+
+
+/// ETH DNA fetch and clear active interrupts and return the active interrupts
+static per_inline per_eth_dma_sr_e per_eth_dma_irq(const per_eth_t* const eth)
+{
+    uint_fast32_t irq = per_eth_dma_dier(eth) & (uint_fast16_t)PER_ETH_DMA_SR_MASK & per_eth_dma_sr(eth);
+
+    per_eth_dma_set_sr(eth, irq); // Clear
+
+    return (per_eth_dma_sr_e)irq;
+}
 
 // /// 
 // static per_inline bool per_eth_dma_(const per_eth_t* const eth)
@@ -2211,6 +2778,32 @@ static per_inline void per_eth_dma_set_sr(const per_eth_t* const eth)
 // {
 //     return per_bit_rw_set(&eth->PerDma->, val);
 // }
+
+// /// 
+// static per_inline uint_fast32_t per_eth_dma_(const per_eth_t* const eth)
+// {
+//     return per_bit_rw32_reg(&eth->PerDma->);
+// }
+
+// /// 
+// static per_inline void per_eth_dma_set_(const per_eth_t* const eth, uint32_t val)
+// {
+//     per_bit_rw32_reg_set(&eth->PerDma->, val);
+// }
+
+
+// /// 
+// static per_inline bool per_eth_dma_(const per_eth_t* const eth)
+// {
+//     return per_bit_rc1_w1(&eth->PerDma->);
+// }
+
+// /// 
+// static per_inline bool per_eth_dma_clr_(const per_eth_t* const eth)
+// {
+//     return per_bit_rc1_w1_rdclr(&eth->PerDma->);
+// }
+
 
 
 
