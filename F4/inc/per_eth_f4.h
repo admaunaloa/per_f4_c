@@ -269,6 +269,16 @@ typedef enum
     PER_ETH_DMA_RTC_128 = 0b11, ///< 128
 } per_eth_dma_rtc_e;
 
+/// ETH DMA missed frame and buffer overflow counter register (ETH_DMAMFBOCR)
+typedef enum
+{
+    PER_ETH_DMA_MFBOCR_MFC_MASK  = 0xffff, ///< Missed frames by the controller
+    PER_ETH_DMA_MFBOCR_OMFC_MASK = 0x01 << 16, ///< Overflow bit for missed frame counter
+    PER_ETH_DMA_MFBOCR_MFA_SHIFT = 17, ///< Missed frames by the application
+    PER_ETH_DMA_MFBOCR_MFA_MASK  = 0x07ff, ///< Missed frames by the application
+    PER_ETH_DMA_MFBOCR_OFOC_MASK = 0x01 << 28, ///< Overflow bit for FIFO overflow counter
+} per_eth_dma_mfbocr_e;
+
 typedef struct
 {
     // MAC configuration register (ETH_MACCR)
@@ -673,6 +683,34 @@ typedef struct
     };
 
     // DMA missed frame and buffer overflow counter register (ETH_DMAMFBOCR)
+    union
+    {
+        struct
+        {
+            per_bit_r16_t Mfc; ///< Missed frames by the controller
+            per_bit_r1_t Omfc; ///< Overflow bit for missed frame counter
+            per_bit_r11_t Mfa; ///< Missed frames by the application
+            per_bit_r1_t Omfa; ///< Overflow bit for FIFO overflow counter
+            per_bit_n3_t MfbocrBit29; ///< Reserved
+        };
+        per_bit_r32_reg_t Mfbocr; ///< DMA missed frame and buffer overflow counter register (ETH_DMAMFBOCR)
+    };
+
+    // DMA receive status watchdog timer register (ETH_DMARSWTR)
+    per_bit_rw8_t Rswtc; ///< Receive status (RS) watchdog timer count
+    per_bit_n24_t RswtrBit8; ///< Reserved
+
+    // DMA current host transmit descriptor register (ETH_DMACHTDR)
+    per_bit_r32_reg_t Htdap; ///< Host transmit descriptor address pointer
+
+    // DMA current host receive descriptor register (ETH_DMACHRDR)
+    per_bit_r32_reg_t Hrdap; ///< Host receive descriptor address pointer
+
+    // DMA current host transmit buffer address register (ETH_DMACHTBAR)
+    per_bit_r32_reg_t Htbap; ///< Host transmit buffer address pointer
+
+    // DMA current host receive buffer address register (ETH_DMACHRBAR)
+    per_bit_r32_reg_t Hrbap; ///< Host receive buffer address pointer
 
 } per_eth_dma_t;
 
@@ -2957,11 +2995,59 @@ static per_inline void per_eth_dma_set_nise(const per_eth_t* const eth, bool val
     per_bit_rw1_set(&eth->PerDma->Nise, val);
 }
 
+/// DMA missed frame and buffer overflow counter register (ETH_DMAMFBOCR)
+static per_inline uint_fast32_t per_eth_dma_mfbocr(const per_eth_t* const eth)
+{
+    return per_bit_r32_reg(&eth->PerDma->Mfbocr);
+}
 
+/// Missed frames by the controller
+uint32_t per_eth_dma_mfc(const per_eth_t* const eth);
 
+/// Overflow bit for missed frame counter
+bool per_eth_dma_omfc(const per_eth_t* const eth);
 
+/// Missed frames by the application
+uint32_t per_eth_dma_mfa(const per_eth_t* const eth);
 
+/// Overflow bit for FIFO overflow counter
+bool per_eth_dma_omfa(const per_eth_t* const eth);
 
+/// Receive status (RS) watchdog timer count
+static per_inline uint_fast16_t per_eth_dma_rswtc(const per_eth_t* const eth)
+{
+    return per_bit_rw8(&eth->PerDma->Rswtc);
+}
+
+/// Receive status (RS) watchdog timer count
+static per_inline bool per_eth_dma_set_rswtc(const per_eth_t* const eth, uint16_t val)
+{
+    return per_bit_rw8_set(&eth->PerDma->Rswtc, val);
+}
+
+/// Host transmit descriptor address pointer
+static per_inline uint_fast32_t per_eth_dma_htdap(const per_eth_t* const eth)
+{
+    return per_bit_r32_reg(&eth->PerDma->Htdap);
+}
+
+/// Host receive descriptor address pointer
+static per_inline uint_fast32_t per_eth_dma_hrdap(const per_eth_t* const eth)
+{
+    return per_bit_r32_reg(&eth->PerDma->Hrdap);
+}
+
+/// Host transmit buffer address pointer
+static per_inline uint_fast32_t per_eth_dma_htbap(const per_eth_t* const eth)
+{
+    return per_bit_r32_reg(&eth->PerDma->Htbap);
+}
+
+/// Host receive buffer address pointer
+static per_inline uint_fast32_t per_eth_dma_hrbap(const per_eth_t* const eth)
+{
+    return per_bit_r32_reg(&eth->PerDma->Hrbap);
+}
 
 /// ETH DNA fetch and clear active interrupts and return the active interrupts
 static per_inline per_eth_dma_sr_e per_eth_dma_irq(const per_eth_t* const eth)
@@ -2972,59 +3058,6 @@ static per_inline per_eth_dma_sr_e per_eth_dma_irq(const per_eth_t* const eth)
 
     return (per_eth_dma_sr_e)irq;
 }
-
-// /// 
-// static per_inline bool per_eth_dma_(const per_eth_t* const eth)
-// {
-//     return per_bit_rw1(&eth->PerDma->);
-// }
-
-// /// 
-// static per_inline void per_eth_dma_set_(const per_eth_t* const eth, bool val)
-// {
-//     per_bit_rw1_set(&eth->PerDma->, val);
-// }
-
-
-// /// 
-// static per_inline uint_fast16_t per_eth_dma_(const per_eth_t* const eth)
-// {
-//     return per_bit_rw(&eth->PerDma->);
-// }
-
-// /// 
-// static per_inline bool per_eth_dma_set_(const per_eth_t* const eth, uint16_t val)
-// {
-//     return per_bit_rw_set(&eth->PerDma->, val);
-// }
-
-// /// 
-// static per_inline uint_fast32_t per_eth_dma_(const per_eth_t* const eth)
-// {
-//     return per_bit_rw32_reg(&eth->PerDma->);
-// }
-
-// /// 
-// static per_inline void per_eth_dma_set_(const per_eth_t* const eth, uint32_t val)
-// {
-//     per_bit_rw32_reg_set(&eth->PerDma->, val);
-// }
-
-
-// /// 
-// static per_inline bool per_eth_dma_(const per_eth_t* const eth)
-// {
-//     return per_bit_rc1_w1(&eth->PerDma->);
-// }
-
-// /// 
-// static per_inline bool per_eth_dma_clr_(const per_eth_t* const eth)
-// {
-//     return per_bit_rc1_w1_rdclr(&eth->PerDma->);
-// }
-
-
-
 
 #ifdef __cplusplus
 }
