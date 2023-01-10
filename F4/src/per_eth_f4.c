@@ -27,6 +27,10 @@
 #include "per_eth_f4.h"
 
 static uint32_t Macpmtcsr; // Latch for wakeup flags
+static uint32_t Dmamfc; // Latch for missed frame counter
+static uint16_t Dmamfa; // Latch for Missed frames by the application
+static bool Dmaomfc; // Latch for Overflow bit for missed frame counter
+static bool Dmaofoc; // Latch for Overflow bit for FIFO overflow counter
 
 /// ETH Macpmtcsr update
 uint32_t per_eth_mac_macpmtcsr(const per_eth_t* const eth)
@@ -52,6 +56,61 @@ bool per_eth_mac_mpr(const per_eth_t* const eth)
 {
    bool val = (per_eth_mac_macpmtcsr(eth) & PER_ETH_PMTCSR_MPR) != 0;
    Macpmtcsr &= ~PER_ETH_PMTCSR_MPR; // Clear the latch
+
+   return val;
+}
+
+/// ETH Fetch and latch the MFBOCR
+static void per_eth_dma_mfbocr_latch(const per_eth_t* const eth)
+{
+   uint32_t val = per_bit_r32_reg(&eth->PerDma->Mfbocr); // Fetch and clear
+
+   Dmamfc += val & PER_ETH_DMA_MFBOCR_MFC_MASK;
+   Dmaomfc |= (val & PER_ETH_DMA_MFBOCR_OMFC_MASK) != 0;
+   Dmamfa += (uint16_t)((val >> PER_ETH_DMA_MFBOCR_MFA_SHIFT) & PER_ETH_DMA_MFBOCR_MFA_MASK);
+   Dmaofoc |= (val & PER_ETH_DMA_MFBOCR_OFOC_MASK) != 0;
+}
+
+/// ETH Missed frames by the controller
+uint32_t per_eth_dma_mfc(const per_eth_t* const eth)
+{
+   per_eth_dma_mfbocr_latch(eth);
+   
+   uint32_t val = Dmamfc;
+   Dmamfc = 0; // clear
+ 
+   return val;
+}
+
+/// ETH Overflow bit for missed frame counter
+bool per_eth_dma_omfc(const per_eth_t* const eth)
+{
+   per_eth_dma_mfbocr_latch(eth);
+   
+   bool val = Dmaomfc;
+   Dmaomfc = false;
+
+   return val;
+}
+
+/// ETH Missed frames by the application
+uint16_t per_eth_dma_mfa(const per_eth_t* const eth)
+{
+  per_eth_dma_mfbocr_latch(eth);
+   
+   uint16_t val = Dmamfa;
+   Dmamfa = 0; // clear
+ 
+   return val;
+}
+
+/// ETH Overflow bit for FIFO overflow counter
+bool per_eth_dma_ofoc(const per_eth_t* const eth)
+{
+   per_eth_dma_mfbocr_latch(eth);
+   
+   bool val = Dmaofoc;
+   Dmaofoc = false;
 
    return val;
 }
