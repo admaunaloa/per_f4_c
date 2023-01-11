@@ -3008,7 +3008,7 @@ uint32_t per_eth_dma_mfc(const per_eth_t* const eth);
 bool per_eth_dma_omfc(const per_eth_t* const eth);
 
 /// Missed frames by the application
-uint32_t per_eth_dma_mfa(const per_eth_t* const eth);
+uint16_t per_eth_dma_mfa(const per_eth_t* const eth);
 
 /// Overflow bit for FIFO overflow counter
 bool per_eth_dma_omfa(const per_eth_t* const eth);
