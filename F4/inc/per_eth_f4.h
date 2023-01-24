@@ -3049,7 +3049,7 @@ static per_inline uint_fast32_t per_eth_dma_hrbap(const per_eth_t* const eth)
     return per_bit_r32_reg(&eth->PerDma->Hrbap);
 }
 
-/// ETH DNA fetch and clear active interrupts and return the active interrupts
+/// ETH DMA fetch and clear active interrupts and return the active interrupts
 static per_inline per_eth_dma_sr_e per_eth_dma_irq(const per_eth_t* const eth)
 {
     uint_fast32_t irq = per_eth_dma_dier(eth) & (uint_fast16_t)PER_ETH_DMA_SR_MASK & per_eth_dma_sr(eth);

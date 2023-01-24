@@ -46,6 +46,7 @@ typedef enum
     PER_LOG_BITBAND, ///< BITBAND
     PER_LOG_CAN_1, ///< CAN1
     PER_LOG_CAN_2, ///< CAN2
+    PER_LOG_CAN_3, ///< CAN3
     PER_LOG_CAN, ///< CAN
     PER_LOG_DAC_CHANNEL_1, ///< DAC CHANNEL1
     PER_LOG_DAC_CHANNEL_2, ///< DAC CHANNEL2
