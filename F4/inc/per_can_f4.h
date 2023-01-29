@@ -24,8 +24,10 @@
  * SOFTWARE.
  *
  * Convenience functions:
- * per_can_mirq()            clears active master interrupts and returns bitmask of the cleared ones
- * per_can_tirq()            clears active transport interrupts and returns bitmask of the cleared ones
+ * per_can_msr_fc()   clears active master interrupts and returns bitmask of the cleared ones
+ * per_can_tsr_fc()   clears active transport interrupts and returns bitmask of the cleared ones
+ * per_can_rf0r_fc()  clears active fifo 0 bits and returns bitmask of the cleared ones
+ * per_can_rf1r_fc()  clears active fifo 1 bits and returns bitmask of the cleared ones
  */
 
 #ifndef per_can_f4_h_
@@ -104,6 +106,15 @@ typedef enum
                         PER_CAN_TSR_TERR2,
 } per_can_tsr_e;
 
+/// CAN receive FIFO x register (CAN_RFxR)
+typedef enum
+{
+    PER_CAN_RFR_FULL = 0b00001000, ///< FIFO x full
+    PER_CAN_RFR_FOVR = 0b00010000, ///< FIFO x overrun
+    PER_CAN_RFR_MASK  = PER_CAN_RFR_FULL | ///< All interrupt flag
+                        PER_CAN_RFR_FOVR,
+} per_can_rfr_e;
+
 typedef struct
 {
     // CAN master control register (CAN_MCR)
@@ -174,18 +185,81 @@ typedef struct
         per_bit_rw32_reg_t Tsr; ///< CAN transmit status register (CAN_TSR)
     };
 
+    // CAN receive FIFO 0 register (CAN_RF0R)
+    union
+    {
+        struct
+        {
+            per_bit_r2_t Fmp0; ///< FIFO 0 message pending
+            per_bit_n1_t Rf0rBit2; ///< Reserved
+            per_bit_rc1_w1_t Full0; ///< FIFO 0 full
+            per_bit_rc1_w1_t Fovr0; ///< FIFO 0 overrun
+            per_bit_rs1_t Rfom0; ///< Release FIFO 0 output mailbox
+            per_bit_n26_t Rf0rBit6; ///< Reserved
+        };
+        per_bit_rw32_reg_t Rf0r; ///< CAN receive FIFO 0 register (CAN_RF0R)
+    };
+
+    // CAN receive FIFO 1 register (CAN_RF1R)
+    union
+    {
+        struct
+        {
+            per_bit_r2_t Fmp1; ///< FIFO 1 message pending
+            per_bit_n1_t Rf1rBit2; ///< Reserved
+            per_bit_rc1_w1_t Full1; ///< FIFO 1 full
+            per_bit_rc1_w1_t Fovr1; ///< FIFO 1 overrun
+            per_bit_rs1_t Rfom1; ///< Release FIFO 1 output mailbox
+            per_bit_n26_t Rf1rBit6; ///< Reserved
+        };
+        per_bit_rw32_reg_t Rf1r; ///< CAN receive FIFO 1 register (CAN_RF1R)
+    };
+
+    // CAN interrupt enable register (CAN_IER)
+    per_bit_rw1_t Tmeie; ///< Transmit mailbox empty interrupt enable
+    per_bit_rw1_t Fmpie0; ///< FIFO message pending interrupt enable
+    per_bit_rw1_t Ffie0; ///< FIFO full interrupt enable
+    per_bit_rw1_t Fovie0; ///< FIFO overrun interrupt enable
+    per_bit_rw1_t Fmpie1; ///< FIFO message pending interrupt enable
+    per_bit_rw1_t Ffie1; ///< FIFO full interrupt enable
+    per_bit_rw1_t Fovie1; ///< FIFO overrun interrupt enable
+    per_bit_n1_t IerBit7; ///< Reserved
+    per_bit_rw1_t Ewgie; ///< Error warning interrupt enable
+    per_bit_rw1_t Epvie; ///< Error passive interrupt enable
+    per_bit_rw1_t Bofie; ///< Bus-off interrupt enable
+    per_bit_rw1_t Lecie; ///< Last error code interrupt enable
+    per_bit_n3_t IerBit12; ///< Reserved
+    per_bit_rw1_t Errie; ///< Error interrupt enable
+    per_bit_rw1_t Wkuie; ///< Wakeup interrupt enable
+    per_bit_rw1_t Slkie; ///< Sleep interrupt enable
+    per_bit_n14_t IerBit18; ///< Reserved
+
+    // CAN error status register (CAN_ESR)
+    per_bit_r1_t Ewgf; ///< Error warning flag
+    per_bit_r1_t Epvf; ///< Error passive flag
+    per_bit_r1_t Boff; ///< Bus-off flag
+    per_bit_n1_t EsrBit3; ///< Reserved
+    per_bit_rw3_t Lec; ///< Last error code
+    per_bit_n9_t EsrBit7; ///< Reserved
+    per_bit_r8_t Tec; ///< Least significant byte of the 9-bit transmit error counter
+    per_bit_r8_t Rec; ///< Receive error counter
+
+    // CAN bit timing register (CAN_BTR)
+    per_bit_rw10_t Brp; ///< Baud rate prescaler
+    per_bit_n6_t BtrBit10; ///< Reserved
+    per_bit_rw4_t Ts1; ///< Time segment 1
+    per_bit_rw3_t Ts2; ///< Time segment 2
+    per_bit_n1_t BtrBit23; ///< Reserved
+    per_bit_rw2_t Sjw; ///< Resynchronization jump width
+    per_bit_n4_t BtrBit26; ///< Reserved
+    per_bit_rw1_t Lbkm; ///< Loop back mode (debug)
+    per_bit_rw1_t Silm; ///< Silent mode (debug)
 
 
 
-
-
-
-
-
-
-            // per_bit_r1_t ; ///< 
-            // per_bit_rc1_w1_t ; ///< 
-            // per_bit_n3_t TsrBit; ///< Reserved
+    // per_bit_r1_t ; ///< 
+    // per_bit_rc1_w1_t ; ///< 
+    // per_bit_n_t BtrBit; ///< Reserved
 
 
 
@@ -637,6 +711,399 @@ static per_inline bool per_can_low2(const per_can_t* const can)
     return per_bit_r1(&can->Per->Low2);
 }
 
+/// CAN receive FIFO 0 register (CAN_RF0R)
+static per_inline uint_fast32_t per_can_rf0r(const per_can_t* const can)
+{
+    return per_bit_rw32_reg(&can->Per->Rf0r);
+}
+
+/// CAN receive FIFO 0 register (CAN_RF0R)
+static per_inline void per_can_set_rf0r(const per_can_t* const can, uint32_t val)
+{
+    per_bit_rw32_reg_set(&can->Per->Rf0r, val);
+}
+
+/// FIFO 0 message pending
+static per_inline uint_fast16_t per_can_fmp0(const per_can_t* const can)
+{
+    return per_bit_r2(&can->Per->Fmp0);
+}
+
+/// FIFO 0 full
+static per_inline bool per_can_full0(const per_can_t* const can)
+{
+    return per_bit_rc1_w1(&can->Per->Full0);
+}
+
+/// FIFO 0 full
+static per_inline bool per_can_clr_full0(const per_can_t* const can)
+{
+    return per_bit_rc1_w1_rdclr(&can->Per->Full0);
+}
+
+/// FIFO 0 overrun
+static per_inline bool per_can_fovr0(const per_can_t* const can)
+{
+    return per_bit_rc1_w1(&can->Per->Fovr0);
+}
+
+/// FIFO 0 overrun
+static per_inline bool per_can_clr_fovr0(const per_can_t* const can)
+{
+    return per_bit_rc1_w1_rdclr(&can->Per->Fovr0);
+}
+
+/// Release FIFO 0 output mailbox
+static per_inline bool per_can_rfom0(const per_can_t* const can)
+{
+    return per_bit_rs1(&can->Per->Rfom0);
+}
+
+/// Release FIFO 0 output mailbox
+static per_inline void per_can_set_rfom0(const per_can_t* const can)
+{
+    per_bit_rs1_set(&can->Per->Rfom0);
+}
+
+/// CAN receive FIFO 1 register (CAN_RF1R)
+static per_inline uint_fast32_t per_can_rf1r(const per_can_t* const can)
+{
+    return per_bit_rw32_reg(&can->Per->Rf1r);
+}
+
+/// CAN receive FIFO 1 register (CAN_RF1R)
+static per_inline void per_can_set_rf1r(const per_can_t* const can, uint32_t val)
+{
+    per_bit_rw32_reg_set(&can->Per->Rf1r, val);
+}
+
+/// FIFO 1 message pending
+static per_inline uint_fast16_t per_can_fmp1(const per_can_t* const can)
+{
+    return per_bit_r2(&can->Per->Fmp1);
+}
+
+/// FIFO 1 full
+static per_inline bool per_can_full1(const per_can_t* const can)
+{
+    return per_bit_rc1_w1(&can->Per->Full1);
+}
+
+/// FIFO 1 full
+static per_inline bool per_can_clr_full1(const per_can_t* const can)
+{
+    return per_bit_rc1_w1_rdclr(&can->Per->Full1);
+}
+
+/// FIFO 1 overrun
+static per_inline bool per_can_fovr1(const per_can_t* const can)
+{
+    return per_bit_rc1_w1(&can->Per->Fovr1);
+}
+
+/// FIFO 1 overrun
+static per_inline bool per_can_clr_fovr1(const per_can_t* const can)
+{
+    return per_bit_rc1_w1_rdclr(&can->Per->Fovr1);
+}
+
+/// Release FIFO 1 output mailbox
+static per_inline bool per_can_rfom1(const per_can_t* const can)
+{
+    return per_bit_rs1(&can->Per->Rfom1);
+}
+
+/// Release FIFO 1 output mailbox
+static per_inline void per_can_set_rfom1(const per_can_t* const can)
+{
+    per_bit_rs1_set(&can->Per->Rfom1);
+}
+
+/// Transmit mailbox empty interrupt enable
+static per_inline bool per_can_tmeie(const per_can_t* const can)
+{
+    return per_bit_rw1(&can->Per->Tmeie);
+}
+
+/// Transmit mailbox empty interrupt enable
+static per_inline void per_can_set_tmeie(const per_can_t* const can, bool val)
+{
+    per_bit_rw1_set(&can->Per->Tmeie, val);
+}
+
+/// FIFO message pending interrupt enable
+static per_inline bool per_can_fmpie0(const per_can_t* const can)
+{
+    return per_bit_rw1(&can->Per->Fmpie0);
+}
+
+/// FIFO message pending interrupt enable
+static per_inline void per_can_set_fmpie0(const per_can_t* const can, bool val)
+{
+    per_bit_rw1_set(&can->Per->Fmpie0, val);
+}
+
+/// FIFO full interrupt enable
+static per_inline bool per_can_ffie0(const per_can_t* const can)
+{
+    return per_bit_rw1(&can->Per->Ffie0);
+}
+
+/// FIFO full interrupt enable
+static per_inline void per_can_set_ffie0(const per_can_t* const can, bool val)
+{
+    per_bit_rw1_set(&can->Per->Ffie0, val);
+}
+
+/// FIFO overrun interrupt enable
+static per_inline bool per_can_fovie0(const per_can_t* const can)
+{
+    return per_bit_rw1(&can->Per->Fovie0);
+}
+
+/// FIFO overrun interrupt enable
+static per_inline void per_can_set_fovie0(const per_can_t* const can, bool val)
+{
+    per_bit_rw1_set(&can->Per->Fovie0, val);
+}
+
+/// FIFO message pending interrupt enable
+static per_inline bool per_can_fmpie1(const per_can_t* const can)
+{
+    return per_bit_rw1(&can->Per->Fmpie1);
+}
+
+/// FIFO message pending interrupt enable
+static per_inline void per_can_set_fmpie1(const per_can_t* const can, bool val)
+{
+    per_bit_rw1_set(&can->Per->Fmpie1, val);
+}
+
+/// FIFO full interrupt enable
+static per_inline bool per_can_ffie1(const per_can_t* const can)
+{
+    return per_bit_rw1(&can->Per->Ffie1);
+}
+
+/// FIFO full interrupt enable
+static per_inline void per_can_set_ffie1(const per_can_t* const can, bool val)
+{
+    per_bit_rw1_set(&can->Per->Ffie1, val);
+}
+
+/// FIFO overrun interrupt enable
+static per_inline bool per_can_fovie1(const per_can_t* const can)
+{
+    return per_bit_rw1(&can->Per->Fovie1);
+}
+
+/// FIFO overrun interrupt enable
+static per_inline void per_can_set_fovie1(const per_can_t* const can, bool val)
+{
+    per_bit_rw1_set(&can->Per->Fovie1, val);
+}
+
+/// Error warning interrupt enable
+static per_inline bool per_can_ewgie(const per_can_t* const can)
+{
+    return per_bit_rw1(&can->Per->Ewgie);
+}
+
+/// Error warning interrupt enable
+static per_inline void per_can_set_ewgie(const per_can_t* const can, bool val)
+{
+    per_bit_rw1_set(&can->Per->Ewgie, val);
+}
+
+/// Error passive interrupt enable
+static per_inline bool per_can_epvie(const per_can_t* const can)
+{
+    return per_bit_rw1(&can->Per->Epvie);
+}
+
+/// Error passive interrupt enable
+static per_inline void per_can_set_epvie(const per_can_t* const can, bool val)
+{
+    per_bit_rw1_set(&can->Per->Epvie, val);
+}
+
+/// Bus-off interrupt enable
+static per_inline bool per_can_bofie(const per_can_t* const can)
+{
+    return per_bit_rw1(&can->Per->Bofie);
+}
+
+/// Bus-off interrupt enable
+static per_inline void per_can_set_bofie(const per_can_t* const can, bool val)
+{
+    per_bit_rw1_set(&can->Per->Bofie, val);
+}
+
+/// Last error code interrupt enable
+static per_inline bool per_can_lecie(const per_can_t* const can)
+{
+    return per_bit_rw1(&can->Per->Lecie);
+}
+
+/// Last error code interrupt enable
+static per_inline void per_can_set_lecie(const per_can_t* const can, bool val)
+{
+    per_bit_rw1_set(&can->Per->Lecie, val);
+}
+
+/// Error interrupt enable
+static per_inline bool per_can_errie(const per_can_t* const can)
+{
+    return per_bit_rw1(&can->Per->Errie);
+}
+
+/// Error interrupt enable
+static per_inline void per_can_set_errie(const per_can_t* const can, bool val)
+{
+    per_bit_rw1_set(&can->Per->Errie, val);
+}
+
+/// Wakeup interrupt enable
+static per_inline bool per_can_wkuie(const per_can_t* const can)
+{
+    return per_bit_rw1(&can->Per->Wkuie);
+}
+
+/// Wakeup interrupt enable
+static per_inline void per_can_set_wkuie(const per_can_t* const can, bool val)
+{
+    per_bit_rw1_set(&can->Per->Wkuie, val);
+}
+
+/// Sleep interrupt enable
+static per_inline bool per_can_slkie(const per_can_t* const can)
+{
+    return per_bit_rw1(&can->Per->Slkie);
+}
+
+/// Sleep interrupt enable
+static per_inline void per_can_set_slkie(const per_can_t* const can, bool val)
+{
+    per_bit_rw1_set(&can->Per->Slkie, val);
+}
+
+/// Error warning flag
+static per_inline bool per_can_ewgf(const per_can_t* const can)
+{
+    return per_bit_r1(&can->Per->Ewgf);
+}
+
+/// Error passive flag
+static per_inline bool per_can_epvf(const per_can_t* const can)
+{
+    return per_bit_r1(&can->Per->Epvf);
+}
+
+/// Bus-off flag
+static per_inline bool per_can_boff(const per_can_t* const can)
+{
+    return per_bit_r1(&can->Per->Boff);
+}
+
+/// Last error code
+static per_inline uint_fast16_t per_can_lec(const per_can_t* const can)
+{
+    return per_bit_rw3(&can->Per->Lec);
+}
+
+/// Last error code
+static per_inline void per_can_set_lec(const per_can_t* const can, uint_fast16_t val)
+{
+    per_bit_rw3_set(&can->Per->Lec, val);
+}
+
+/// Least significant byte of the 9-bit transmit error counter
+static per_inline uint_fast16_t per_can_tec(const per_can_t* const can)
+{
+    return per_bit_r8(&can->Per->Tec);
+}
+
+/// Receive error counter
+static per_inline uint_fast16_t per_can_rec(const per_can_t* const can)
+{
+    return per_bit_r8(&can->Per->Rec);
+}
+
+/// Baud rate prescaler
+static per_inline uint_fast16_t per_can_brp(const per_can_t* const can)
+{
+    return per_bit_rw10(&can->Per->Brp);
+}
+
+/// Baud rate prescaler
+static per_inline void per_can_set_brp(const per_can_t* const can, uint_fast16_t val)
+{
+    per_bit_rw10_set(&can->Per->Brp, val);
+}
+
+/// Time segment 1
+static per_inline uint_fast16_t per_can_ts1(const per_can_t* const can)
+{
+    return per_bit_rw4(&can->Per->Ts1);
+}
+
+/// Time segment 1
+static per_inline void per_can_set_ts1(const per_can_t* const can, uint_fast16_t val)
+{
+    per_bit_rw4_set(&can->Per->Ts1, val);
+}
+
+/// Time segment 2
+static per_inline uint_fast16_t per_can_ts2(const per_can_t* const can)
+{
+    return per_bit_rw3(&can->Per->Ts2);
+}
+
+/// Time segment 2
+static per_inline void per_can_set_ts2(const per_can_t* const can, uint_fast16_t val)
+{
+    per_bit_rw3_set(&can->Per->Ts2, val);
+}
+
+/// Resynchronization jump width
+static per_inline uint_fast16_t per_can_sjw(const per_can_t* const can)
+{
+    return per_bit_rw2(&can->Per->Sjw);
+}
+
+/// Resynchronization jump width
+static per_inline void per_can_set_sjw(const per_can_t* const can, uint_fast16_t val)
+{
+    per_bit_rw2_set(&can->Per->Sjw, val);
+}
+
+/// Loop back mode (debug)
+static per_inline bool per_can_lbkm(const per_can_t* const can)
+{
+    return per_bit_rw1(&can->Per->Lbkm);
+}
+
+/// Loop back mode (debug)
+static per_inline void per_can_set_lbkm(const per_can_t* const can, bool val)
+{
+    per_bit_rw1_set(&can->Per->Lbkm, val);
+}
+
+/// Silent mode (debug)
+static per_inline bool per_can_silm(const per_can_t* const can)
+{
+    return per_bit_rw1(&can->Per->Silm);
+}
+
+/// Silent mode (debug)
+static per_inline void per_can_set_silm(const per_can_t* const can, bool val)
+{
+    per_bit_rw1_set(&can->Per->Silm, val);
+}
+
+
+
+
 
 
 
@@ -649,7 +1116,7 @@ static per_inline bool per_can_low2(const per_can_t* const can)
 
 
 /// CAN fetch and clear active master interrupts and return the active interrupts
-static per_inline per_can_msr_e per_can_mirq(const per_can_t* const can)
+static per_inline per_can_msr_e per_can_msr_fc(const per_can_t* const can)
 {
     uint_fast32_t irq = (uint_fast32_t)PER_CAN_MSR_MASK & per_can_msr(can);
 
@@ -659,7 +1126,7 @@ static per_inline per_can_msr_e per_can_mirq(const per_can_t* const can)
 }
 
 /// CAN fetch and clear active transport interrupts and return the active interrupts
-static per_inline per_can_tsr_e per_can_tirq(const per_can_t* const can)
+static per_inline per_can_tsr_e per_can_tsr_fc(const per_can_t* const can)
 {
     uint_fast32_t irq = (uint_fast32_t)PER_CAN_TSR_MASK & per_can_tsr(can);
 
@@ -668,46 +1135,32 @@ static per_inline per_can_tsr_e per_can_tirq(const per_can_t* const can)
     return (per_can_tsr_e)irq;
 }
 
+/// CAN fetch and clear active FIFO 0 bits
+static per_inline per_can_rfr_e per_can_rf0r_fc(const per_can_t* const can)
+{
+    uint_fast32_t fif = (uint_fast32_t)PER_CAN_RFR_MASK & per_can_rf0r(can);
+
+    per_can_set_rf0r(can, fif); // Clear
+
+    return (per_can_rfr_e)fif;
+}
+
+/// CAN fetch and clear active FIFO 1 bits
+static per_inline per_can_rfr_e per_can_rf1r_fc(const per_can_t* const can)
+{
+    uint_fast32_t fif = (uint_fast32_t)PER_CAN_RFR_MASK & per_can_rf1r(can);
+
+    per_can_set_rf1r(can, fif); // Clear
+
+    return (per_can_rfr_e)fif;
+}
 
 
 
 
-// /// 
-// static per_inline bool per_can_(const per_can_t* const can)
-// {
-//     return per_bit_rw1(&can->Per->);
-// }
-
-// /// 
-// static per_inline void per_can_set_(const per_can_t* const can, bool val)
-// {
-//     per_bit_rw1_set(&can->Per->, val);
-// }
-
-// /// 
-// static per_inline bool per_can_(const per_can_t* const can)
-// {
-//     return per_bit_rc1_w1(&can->Per->);
-// }
-
-// /// 
-// static per_inline bool per_can_clr_(const per_can_t* const can)
-// {
-//     return per_bit_rc1_w1_rdclr(&can->Per->);
-// }
 
 
-// /// 
-// static per_inline bool per_can_(const per_can_t* const can)
-// {
-//     return per_bit_rs1(&can->Per->);
-// }
 
-// /// 
-// static per_inline void per_can_set_(const per_can_t* const can)
-// {
-//     per_bit_rs1_set(&can->Per->);
-// }
 
 
 
