@@ -107,7 +107,7 @@ type-safe and they enable features such as zero-cost error checking.
 ## DEVELOPMENT STATUS (jan 2023)
 Supported peripherals
 * 100% ADC, DES, DMA, ETH, FLASH, GPIO, I2C, PWR, RCC, SPI, TIM_AD, TIM_GP, USART
-* 50%  SYS_CFG
+* 50%  SYS_CFG CAN
 
 Status generics
 * 100% BITBAND, LOGGING

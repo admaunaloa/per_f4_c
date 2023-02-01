@@ -276,6 +276,7 @@ PER_BIT_READ(per_bit_r13, 13); ///< per_bit_r13_t 13 bit peripheral read only
 PER_BIT_READ(per_bit_r14, 14); ///< per_bit_r14_t 14 bit peripheral read only
 PER_BIT_READ(per_bit_r15, 15); ///< per_bit_r15_t 15 bit peripheral read only
 PER_BIT_READ(per_bit_r16, 16); ///< per_bit_r16_t 16 bit peripheral read only
+PER_BIT_READ(per_bit_r18, 18); ///< per_bit_r18_t 18 bit peripheral read only
 
 /// Multiple bit xxx_t no actions, reserved
 #define PER_BIT_NONE(NAME,SIZE)  typedef struct { per_bit_bitband_t N[SIZE]; } NAME##_t;

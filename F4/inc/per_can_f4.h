@@ -28,6 +28,8 @@
  * per_can_tsr_fc()   clears active transport interrupts and returns bitmask of the cleared ones
  * per_can_rf0r_fc()  clears active fifo 0 bits and returns bitmask of the cleared ones
  * per_can_rf1r_fc()  clears active fifo 1 bits and returns bitmask of the cleared ones
+ * per_can_set_tir()  start transmision
+ * per_can_rir()      get identifier information received message
  */
 
 #ifndef per_can_f4_h_
@@ -48,6 +50,13 @@ extern "C" {
 
 /// CAN3 base address
 #define PER_CAN_3 ((per_can_per_t* const)PER_BIT_REG_TO_BIT_BAND(PER_ADDR_APB1 + (uintptr_t)0x6C00))
+
+/// CAN error enumeration
+typedef enum
+{
+    PER_CAN_ERR_OK = PER_LOG_CAN * PER_LOG_MULT, ///< No error
+    PER_CAN_MBX_TX_ERR, ///< MBX_TX full
+} per_can_error_e;
 
 /// CAN master status register (CAN_MSR)
 typedef enum
@@ -115,6 +124,118 @@ typedef enum
                         PER_CAN_RFR_FOVR,
 } per_can_rfr_e;
 
+/// CAN TX mailbox identifier register (CAN_TIxR) (x=0..2)
+typedef enum
+{
+    PER_CAN_MBX_TX_0 = 0, ///< First
+    PER_CAN_MBX_TX_1 = 1, ///< Second
+    PER_CAN_MBX_TX_2 = 2, ///< Third
+    PER_CAN_MBX_TX_LAST = PER_CAN_MBX_TX_2,  ///< Last
+} per_can_mbx_tx_e;
+
+/// CAN TX mailbox identifier register (CAN_TIxR) ()
+typedef enum
+{
+    PER_CAN_TIR_TXRQ = 0b00000001, ///< Transmit mailbox request
+    PER_CAN_TIR_RTR  = 0b00000010, ///< Remote transmission request
+    PER_CAN_TIR_IDE  = 0b00000100, ///< Identifier extensionIdentifier extension
+    PER_CAN_TIR_EXID_MASK  = 0x1fffffff,  ///< Extended identifier
+    PER_CAN_TIR_EXID_SHIFT = 3,  ///< Extended identifier
+    PER_CAN_TIR_STID_MASK  = 0x000007ff,  ///< Extended identifier
+    PER_CAN_TIR_STID_SHIFT = 21,  ///< Extended identifier
+} per_can_tir_e;
+
+/// CAN receive FIFO mailbox identifier register (CAN_RIxR) (x=0..1)
+typedef enum
+{
+    PER_CAN_RIR_RTR  = 0b00000010, ///< Remote transmission request
+    PER_CAN_RIR_IDE  = 0b00000100, ///< Identifier extensionIdentifier extension
+    PER_CAN_RIR_EXID_MASK  = 0x1fffffff,  ///< Extended identifier
+    PER_CAN_RIR_EXID_SHIFT = 3,  ///< Extended identifier
+    PER_CAN_RIR_STID_MASK  = 0x000007ff,  ///< Extended identifier
+    PER_CAN_RIR_STID_SHIFT = 21,  ///< Extended identifier
+} per_can_rir_e;
+
+/// CAN receive FIFO mailbox identifier register (CAN_RIxR) (x=0..1)
+typedef enum
+{
+    PER_CAN_MBX_RX_0 = 0, ///< First
+    PER_CAN_MBX_RX_1 = 1, ///< Second
+    PER_CAN_MBX_RX_LAST = PER_CAN_MBX_RX_1,  ///< Last
+} per_can_mbx_rx_e;
+
+
+/// CAN transmit mailbox registers
+typedef struct
+{
+    // CAN TX mailbox identifier register (CAN_TIxR) (x=0..2)
+    union
+    {
+        struct
+        {
+            per_bit_rw1_t Txrq; ///< Transmit mailbox request
+            per_bit_r1_t Rtr; ///< Remote transmission request
+            per_bit_r1_t Ide; ///< Identifier extensionIdentifier extension
+            per_bit_r18_t Exid; ///< Extended identifier
+            per_bit_r11_t Stid; ///< Standard identifier or extended identifier
+        };
+        per_bit_rw32_reg_t Tir; ///< CAN TX mailbox identifier register (CAN_TIxR)
+    };
+
+    // CAN mailbox data length control and time stamp register (CAN_TDTxR)(x=0..2)
+    union
+    {
+        struct
+        {
+            per_bit_rw4_t Dlc; ///< Data length code
+            per_bit_n4_t TdtrBit4; ///< Reserved
+            per_bit_rw1_t Tgt; ///< Transmit global time
+            per_bit_n7_t TdtrBit9; ///< Reserved
+            per_bit_rw16_t Time; ///< Message time stamp
+        };
+        per_bit_rw32_reg_t Tdtr; ///< CAN mailbox data length control and time stamp register
+    };
+
+    // CAN mailbox data low register (CAN_TDLxR) (x=0..2)
+    per_bit_rw32_reg_t Tdlr; ///< CAN mailbox data low register
+
+    // CAN mailbox data high register (CAN_TDHxR) (x=0..2)
+    per_bit_rw32_reg_t Tdhr; ///< CAN mailbox data high register
+
+    // CAN receive FIFO mailbox identifier register (CAN_RIxR) (x=0..1)
+    union
+    {
+        struct
+        {
+            per_bit_n1_t RirBit0; ///< Reserved
+            per_bit_r1_t Rrtr; ///< Remote transmission request
+            per_bit_r1_t Ride; ///< Identifier extension
+            per_bit_r18_t Rexid; ///< Extended identifier
+            per_bit_r11_t Rstid; ///< Standard identifier or extended identifier
+        };
+        per_bit_r32_reg_t Rir; ///< CAN receive FIFO mailbox identifier register (CAN_RIxR) (x=0..1)
+    };
+
+
+
+
+
+
+} per_can_mbx_tx_t;
+
+/// CAN receive mailbox registers
+typedef struct
+{
+
+
+    // per_bit_r1_t ; ///< 
+    // per_bit_rc1_w1_t ; ///< 
+    // per_bit_n_t BtrBit; ///< Reserved
+} per_can_mbx_rx_t;
+
+
+
+/// CAN control and status registers
 typedef struct
 {
     // CAN master control register (CAN_MCR)
@@ -255,14 +376,14 @@ typedef struct
     per_bit_rw1_t Lbkm; ///< Loop back mode (debug)
     per_bit_rw1_t Silm; ///< Silent mode (debug)
 
+    // CAN Reserved
+    per_bit_n32_t Reserved_0x20[22]; ///< Reserved 0x020 - 0x17F  
+ 
+    // CAN transmit mailbox registers
+    per_can_mbx_tx_t Mbxtx[PER_CAN_MBX_TX_LAST + 1]; 
 
-
-    // per_bit_r1_t ; ///< 
-    // per_bit_rc1_w1_t ; ///< 
-    // per_bit_n_t BtrBit; ///< Reserved
-
-
-
+    // CAN receive mailbox registers
+    per_can_mbx_rx_t Mbxrx[PER_CAN_MBX_RX_LAST + 1]; 
 
 } per_can_per_t;
 
@@ -1101,6 +1222,216 @@ static per_inline void per_can_set_silm(const per_can_t* const can, bool val)
     per_bit_rw1_set(&can->Per->Silm, val);
 }
 
+/// Transmit mailbox request
+static per_inline bool per_can_txrq(const per_can_t* const can, per_can_mbx_tx_e mbx)
+{
+    return per_bit_rw1(&can->Per->Mbxtx[mbx].Txrq);
+}
+
+/// Transmit mailbox request
+static per_inline void per_can_set_txrq(const per_can_t* const can, per_can_mbx_tx_e mbx, bool val)
+{
+    per_bit_rw1_set(&can->Per->Mbxtx[mbx].Txrq, val);
+}
+
+/// Remote transmission request
+static per_inline bool per_can_rtr(const per_can_t* const can, per_can_mbx_tx_e mbx)
+{
+    return per_bit_r1(&can->Per->Mbxtx[mbx].Rtr);
+}
+
+/// Identifier extensionIdentifier extension
+static per_inline bool per_can_ide(const per_can_t* const can, per_can_mbx_tx_e mbx)
+{
+    return per_bit_r1(&can->Per->Mbxtx[mbx].Ide);
+}
+
+/// Extended identifier
+static per_inline bool per_can_exid(const per_can_t* const can, per_can_mbx_tx_e mbx)
+{
+    return per_bit_r18(&can->Per->Mbxtx[mbx].Exid);
+}
+
+/// Standard identifier or extended identifier
+static per_inline bool per_can_stid(const per_can_t* const can, per_can_mbx_tx_e mbx)
+{
+    return per_bit_r11(&can->Per->Mbxtx[mbx].Stid);
+}
+
+/// TX mailbox identifier register (CAN_TIxR)
+static per_inline uint_fast32_t per_can_tir(const per_can_t* const can, per_can_mbx_tx_e mbx)
+{
+    return per_bit_rw32_reg(&can->Per->Mbxtx[mbx].Tir);
+}
+
+/// TX mailbox identifier register (CAN_TIxR) Inlined to prevent copying of arguments on stack
+static per_inline bool per_can_set_tir(const per_can_t* const can, uint32_t id, bool rtr, uint32_t low, uint32_t high)
+{
+    uint32_t tir = PER_CAN_TIR_TXRQ; // Transmit request
+
+    if (rtr)
+    {
+        tir |= PER_CAN_TIR_RTR;
+    }
+
+    if ((id & ~PER_CAN_TIR_STID_MASK) == 0) // Standard identifier
+    {    
+        tir |= (id & PER_CAN_TIR_STID_MASK) << PER_CAN_TIR_STID_SHIFT; // Add standard id
+    }
+    else
+    {
+        tir |= ((id & PER_CAN_TIR_EXID_MASK) << PER_CAN_TIR_EXID_SHIFT) | PER_CAN_TIR_IDE; // Add extended id
+    }
+
+    // Note the if els below is deliberatly written out for performance
+    if (!per_can_rtr(can, PER_CAN_MBX_TX_0))
+    {
+        per_can_mbx_tx_t* const mbx = &can->Per->Mbxtx[PER_CAN_MBX_TX_0];
+        per_bit_rw32_reg_set(&mbx->Tdhr, high);
+        per_bit_rw32_reg_set(&mbx->Tdlr, low);
+        per_bit_rw32_reg_set(&mbx->Tir, tir);
+    }
+    else if(!per_can_rtr(can, PER_CAN_MBX_TX_1))
+    {
+        per_can_mbx_tx_t* const mbx = &can->Per->Mbxtx[PER_CAN_MBX_TX_1];
+        per_bit_rw32_reg_set(&mbx->Tdhr, high);
+        per_bit_rw32_reg_set(&mbx->Tdlr, low);
+        per_bit_rw32_reg_set(&mbx->Tir, tir);
+    }
+    else if(!per_can_rtr(can, PER_CAN_MBX_TX_2))
+    {
+        per_can_mbx_tx_t* const mbx = &can->Per->Mbxtx[PER_CAN_MBX_TX_2];
+        per_bit_rw32_reg_set(&mbx->Tdhr, high);
+        per_bit_rw32_reg_set(&mbx->Tdlr, low);
+        per_bit_rw32_reg_set(&mbx->Tir, tir);
+    }
+    else
+    {
+        per_log_err(can->Err, PER_CAN_MBX_TX_ERR, id);
+        return false;
+    }
+
+    return true;
+}
+
+/// Data length code
+static per_inline uint_fast16_t per_can_dlc(const per_can_t* const can, per_can_mbx_tx_e mbx)
+{
+    return per_bit_rw4(&can->Per->Mbxtx[mbx].Dlc);
+}
+
+/// Data length code
+static per_inline void per_can_set_dlc(const per_can_t* const can, per_can_mbx_tx_e mbx, uint_fast16_t val)
+{
+    per_bit_rw4_set(&can->Per->Mbxtx[mbx].Dlc, val);
+}
+
+/// Transmit global time
+static per_inline bool per_can_tgt(const per_can_t* const can, per_can_mbx_tx_e mbx)
+{
+    return per_bit_rw1(&can->Per->Mbxtx[mbx].Tgt);
+}
+
+/// Transmit global time
+static per_inline void per_can_set_tgt(const per_can_t* const can, per_can_mbx_tx_e mbx, bool val)
+{
+    per_bit_rw1_set(&can->Per->Mbxtx[mbx].Tgt, val);
+}
+
+/// Message time stamp
+static per_inline uint_fast16_t per_can_time(const per_can_t* const can, per_can_mbx_tx_e mbx)
+{
+    return per_bit_rw16(&can->Per->Mbxtx[mbx].Time);
+}
+
+/// Message time stamp
+static per_inline void per_can_set_time(const per_can_t* const can, per_can_mbx_tx_e mbx, uint_fast16_t val)
+{
+    per_bit_rw16_set(&can->Per->Mbxtx[mbx].Time, val);
+}
+
+/// CAN mailbox data length control and time stamp register
+static per_inline uint_fast32_t per_can_tdtr(const per_can_t* const can, per_can_mbx_tx_e mbx)
+{
+    return per_bit_rw32_reg(&can->Per->Mbxtx[mbx].Tdtr);
+}
+
+/// CAN mailbox data length control and time stamp register
+static per_inline void per_can_set_tdtr(const per_can_t* const can, per_can_mbx_tx_e mbx, uint32_t val)
+{
+    per_bit_rw32_reg_set(&can->Per->Mbxtx[mbx].Tdtr, val);
+}
+
+/// CAN mailbox data low register
+static per_inline uint_fast32_t per_can_tdlr(const per_can_t* const can, per_can_mbx_tx_e mbx)
+{
+    return per_bit_rw32_reg(&can->Per->Mbxtx[mbx].Tdlr);
+}
+
+/// CAN mailbox data low register
+static per_inline void per_can_set_tdlr(const per_can_t* const can, per_can_mbx_tx_e mbx, uint32_t val)
+{
+    per_bit_rw32_reg_set(&can->Per->Mbxtx[mbx].Tdlr, val);
+}
+
+/// CAN mailbox data high register
+static per_inline uint_fast32_t per_can_tdhr(const per_can_t* const can, per_can_mbx_tx_e mbx)
+{
+    return per_bit_rw32_reg(&can->Per->Mbxtx[mbx].Tdhr);
+}
+
+/// CAN mailbox data high register
+static per_inline void per_can_set_tdhr(const per_can_t* const can, per_can_mbx_tx_e mbx, uint32_t val)
+{
+    per_bit_rw32_reg_set(&can->Per->Mbxtx[mbx].Tdhr, val);
+}
+
+/// Remote transmission request
+static per_inline bool per_can_rrtr(const per_can_t* const can, per_can_mbx_tx_e mbx)
+{
+    return per_bit_r1(&can->Per->Mbxtx[mbx].Rrtr);
+}
+
+/// Identifier extension
+static per_inline bool per_can_Ride(const per_can_t* const can, per_can_mbx_tx_e mbx)
+{
+    return per_bit_r1(&can->Per->Mbxtx[mbx].Ride);
+}
+
+/// Extended identifier
+static per_inline uint_fast16_t per_can_rexid(const per_can_t* const can, per_can_mbx_tx_e mbx)
+{
+    return per_bit_r18(&can->Per->Mbxtx[mbx].Rexid);
+}
+
+/// Standard identifier or extended identifier
+static per_inline uint_fast16_t per_can_rstid(const per_can_t* const can, per_can_mbx_tx_e mbx)
+{
+    return per_bit_r11(&can->Per->Mbxtx[mbx].Rstid);
+}
+
+/// CAN receive FIFO mailbox identifier register (CAN_RIxR) (x=0..1)
+static per_inline uint_fast32_t per_can_rir(const per_can_t* const can, per_can_mbx_tx_e mbx, bool* rtr, uint32_t* id)
+{
+    uint_fast32_t rir = per_bit_r32_reg(&can->Per->Mbxtx[mbx].Rir);
+ 
+    *rtr = (rir & PER_CAN_RIR_RTR) != 0;
+
+    if ((rir & PER_CAN_RIR_IDE) == 0) // Standard
+    {
+        *id = (rir >> PER_CAN_RIR_STID_SHIFT) & PER_CAN_RIR_STID_MASK;
+    }
+    else
+    {
+        *id = (rir >> PER_CAN_RIR_EXID_SHIFT) & PER_CAN_RIR_EXID_MASK;
+    }
+}
+
+
+
+
+
+
 
 
 
@@ -1160,6 +1491,21 @@ static per_inline per_can_rfr_e per_can_rf1r_fc(const per_can_t* const can)
 
 
 
+
+
+
+
+// /// 
+// static per_inline uint_fast32_t per_can_(const per_can_t* const can)
+// {
+//     return per_bit_rw32_reg(&can->Per->);
+// }
+
+// /// 
+// static per_inline void per_can_set_(const per_can_t* const can, uint32_t val)
+// {
+//     per_bit_rw32_reg_set(&can->Per->, val);
+// }
 
 
 

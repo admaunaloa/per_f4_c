@@ -44,7 +44,7 @@ static per_inline const per_rcc_t* const per_rcc(void)
         .Per = PER_RCC,
         .Err = PER_LOG_RCC,
         .Adc = PER_RCC_ADC_3,
-        .Can = PER_RCC_CAN_2,
+        .Can = PER_RCC_CAN_3,
         .Cryp = true,
         .Dac = true,
         .Eth = true,
