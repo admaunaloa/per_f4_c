@@ -96,6 +96,9 @@ typedef union
 /// Get the contents of a part of a register. Maximum 16 bits
 #define PER_BIT_BITS_GET(PBAND,SIZE) ((uint_fast16_t)(PER_BIT_BIT_BAND_TO_REG(PBAND)->Reg32 >> PER_BIT_SHIFT(PBAND)) & PER_BIT_MAX(SIZE))
 
+/// Get the contents of a part of a register. Maximum 32 bits
+#define PER_BIT_BITS_GET_32(PBAND,SIZE) ((uint_fast32_t)(PER_BIT_BIT_BAND_TO_REG(PBAND)->Reg32 >> PER_BIT_SHIFT(PBAND)) & PER_BIT_MAX(SIZE))
+
 /// Filter to mask leave one bit
 #define PER_BIT_REG_MASK_BIT(PBAND) ((uint32_t)(1 << PER_BIT_SHIFT(PBAND)))
 
@@ -261,6 +264,9 @@ PER_BIT_READ_WRITE(per_bit_rw16, 16); ///< per_bit_rw16_t 16 bit peripheral read
 #define PER_BIT_READ(NAME,SIZE)  typedef struct { volatile const uint32_t BIT[SIZE]; } NAME##_t;\
     static per_inline uint_fast16_t NAME (const NAME##_t* self) {return PER_BIT_BITS_GET(self, SIZE);}
 
+#define PER_BIT_READ_32(NAME,SIZE)  typedef struct { volatile const uint32_t BIT[SIZE]; } NAME##_t;\
+    static per_inline uint_fast32_t NAME (const NAME##_t* self) {return PER_BIT_BITS_GET_32(self, SIZE);}
+
 PER_BIT_READ(per_bit_r2, 2); ///< per_bit_r2_t 2 bit peripheral read only
 PER_BIT_READ(per_bit_r3, 3); ///< per_bit_r3_t 3 bit peripheral read only
 PER_BIT_READ(per_bit_r4, 4); ///< per_bit_r4_t 4 bit peripheral read only
@@ -276,7 +282,7 @@ PER_BIT_READ(per_bit_r13, 13); ///< per_bit_r13_t 13 bit peripheral read only
 PER_BIT_READ(per_bit_r14, 14); ///< per_bit_r14_t 14 bit peripheral read only
 PER_BIT_READ(per_bit_r15, 15); ///< per_bit_r15_t 15 bit peripheral read only
 PER_BIT_READ(per_bit_r16, 16); ///< per_bit_r16_t 16 bit peripheral read only
-PER_BIT_READ(per_bit_r18, 18); ///< per_bit_r18_t 18 bit peripheral read only
+PER_BIT_READ_32(per_bit_r18, 18); ///< per_bit_r18_t 18 bit peripheral read only
 
 /// Multiple bit xxx_t no actions, reserved
 #define PER_BIT_NONE(NAME,SIZE)  typedef struct { per_bit_bitband_t N[SIZE]; } NAME##_t;
@@ -326,7 +332,7 @@ static per_inline uint_fast8_t per_bit_rw8_reg(const per_bit_rw8_reg_t* self)
 }
 
 /// Peripheral register 8 bit write
-static per_inline void per_bit_rw8_reg_set(per_bit_rw8_reg_t* self, uint_fast8_t val)
+static per_inline void per_bit_rw8_reg_set(per_bit_rw8_reg_t* self, const uint_fast8_t val)
 {
     PER_BIT_BIT_BAND_TO_REG(self)->Reg8 = val;
 }
@@ -344,7 +350,7 @@ static per_inline uint_fast16_t per_bit_rw16_reg(const per_bit_rw16_reg_t* self)
 }
 
 /// Peripheral register 16 bit write
-static per_inline void per_bit_rw16_reg_set(per_bit_rw16_reg_t* self, uint_fast16_t val)
+static per_inline void per_bit_rw16_reg_set(per_bit_rw16_reg_t* self, const uint_fast16_t val)
 {
     PER_BIT_BIT_BAND_TO_REG(self)->Reg16 = val;
 }
@@ -362,7 +368,7 @@ static per_inline uint32_t per_bit_rw32_reg(const per_bit_rw32_reg_t* self)
 }
 
 /// Peripheral register 32 bit write
-static per_inline void per_bit_rw32_reg_set(per_bit_rw32_reg_t* self, uint32_t val)
+static per_inline void per_bit_rw32_reg_set(per_bit_rw32_reg_t* self, const uint32_t val)
 {
     PER_BIT_BIT_BAND_TO_REG(self)->Reg32 = val;
 }
@@ -398,7 +404,7 @@ typedef struct
 } per_bit_r32_reg_t;
 
 /// Peripheral register 32 bit get
-static per_inline uint32_t per_bit_r32_reg(const per_bit_r32_reg_t* self)
+static per_inline uint_fast32_t per_bit_r32_reg(const per_bit_r32_reg_t* self)
 {
     return PER_BIT_BIT_BAND_TO_REG(self)->Reg32;
 }
@@ -410,7 +416,7 @@ typedef struct
 } per_bit_w8_reg_t;
 
 /// Peripheral register 8 bit write
-static per_inline void per_bit_w8_reg_set(per_bit_w8_reg_t* self, uint_fast8_t val)
+static per_inline void per_bit_w8_reg_set(per_bit_w8_reg_t* self, const uint_fast8_t val)
 {
     PER_BIT_BIT_BAND_TO_REG(self)->Reg8 = val;
 }
@@ -422,7 +428,7 @@ typedef struct
 } per_bit_w16_reg_t;
 
 /// Peripheral register 16 bit write
-static per_inline void per_bit_w16_reg_set(per_bit_w16_reg_t* self, uint_fast16_t val)
+static per_inline void per_bit_w16_reg_set(per_bit_w16_reg_t* self, const uint_fast16_t val)
 {
     PER_BIT_BIT_BAND_TO_REG(self)->Reg16 = val;
 }
@@ -434,7 +440,7 @@ typedef struct
 } per_bit_w32_reg_t;
 
 /// Peripheral register 32 bit write
-static per_inline void per_bit_w32_reg_set(per_bit_w32_reg_t* self, uint32_t val)
+static per_inline void per_bit_w32_reg_set(per_bit_w32_reg_t* self, const uint32_t val)
 {
     PER_BIT_BIT_BAND_TO_REG(self)->Reg32 = val;
 }
