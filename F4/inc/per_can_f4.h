@@ -26,11 +26,13 @@
  * Convenience functions:
  * per_can_msr_fc()      clears active master interrupts and returns bitmask of the cleared ones
  * per_can_tsr_fc()      clears active transport interrupts and returns bitmask of the cleared ones
- * per_can_rf0r_fc()     clears active fifo 0 bits and returns bitmask of the cleared ones
- * per_can_rf1r_fc()     clears active fifo 1 bits and returns bitmask of the cleared ones
+ * per_can_rfr_fc()      clears active fifo 0 bits and returns bitmask of the cleared ones
  * per_can_set_tir()     start transmision
- * per_can_set_tir_rtr() start transmision of remote message
+ * per_can_set_tir_rm()  start transmision of remote message
+ * per_can_set_tir_ttc() start transmision of time triggered communication message
  * per_can_rir()         get identifier information received message
+ * per_can_read()        read one message
+ * per_can_read_time()   read one message time triggered communication
  */
 
 #ifndef per_can_f4_h_
@@ -55,12 +57,25 @@ extern "C" {
 /// CAN DATA SIZE MAX
 #define PER_CAN_DATA_MAX (8)
 
+/// CAN FILTER MAX
+#define PER_CAN_FILTER_MAX (28)
+
 /// CAN error enumeration
 typedef enum
 {
     PER_CAN_ERR_OK = PER_LOG_CAN * PER_LOG_MULT, ///< No error
     PER_CAN_MBX_TX_ERR, ///< MBX_TX full
-    PER_CAN_MBX_TX_RTR_ERR, ///< MBX_TX full for remote message
+    PER_CAN_MBX_TX_RM_ERR, ///< MBX_TX full for remote message
+    PER_CAN_MBX_TX_TTC_ERR, ///< MBX_TX full for time triggered communication
+    PER_CAN_MBX_RX_OVR_ERR, ///< MBX_RX FIFO overrun
+    PER_CAN_FBM_BANK_MAX_ERR, ///< Filter bank number too high on fbm get
+    PER_CAN_SET_FBM_BANK_MAX_ERR, ///< Filter bank number too high on fbm set
+    PER_CAN_FSC_BANK_MAX_ERR, ///< Filter bank number too high on fsc get
+    PER_CAN_SET_FSC_BANK_MAX_ERR, ///< Filter bank number too high on fsc set
+    PER_CAN_FFA_BANK_MAX_ERR, ///< Filter bank number too high on ffa get
+    PER_CAN_SET_FFA_BANK_MAX_ERR, ///< Filter bank number too high on ffa set
+    PER_CAN_FACT_BANK_MAX_ERR, ///< Filter bank number too high on fact get
+    PER_CAN_SET_FACT_BANK_MAX_ERR, ///< Filter bank number too high on fact set
 } per_can_error_e;
 
 /// CAN master status register (CAN_MSR)
@@ -123,13 +138,15 @@ typedef enum
 /// CAN receive FIFO x register (CAN_RFxR)
 typedef enum
 {
+    PER_CAN_RFR_FMP  = 0b00000011, ///< FIFO x message pending
     PER_CAN_RFR_FULL = 0b00001000, ///< FIFO x full
     PER_CAN_RFR_FOVR = 0b00010000, ///< FIFO x overrun
+    PER_CAN_RFR_RFOM = 0b00100000, ///< Release FIFO 1 output mailbox
     PER_CAN_RFR_MASK  = PER_CAN_RFR_FULL | ///< All interrupt flag
                         PER_CAN_RFR_FOVR,
 } per_can_rfr_e;
 
-/// CAN mailbox message data
+/// CAN mailbox message transmit data
 typedef struct
 {
     union
@@ -144,6 +161,23 @@ typedef struct
     uint32_t Id;
     uint_fast16_t Length;
 } per_can_mess_t;
+
+/// CAN mailbox message receive data for Time Triggered Communication
+typedef struct
+{
+    union
+    {
+        uint8_t Data[PER_CAN_DATA_MAX];
+        struct
+        {
+            uint32_t Low; ///< Low part
+            uint32_t High; ///< High part
+        };
+    };
+    uint32_t Id;
+    uint_fast16_t Length;
+    uint_fast16_t Time;
+} per_can_mess_time_t;
 
 /// CAN TX mailbox identifier register (CAN_TIxR) (x=0..2)
 typedef enum
@@ -169,9 +203,8 @@ typedef enum
 typedef enum
 {
     PER_CAN_TDTR_DLC_MASK = 0x000f, ///< Data length code
-    PER_CAN_TDTR_DLC_TGT = 0x0010, ///< Transmit global time
-    PER_CAN_TDTR_DLC_TIME_MASK = 0x00ff, ///< Message time stamp
-    PER_CAN_TDTR_DLC_TIME_SHIFT = 16, ///< Message time stamp
+    PER_CAN_TDTR_TGT = 0x0010, ///< Transmit global time
+    PER_CAN_TDTR_TIME_SHIFT = 16, ///< Message time stamp
 } per_can_tdtr_e;
 
 /// CAN receive FIFO mailbox identifier register (CAN_RIxR) (x=0..1)
@@ -193,6 +226,28 @@ typedef enum
     PER_CAN_RIR_STID_SHIFT = 21,  ///< Extended identifier
 } per_can_rir_e;
 
+typedef enum
+{
+    PER_CAN_RDTR_DLC_MASK = 0x000f, ///< Data length code
+    PER_CAN_RDTR_FMI_MASK = 0x00ff, ///< Filter match index
+    PER_CAN_RDTR_FMI_SHIFT = 8, ///< Filter match index
+    PER_CAN_RDTR_TIME_SHIFT = 16, ///< Message time stamp
+} per_can_rdtr_e;
+
+/// CAN receive FIFO x register (CAN_RFxR)
+typedef union
+{
+    struct
+    {
+        per_bit_r2_t Fmp; ///< FIFO message pending
+        per_bit_n1_t RfrBit2; ///< Reserved
+        per_bit_rc1_w1_t Full; ///< FIFO full
+        per_bit_rc1_w1_t Fovr; ///< FIFO overrun
+        per_bit_rs1_t Rfom; ///< Release FIFO output mailbox
+        per_bit_n26_t RfrBit6; ///< Reserved
+    };
+    per_bit_rw32_reg_t Rfr; ///< CAN receive FIFO register (CAN_RFxR)
+} per_can_rfr_t;
 
 /// CAN transmit mailbox registers
 typedef struct
@@ -269,6 +324,13 @@ typedef struct
     per_bit_r32_reg_t Rdhr; ///< CAN mailbox data high register
 } per_can_mbx_rx_t;
 
+/// CAN filter bank register
+typedef union
+{
+    per_bit_rw32_reg_t Fir1; ///< Filter bank i register 1
+    per_bit_rw32_reg_t Fir2; ///< Filter bank i register 2
+} per_can_filter_t;
+
 /// CAN control and status registers
 typedef struct
 {
@@ -340,35 +402,8 @@ typedef struct
         per_bit_rw32_reg_t Tsr; ///< CAN transmit status register (CAN_TSR)
     };
 
-    // CAN receive FIFO 0 register (CAN_RF0R)
-    union
-    {
-        struct
-        {
-            per_bit_r2_t Fmp0; ///< FIFO 0 message pending
-            per_bit_n1_t Rf0rBit2; ///< Reserved
-            per_bit_rc1_w1_t Full0; ///< FIFO 0 full
-            per_bit_rc1_w1_t Fovr0; ///< FIFO 0 overrun
-            per_bit_rs1_t Rfom0; ///< Release FIFO 0 output mailbox
-            per_bit_n26_t Rf0rBit6; ///< Reserved
-        };
-        per_bit_rw32_reg_t Rf0r; ///< CAN receive FIFO 0 register (CAN_RF0R)
-    };
-
-    // CAN receive FIFO 1 register (CAN_RF1R)
-    union
-    {
-        struct
-        {
-            per_bit_r2_t Fmp1; ///< FIFO 1 message pending
-            per_bit_n1_t Rf1rBit2; ///< Reserved
-            per_bit_rc1_w1_t Full1; ///< FIFO 1 full
-            per_bit_rc1_w1_t Fovr1; ///< FIFO 1 overrun
-            per_bit_rs1_t Rfom1; ///< Release FIFO 1 output mailbox
-            per_bit_n26_t Rf1rBit6; ///< Reserved
-        };
-        per_bit_rw32_reg_t Rf1r; ///< CAN receive FIFO 1 register (CAN_RF1R)
-    };
+    // CAN receive FIFO x register (CAN_RFxR)
+    per_can_rfr_t Rfr[PER_CAN_MBX_RX_LAST];
 
     // CAN interrupt enable register (CAN_IER)
     per_bit_rw1_t Tmeie; ///< Transmit mailbox empty interrupt enable
@@ -411,7 +446,7 @@ typedef struct
     per_bit_rw1_t Silm; ///< Silent mode (debug)
 
     // CAN Reserved
-    per_bit_n32_t Reserved_0x20[22]; ///< Reserved 0x020 - 0x17F  
+    per_bit_n32_t Reserved_0x20[22]; ///< Reserved 0x020 - 0x17f  
  
     // CAN transmit mailbox registers
     per_can_mbx_tx_t Mbxtx[PER_CAN_MBX_TX_LAST + 1]; 
@@ -419,6 +454,36 @@ typedef struct
     // CAN receive mailbox registers
     per_can_mbx_rx_t Mbxrx[PER_CAN_MBX_RX_LAST + 1]; 
 
+    // CAN Reserved
+    per_bit_n32_t Reserved_0x1d0[12]; ///< Reserved 0x1d0 - 0x200  
+
+    // CAN filter master register (CAN_FMR)
+    per_bit_rw1_t Finit; ///< Filter init mode
+    per_bit_n7_t FmrBit1; ///< Reserved
+    per_bit_rw6_t Can2sb; ///< CAN2 start bank
+    per_bit_n18_t FmrBit14; ///< Reserved
+
+    // CAN filter mode register (CAN_FM1R)
+    per_bit_rw1_t Fbm[PER_CAN_FILTER_MAX]; ///< Filter mode
+    per_bit_n4_t FbmBit28; ///< Reserved
+
+    // CAN filter scale register (CAN_FS1R)
+    per_bit_rw1_t Fsc[PER_CAN_FILTER_MAX]; ///< Filter scale configuration
+    per_bit_n4_t FBit28; ///< Reserved
+
+    // CAN filter FIFO assignment register (CAN_FFA1R)
+    per_bit_rw1_t Ffa[PER_CAN_FILTER_MAX]; ///< Filter FIFO assignment for filter 
+    per_bit_n4_t FBit28; ///< Reserved
+
+    // CAN filter activation register (CAN_FA1R)
+    per_bit_rw1_t Fact[PER_CAN_FILTER_MAX]; ///< Filter active
+    per_bit_n4_t FBit28; ///< Reserved
+
+    // CAN Reserved
+    per_bit_n32_t Reserved_0x1d0[8]; ///< Reserved 0x220 - 0x240  
+
+    // Filter bank i register x (CAN_FiRx) (i=0..27, x=1, 2)
+    per_can_filter_t Fir[PER_CAN_FILTER_MAX]; ///< Filter bank register 
 } per_can_per_t;
 
 /// CAN descriptor
@@ -866,112 +931,58 @@ static per_inline bool per_can_low2(const per_can_t* const can)
     return per_bit_r1(&can->Per->Low2);
 }
 
-/// CAN receive FIFO 0 register (CAN_RF0R)
-static per_inline uint_fast32_t per_can_rf0r(const per_can_t* const can)
+/// CAN receive FIFO x register (CAN_RFxR)
+static per_inline uint_fast32_t per_can_rfr(const per_can_t* const can, const per_can_mbx_rx_e mbx)
 {
-    return per_bit_rw32_reg(&can->Per->Rf0r);
+    return per_bit_rw32_reg(&can->Per->Rfr[mbx].Rfr);
 }
 
-/// CAN receive FIFO 0 register (CAN_RF0R)
-static per_inline void per_can_set_rf0r(const per_can_t* const can, uint32_t val)
+/// CAN receive FIFO x register (CAN_RFxR)
+static per_inline void per_can_set_rfr(const per_can_t* const can, const per_can_mbx_rx_e mbx, uint32_t val)
 {
-    per_bit_rw32_reg_set(&can->Per->Rf0r, val);
+    per_bit_rw32_reg_set(&can->Per->Rfr[mbx].Rfr, val);
 }
 
-/// FIFO 0 message pending
-static per_inline uint_fast16_t per_can_fmp0(const per_can_t* const can)
+/// FIFO x message pending
+static per_inline uint_fast16_t per_can_fmp(const per_can_t* const can, const per_can_mbx_rx_e mbx)
 {
-    return per_bit_r2(&can->Per->Fmp0);
+    return per_bit_r2(&can->Per->Rfr[mbx].Fmp);
 }
 
-/// FIFO 0 full
-static per_inline bool per_can_full0(const per_can_t* const can)
+/// FIFO x full
+static per_inline bool per_can_full(const per_can_t* const can, const per_can_mbx_rx_e mbx)
 {
-    return per_bit_rc1_w1(&can->Per->Full0);
+    return per_bit_rc1_w1(&can->Per->Rfr[mbx].Full);
 }
 
-/// FIFO 0 full
-static per_inline bool per_can_clr_full0(const per_can_t* const can)
+/// FIFO x full
+static per_inline bool per_can_clr_full(const per_can_t* const can, const per_can_mbx_rx_e mbx)
 {
-    return per_bit_rc1_w1_rdclr(&can->Per->Full0);
+    return per_bit_rc1_w1_rdclr(&can->Per->Rfr[mbx].Full);
 }
 
-/// FIFO 0 overrun
-static per_inline bool per_can_fovr0(const per_can_t* const can)
+/// FIFO x overrun
+static per_inline bool per_can_fovr(const per_can_t* const can, const per_can_mbx_rx_e mbx)
 {
-    return per_bit_rc1_w1(&can->Per->Fovr0);
+    return per_bit_rc1_w1(&can->Per->Rfr[mbx].Fovr);
 }
 
-/// FIFO 0 overrun
-static per_inline bool per_can_clr_fovr0(const per_can_t* const can)
+/// FIFO x overrun
+static per_inline bool per_can_clr_fovr(const per_can_t* const can, const per_can_mbx_rx_e mbx)
 {
-    return per_bit_rc1_w1_rdclr(&can->Per->Fovr0);
+    return per_bit_rc1_w1_rdclr(&can->Per->Rfr[mbx].Fovr);
 }
 
-/// Release FIFO 0 output mailbox
-static per_inline bool per_can_rfom0(const per_can_t* const can)
+/// Release FIFO x output mailbox
+static per_inline bool per_can_rfom(const per_can_t* const can, const per_can_mbx_rx_e mbx)
 {
-    return per_bit_rs1(&can->Per->Rfom0);
+    return per_bit_rs1(&can->Per->Rfr[mbx].Rfom);
 }
 
-/// Release FIFO 0 output mailbox
-static per_inline void per_can_set_rfom0(const per_can_t* const can)
+/// Release FIFO x output mailbox
+static per_inline void per_can_set_rfom(const per_can_t* const can, const per_can_mbx_rx_e mbx)
 {
-    per_bit_rs1_set(&can->Per->Rfom0);
-}
-
-/// CAN receive FIFO 1 register (CAN_RF1R)
-static per_inline uint_fast32_t per_can_rf1r(const per_can_t* const can)
-{
-    return per_bit_rw32_reg(&can->Per->Rf1r);
-}
-
-/// CAN receive FIFO 1 register (CAN_RF1R)
-static per_inline void per_can_set_rf1r(const per_can_t* const can, uint32_t val)
-{
-    per_bit_rw32_reg_set(&can->Per->Rf1r, val);
-}
-
-/// FIFO 1 message pending
-static per_inline uint_fast16_t per_can_fmp1(const per_can_t* const can)
-{
-    return per_bit_r2(&can->Per->Fmp1);
-}
-
-/// FIFO 1 full
-static per_inline bool per_can_full1(const per_can_t* const can)
-{
-    return per_bit_rc1_w1(&can->Per->Full1);
-}
-
-/// FIFO 1 full
-static per_inline bool per_can_clr_full1(const per_can_t* const can)
-{
-    return per_bit_rc1_w1_rdclr(&can->Per->Full1);
-}
-
-/// FIFO 1 overrun
-static per_inline bool per_can_fovr1(const per_can_t* const can)
-{
-    return per_bit_rc1_w1(&can->Per->Fovr1);
-}
-
-/// FIFO 1 overrun
-static per_inline bool per_can_clr_fovr1(const per_can_t* const can)
-{
-    return per_bit_rc1_w1_rdclr(&can->Per->Fovr1);
-}
-
-/// Release FIFO 1 output mailbox
-static per_inline bool per_can_rfom1(const per_can_t* const can)
-{
-    return per_bit_rs1(&can->Per->Rfom1);
-}
-
-/// Release FIFO 1 output mailbox
-static per_inline void per_can_set_rfom1(const per_can_t* const can)
-{
-    per_bit_rs1_set(&can->Per->Rfom1);
+    per_bit_rs1_set(&can->Per->Rfr[mbx].Rfom);
 }
 
 /// Transmit mailbox empty interrupt enable
@@ -1360,7 +1371,7 @@ static per_inline bool per_can_set_tir(const per_can_t* const can, const per_can
 }
 
 /// TX mailbox identifier register (CAN_TIxR) remote request
-static per_inline bool per_can_set_tir_rtr(const per_can_t* const can, const uint32_t id, const uint_fast16_t dlc)
+static per_inline bool per_can_set_tir_rm(const per_can_t* const can, const uint32_t id, const uint_fast16_t dlc)
 {
     const uint32_t tdtr = dlc & PER_CAN_TDTR_DLC_MASK;
     const uint32_t tir = per_can_tir_id(id) | PER_CAN_TIR_RTR; // Transmit request
@@ -1383,7 +1394,41 @@ static per_inline bool per_can_set_tir_rtr(const per_can_t* const can, const uin
     }
     else
     {
-        per_log_err(can->Err, PER_CAN_MBX_TX_RTR_ERR, id);
+        per_log_err(can->Err, PER_CAN_MBX_TX_RM_ERR, id);
+        return false;
+    }
+
+    return true;
+}
+
+/// TX mailbox identifier register (CAN_TIxR) time triggered communication
+static per_inline bool per_can_set_tir_ttc(const per_can_t* const can, const per_can_mess_t* const data, const uint16_t time)
+{
+    const uint32_t tdtr = ((PER_CAN_DATA_MAX & PER_CAN_TDTR_DLC_MASK) | PER_CAN_TDTR_TGT) | (time << PER_CAN_TDTR_TIME_SHIFT);
+    const uint32_t tir = per_can_tir_id(data->Id) | PER_CAN_TIR_RTR; // Transmit request
+
+    // Note the if else below is deliberatly written out for performance
+    if (!per_can_rtr_tx(can, PER_CAN_MBX_TX_0))
+    {
+        per_can_mbx_tx_t* const mbx = &can->Per->Mbxtx[PER_CAN_MBX_TX_0];
+        per_can_set_data(mbx, data);
+        per_can_set_head(mbx, tdtr, tir);
+    }
+    else if(!per_can_rtr_tx(can, PER_CAN_MBX_TX_1))
+    {
+        per_can_mbx_tx_t* const mbx = &can->Per->Mbxtx[PER_CAN_MBX_TX_1];
+        per_can_set_data(mbx, data);
+        per_can_set_head(mbx, tdtr, tir);
+    }
+    else if(!per_can_rtr_tx(can, PER_CAN_MBX_TX_2))
+    {
+        per_can_mbx_tx_t* const mbx = &can->Per->Mbxtx[PER_CAN_MBX_TX_2];
+        per_can_set_data(mbx, data);
+        per_can_set_head(mbx, tdtr, tir);
+    }
+    else
+    {
+        per_log_err(can->Err, PER_CAN_MBX_TX_TTC_ERR, data->Id);
         return false;
     }
 
@@ -1545,8 +1590,125 @@ static per_inline uint_fast32_t per_can_rdhr(const per_can_t* const can, const p
     return per_bit_r32_reg(&can->Per->Mbxrx[mbx].Rdhr);
 }
 
+/// Filter init mode
+static per_inline bool per_can_finit(const per_can_t* const can)
+{
+    return per_bit_rw1(&can->Per->Finit);
+}
 
+/// Filter init mode
+static per_inline void per_can_set_finit(const per_can_t* const can, const bool val)
+{
+    per_bit_rw1_set(&can->Per->Finit, val);
+}
 
+/// CAN2 start bank
+static per_inline uint_fast16_t per_can_can2sb(const per_can_t* const can)
+{
+    return per_bit_rw6(&can->Per->Can2sb);
+}
+
+/// CAN2 start bank
+static per_inline void per_can_set_can2sb(const per_can_t* const can, uint_fast16_t val)
+{
+    per_bit_rw6_set(&can->Per->Can2sb, val);
+}
+
+/// Filter mode
+static per_inline bool per_can_fbm(const per_can_t* const can, const uint_fast16_t bank)
+{
+    if (bank >= PER_CAN_FILTER_MAX)
+    {
+        per_log_err(can->Err, PER_CAN_FBM_BANK_MAX_ERR, bank);
+        return false;
+    }
+    return per_bit_rw1(&can->Per->Fbm[bank]);
+}
+
+/// Filter mode
+static per_inline bool per_can_set_fbm(const per_can_t* const can, const uint_fast16_t bank, const bool val)
+{
+    if (bank >= PER_CAN_FILTER_MAX)
+    {
+        per_log_err(can->Err, PER_CAN_SET_FBM_BANK_MAX_ERR, bank);
+        return false;
+    }
+
+    per_bit_rw1_set(&can->Per->Fbm[bank], val);
+    return true;
+}
+
+/// Filter scale configuration
+static per_inline bool per_can_fsc(const per_can_t* const can, const uint_fast16_t bank)
+{
+    if (bank >= PER_CAN_FILTER_MAX)
+    {
+        per_log_err(can->Err, PER_CAN_FSC_BANK_MAX_ERR, bank);
+        return false;
+    }
+    return per_bit_rw1(&can->Per->Fsc[bank]);
+}
+
+/// Filter scale configuration
+static per_inline bool per_can_set_fsc(const per_can_t* const can, const uint_fast16_t bank, const bool val)
+{
+    if (bank >= PER_CAN_FILTER_MAX)
+    {
+        per_log_err(can->Err, PER_CAN_SET_FSC_BANK_MAX_ERR, bank);
+        return false;
+    }
+
+    per_bit_rw1_set(&can->Per->Fsc[bank], val);
+    return true;
+}
+
+/// Filter FIFO assignment for filter 
+static per_inline bool per_can_ffa(const per_can_t* const can, const uint_fast16_t bank)
+{
+    if (bank >= PER_CAN_FILTER_MAX)
+    {
+        per_log_err(can->Err, PER_CAN_FFA_BANK_MAX_ERR, bank);
+        return false;
+    }
+    return per_bit_rw1(&can->Per->Ffa[bank]);
+}
+
+/// Filter FIFO assignment for filter 
+static per_inline bool per_can_set_ffa(const per_can_t* const can, const uint_fast16_t bank, const bool val)
+{
+    if (bank >= PER_CAN_FILTER_MAX)
+    {
+        per_log_err(can->Err, PER_CAN_SET_FFA_BANK_MAX_ERR, bank);
+        return false;
+    }
+
+    per_bit_rw1_set(&can->Per->Ffa[bank], val);
+    return true;
+}
+
+/// Filter active
+static per_inline bool per_can_fact(const per_can_t* const can, const uint_fast16_t bank)
+{
+    if (bank >= PER_CAN_FILTER_MAX)
+    {
+        per_log_err(can->Err, PER_CAN_FACT_BANK_MAX_ERR, bank);
+        return false;
+    }
+    return per_bit_rw1(&can->Per->Fact[bank]);
+}
+
+/// Filter active
+static per_inline bool per_can_set_fact(const per_can_t* const can, const uint_fast16_t bank, const bool val)
+{
+    if (bank >= PER_CAN_FILTER_MAX)
+    {
+        per_log_err(can->Err, PER_CAN_SET_FACT_BANK_MAX_ERR, bank);
+        return false;
+    }
+
+    per_bit_rw1_set(&can->Per->Fact[bank], val);
+    return true;
+}
 
 
 
@@ -1583,29 +1745,125 @@ static per_inline per_can_tsr_e per_can_tsr_fc(const per_can_t* const can)
     return (per_can_tsr_e)irq;
 }
 
-/// CAN fetch and clear active FIFO 0 bits
-static per_inline per_can_rfr_e per_can_rf0r_fc(const per_can_t* const can)
+/// CAN fetch and clear active FIFO x bits
+static per_inline per_can_rfr_e per_can_rfr_fc(const per_can_t* const can, const per_can_mbx_rx_e mbx)
 {
-    uint_fast32_t fif = (uint_fast32_t)PER_CAN_RFR_MASK & per_can_rf0r(can);
+    uint_fast32_t fif = (uint_fast32_t)PER_CAN_RFR_MASK & per_can_rfr(can, mbx);
 
-    per_can_set_rf0r(can, fif); // Clear
+    per_can_set_rfr(can, mbx, fif); // Clear
 
     return (per_can_rfr_e)fif;
 }
 
-/// CAN fetch and clear active FIFO 1 bits
-static per_inline per_can_rfr_e per_can_rf1r_fc(const per_can_t* const can)
+/// CAN fetch receive one message
+static per_inline uint_fast16_t per_can_read(const per_can_t* const can, const per_can_mbx_rx_e mbx, per_can_mess_t* data)
 {
-    uint_fast32_t fif = (uint_fast32_t)PER_CAN_RFR_MASK & per_can_rf1r(can);
+    uint_fast32_t fif = per_can_rfr(can, mbx);
+    uint_fast16_t fmp = fif & (uint_fast32_t)PER_CAN_RFR_FMP;
 
-    per_can_set_rf1r(can, fif); // Clear
+    if (fmp == 0)
+    {
+        return 0; // Noting to read
+    }
 
-    return (per_can_rfr_e)fif;
+    uint_fast32_t rir = per_bit_r32_reg(&can->Per->Mbxrx[mbx].Rir);
+
+    if ((rir | PER_CAN_RIR_RTR) == 0) // non remote
+    {
+        data->Low = per_bit_r32_reg(&can->Per->Mbxrx[mbx].Rdhr);
+        data->High = per_bit_r32_reg(&can->Per->Mbxrx[mbx].Rdlr);
+        data->Length = per_bit_r32_reg(&can->Per->Mbxrx[mbx].Rdtr) & PER_CAN_RDTR_DLC_MASK;
+    }
+    else
+    {
+        data->Length = 0;
+    }
+
+    if ((rir & PER_CAN_RIR_IDE) == 0) // Standard
+    {
+        data->Id = (rir >> PER_CAN_RIR_STID_SHIFT) & PER_CAN_RIR_STID_MASK;
+    }
+    else
+    {
+        data->Id = (rir >> PER_CAN_RIR_EXID_SHIFT) & PER_CAN_RIR_EXID_MASK;
+    }
+
+    fif = PER_CAN_RFR_RFOM; // Release mailbox
+
+    if ((fif & PER_CAN_RFR_FOVR) != 0) // Check for overrun errors
+    {
+        per_log_err(can->Err, PER_CAN_MBX_RX_OVR_ERR, mbx);
+        fif |= PER_CAN_MBX_RX_OVR_ERR;
+    }
+
+    per_can_set_rfr(can, mbx, fif); // Release and clear
+
+    return fmp;
+}
+
+/// CAN fetch receive one message Time Triggerec Communication
+static per_inline uint_fast16_t per_can_read_time(const per_can_t* const can, const per_can_mbx_rx_e mbx, per_can_mess_time_t* data)
+{
+    uint_fast32_t fif = per_can_rfr(can, mbx);
+    uint_fast16_t fmp = fif & (uint_fast32_t)PER_CAN_RFR_FMP;
+
+    if (fmp == 0)
+    {
+        return 0; // Noting to read
+    }
+
+    uint_fast32_t rir = per_bit_r32_reg(&can->Per->Mbxrx[mbx].Rir);
+    uint_fast32_t rdtr = per_bit_r32_reg(&can->Per->Mbxrx[mbx].Rdtr);
+
+    if ((rir | PER_CAN_RIR_RTR) == 0) // non remote
+    {
+        data->Low = per_bit_r32_reg(&can->Per->Mbxrx[mbx].Rdhr);
+        data->High = per_bit_r32_reg(&can->Per->Mbxrx[mbx].Rdlr);
+        data->Length = rdtr & PER_CAN_RDTR_DLC_MASK;
+        data->Time = rdtr >> PER_CAN_RDTR_TIME_SHIFT;
+    }
+    else
+    {
+        data->Length = 0;
+    }
+
+    if ((rir & PER_CAN_RIR_IDE) == 0) // Standard
+    {
+        data->Id = (rir >> PER_CAN_RIR_STID_SHIFT) & PER_CAN_RIR_STID_MASK;
+    }
+    else
+    {
+        data->Id = (rir >> PER_CAN_RIR_EXID_SHIFT) & PER_CAN_RIR_EXID_MASK;
+    }
+
+    fif = PER_CAN_RFR_RFOM; // Release mailbox
+
+    if ((fif & PER_CAN_RFR_FOVR) != 0) // Check for overrun errors
+    {
+        per_log_err(can->Err, PER_CAN_MBX_RX_OVR_ERR, mbx);
+        fif |= PER_CAN_MBX_RX_OVR_ERR;
+    }
+
+    per_can_set_rfr(can, mbx, fif); // Release and clear
+
+    return fmp;
 }
 
 
 
 
+
+// /// 
+// static per_inline bool per_can_(const per_can_t* const can, const uint_fast16_t bank)
+// {
+//     return per_bit_rw1(&can->Per->);
+// }
+
+// /// 
+// static per_inline void per_can_set_(const per_can_t* const can, const uint_fast16_t bank, const bool val)
+// {
+//     per_bit_rw1_set(&can->Per->, val);
+// }
 
 
 
@@ -1624,6 +1882,17 @@ static per_inline per_can_rfr_e per_can_rf1r_fc(const per_can_t* const can)
 //     per_bit_rw32_reg_set(&can->Per->, val);
 // }
 
+// /// 
+// static per_inline bool per_can_(const per_can_t* const can)
+// {
+//     return per_bit_rw1(&can->Per->);
+// }
+
+// /// 
+// static per_inline void per_can_set_(const per_can_t* const can, const bool val)
+// {
+//     per_bit_rw1_set(&can->Per->, val);
+// }
 
 
 
